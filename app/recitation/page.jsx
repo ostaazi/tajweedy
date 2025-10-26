@@ -4,62 +4,31 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
+// Types for segments
+type WordSegment = [number, number, number]; // [word_index, start_ms, end_ms]
+type VerseTimestamp = {
+  verse_key: string;
+  timestamp_from: number;
+  timestamp_to: number;
+  segments?: WordSegment[];
+};
+
 const RECITERS = [
-  { 
-    id: 0, 
-    name: 'اسم القارئ', 
-    subtext: 'غير محدد (عشوائي)', 
-    folder: null,
-    oldEdition: null 
-  },
-  { 
-    id: 1, 
-    name: 'مشاري العفاسي', 
-    subtext: null, 
-    folder: 'Alafasy_128kbps',
-    oldEdition: 'ar.alafasy' 
-  },
-  { 
-    id: 2, 
-    name: 'عبد الباسط عبد الصمد', 
-    subtext: null, 
-    folder: 'Abdul_Basit_Mujawwad_128kbps',
-    oldEdition: 'ar.abdulbasitmurattal' 
-  },
-  { 
-    id: 3, 
-    name: 'عبد الرحمن السديس', 
-    subtext: null, 
-    folder: 'Abdurrahmaan_As-Sudais_192kbps',
-    oldEdition: 'ar.abdurrahmaansudais' 
-  },
-  { 
-    id: 4, 
-    name: 'محمد صديق المنشاوي', 
-    subtext: null, 
-    folder: 'Minshawy_Mujawwad_192kbps',
-    oldEdition: 'ar.minshawi' 
-  },
-  { 
-    id: 5, 
-    name: 'محمود خليل الحصري', 
-    subtext: null, 
-    folder: 'Husary_128kbps',
-    oldEdition: 'ar.husary' 
-  },
-  { 
-    id: 6, 
-    name: 'أبو بكر الشاطري', 
-    subtext: null, 
-    folder: 'Abu_Bakr_Ash-Shaatree_128kbps',
-    oldEdition: 'ar.shaatree' 
-  },
+  { id: 0, name: 'اسم القارئ', subtext: 'غير محدد (عشوائي)', reciterName: null, folder: null },
+  { id: 1, name: 'مشاري العفاسي', subtext: null, reciterName: 'Mishari Rashid al-`Afasy', folder: 'Alafasy_128kbps' },
+  { id: 2, name: 'عبد الباسط عبد الصمد', subtext: null, reciterName: 'AbdulBaset AbdulSamad', folder: 'Abdul_Basit_Mujawwad_128kbps' },
+  { id: 3, name: 'عبد الرحمن السديس', subtext: null, reciterName: 'Abdurrahmaan As-Sudais', folder: 'Abdurrahmaan_As-Sudais_192kbps' },
+  { id: 4, name: 'محمد صديق المنشاوي', subtext: null, reciterName: 'Mohamed Siddiq al-Minshawi', folder: 'Minshawy_Mujawwad_192kbps' },
+  { id: 5, name: 'محمود خليل الحصري', subtext: null, reciterName: 'Mahmoud Khalil Al-Hussary', folder: 'Husary_128kbps' },
+  { id: 6, name: 'أبو بكر الشاطري', subtext: null, reciterName: 'Abu Bakr al-Shatri', folder: 'Abu_Bakr_Ash-Shaatree_128kbps' },
 ];
 
 export default function RecitationPage() {
   const [verse, setVerse] = useState(null);
   const [words, setWords] = useState([]);
+  const [wordSegments, setWordSegments] = useState<WordSegment[]>([]);
   const [surahs, setSurahs] = useState([]);
+  const [recitations, setRecitations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -73,10 +42,22 @@ export default function RecitationPage() {
 
   const audioRef = useRef(null);
 
+  // Fetch recitations list once
   useEffect(() => {
+    fetchRecitations();
     fetchSurahs();
     fetchVerse();
   }, []);
+
+  const fetchRecitations = async () => {
+    try {
+      const res = await fetch('https://api.quran.com/api/v4/resources/recitations?language=ar');
+      const data = await res.json();
+      setRecitations(data?.recitations || []);
+    } catch (error) {
+      console.error('خطأ في جلب القراءات:', error);
+    }
+  };
 
   const fetchSurahs = async () => {
     try {
@@ -113,10 +94,40 @@ export default function RecitationPage() {
     }
   }, [selectedSurah, surahs]);
 
+  // Resolve recitation ID from name
+  const resolveRecitationId = (name: string): number | null => {
+    if (!recitations.length || !name) return null;
+    const normalized = (s: string) => s.toLowerCase().trim();
+    const target = normalized(name);
+    
+    const found = recitations.find((r: any) => 
+      normalized(r.reciter_name || '').includes(target) ||
+      target.includes(normalized(r.reciter_name || '')) ||
+      normalized(r.translated_name?.name || '').includes(target)
+    );
+    
+    return found?.id || null;
+  };
+
+  // Fetch chapter segments
+  const fetchChapterSegments = async (recitationId: number, chapterNumber: number) => {
+    try {
+      const url = `https://api.quran.com/api/v4/recitations/${recitationId}/by_chapter/${chapterNumber}?segments=true`;
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data?.audio_file;
+    } catch (error) {
+      console.error('خطأ في جلب المقاطع:', error);
+      return null;
+    }
+  };
+
   const fetchVerse = async () => {
     setLoading(true);
     setAudioBlob(null);
     setHighlightedWordIndex(-1);
+    setWordSegments([]);
     
     try {
       let surahNum = selectedSurah === 0 
@@ -135,10 +146,9 @@ export default function RecitationPage() {
         ? RECITERS[Math.floor(Math.random() * (RECITERS.length - 1)) + 1]
         : RECITERS.find(r => r.id === selectedReciter);
 
-      const paddedSurah = String(surahNum).padStart(3, '0');
-      const paddedAyah = String(ayahNum).padStart(3, '0');
-      const audioUrl = `https://everyayah.com/data/${reciterData.folder}/${paddedSurah}${paddedAyah}.mp3`;
+      const verseKey = `${surahNum}:${ayahNum}`;
 
+      // Fetch verse text
       const verseResponse = await fetch(
         `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/quran-uthmani`
       );
@@ -146,6 +156,40 @@ export default function RecitationPage() {
 
       if (verseData.status === 'OK') {
         const textData = verseData.data;
+
+        // Fetch words
+        const wordsResponse = await fetch(
+          `https://api.quran.com/api/v4/verses/by_key/${verseKey}?language=ar&words=true&word_fields=text_uthmani,location`
+        );
+        const wordsData = await wordsResponse.json();
+        const verseWords = wordsData?.verse?.words || [];
+        setWords(verseWords);
+
+        // Try to get segments
+        const recitationId = resolveRecitationId(reciterData.reciterName);
+        let audioUrl = null;
+        let segments = [];
+
+        if (recitationId) {
+          const chapterData = await fetchChapterSegments(recitationId, surahNum);
+          if (chapterData) {
+            const timestamps: VerseTimestamp[] = chapterData.timestamps || [];
+            const verseTimestamp = timestamps.find(t => t.verse_key === verseKey);
+            
+            if (verseTimestamp?.segments && chapterData.audio_url) {
+              segments = verseTimestamp.segments;
+              audioUrl = chapterData.audio_url;
+              setWordSegments(segments);
+            }
+          }
+        }
+
+        // Fallback to EveryAyah if no segments
+        if (!audioUrl) {
+          const paddedSurah = String(surahNum).padStart(3, '0');
+          const paddedAyah = String(ayahNum).padStart(3, '0');
+          audioUrl = `https://everyayah.com/data/${reciterData.folder}/${paddedSurah}${paddedAyah}.mp3`;
+        }
 
         setVerse({
           text: textData.text,
@@ -155,22 +199,6 @@ export default function RecitationPage() {
           audio: audioUrl,
           reciter: reciterData.name
         });
-
-        try {
-          const verseKey = `${surahNum}:${ayahNum}`;
-          const wordsResponse = await fetch(
-            `https://api.quran.com/api/v4/verses/by_key/${verseKey}?language=ar&words=true&word_fields=text_uthmani`
-          );
-          const wordsData = await wordsResponse.json();
-          if (wordsData.verse && wordsData.verse.words) {
-            setWords(wordsData.verse.words);
-          } else {
-            setWords([]);
-          }
-        } catch (err) {
-          console.log('تعذر جلب الكلمات');
-          setWords([]);
-        }
       }
     } catch (error) {
       console.error('خطأ في جلب الآية:', error);
@@ -187,6 +215,40 @@ export default function RecitationPage() {
       setLoading(false);
     }
   };
+
+  // Auto-highlighting with segments
+  useEffect(() => {
+    const audioEl = audioRef.current;
+    if (!audioEl || wordSegments.length === 0) return;
+
+    const onTimeUpdate = () => {
+      const currentTimeMs = audioEl.currentTime * 1000;
+      
+      // Find which word is currently being recited
+      const activeSegmentIndex = wordSegments.findIndex(
+        seg => currentTimeMs >= seg[1] && currentTimeMs < seg[2]
+      );
+      
+      if (activeSegmentIndex !== -1) {
+        const wordIndex = wordSegments[activeSegmentIndex][0] - 1; // Convert to 0-based
+        setHighlightedWordIndex(wordIndex);
+        
+        // Auto-scroll to highlighted word
+        const el = document.querySelector(`[data-word-idx="${wordIndex}"]`);
+        if (el) {
+          el.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+        }
+      }
+    };
+
+    audioEl.addEventListener('timeupdate', onTimeUpdate);
+    audioEl.addEventListener('seeked', onTimeUpdate);
+
+    return () => {
+      audioEl.removeEventListener('timeupdate', onTimeUpdate);
+      audioEl.removeEventListener('seeked', onTimeUpdate);
+    };
+  }, [wordSegments]);
 
   const startRecording = async () => {
     try {
@@ -258,16 +320,26 @@ export default function RecitationPage() {
               <p className="text-gray-600 font-amiri">الآية {verse?.number}</p>
             </div>
 
-            <div className="quran-text bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner">
+            <div className="quran-text bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner overflow-x-auto">
               {words.length > 0 ? (
                 <div className="flex flex-wrap justify-center gap-2" dir="rtl">
                   {words.map((word, index) => (
                     <span
                       key={index}
-                      onClick={() => setHighlightedWordIndex(index)}
+                      data-word-idx={index}
+                      onClick={() => {
+                        setHighlightedWordIndex(index);
+                        // Jump to word time if segments available
+                        if (wordSegments.length > 0 && audioRef.current) {
+                          const segment = wordSegments.find(s => s[0] - 1 === index);
+                          if (segment) {
+                            audioRef.current.currentTime = segment[1] / 1000;
+                          }
+                        }
+                      }}
                       className={`cursor-pointer px-2 py-1 rounded-lg transition-all ${
                         highlightedWordIndex === index
-                          ? 'bg-green-200 shadow-md scale-110'
+                          ? 'bg-green-200 text-[#1e7850] font-bold shadow-md scale-110'
                           : 'hover:bg-green-50'
                       }`}
                     >
@@ -331,6 +403,9 @@ export default function RecitationPage() {
             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-4">
               <p className="text-sm text-gray-600 mb-2 text-center">
                 استمع للتلاوة الصحيحة - القارئ: <span className="font-bold">{verse?.reciter}</span>
+                {wordSegments.length > 0 && (
+                  <span className="text-green-600 font-bold ml-2">✓ مزامنة دقيقة</span>
+                )}
               </p>
               {verse?.audio ? (
                 <audio 
@@ -373,7 +448,9 @@ export default function RecitationPage() {
 
             <div className="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg">
               <p className="text-sm text-gray-700">
-                💡 <strong>تلميح:</strong> انقر على أي كلمة لتمييزها. المزامنة التلقائية الدقيقة ستكون متاحة قريباً.
+                💡 <strong>تلميح:</strong> {wordSegments.length > 0 
+                  ? 'المزامنة التلقائية الدقيقة مفعّلة! الكلمات ستُظلّل تلقائياً مع القراءة. انقر على أي كلمة للقفز إليها.' 
+                  : 'انقر على أي كلمة لتمييزها. المزامنة التلقائية الدقيقة قيد التحميل...'}
               </p>
             </div>
           </div>
