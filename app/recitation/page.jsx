@@ -207,31 +207,28 @@ export default function RecitationPage() {
               <h2 className="text-xl font-bold text-gray-800 mb-1 font-amiri">
                 {verse?.surah}
               </h2>
+              <p className="text-gray-600 font-amiri">الآية {verse?.number}</p>
             </div>
 
             <div className="quran-text bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner">
               {words.length > 0 ? (
-                <div className="flex flex-wrap justify-center gap-0.5 items-baseline" dir="rtl">
+                <div className="flex flex-wrap justify-center gap-2" dir="rtl">
                   {words.map((word, index) => (
                     <span
                       key={index}
                       onClick={() => setHighlightedWordIndex(index)}
-                      className={`cursor-pointer px-0.5 transition-all inline ${
+                      className={`cursor-pointer px-2 py-1 rounded-lg transition-all ${
                         highlightedWordIndex === index
-                          ? 'bg-green-200 shadow-sm scale-105'
+                          ? 'bg-green-200 shadow-md scale-110'
                           : 'hover:bg-green-50'
                       }`}
                     >
                       {word.text_uthmani}
                     </span>
                   ))}
-                  <span className="ayah-number" data-num={verse?.number}>{verse?.number}</span>
                 </div>
               ) : (
-                <div className="flex justify-center items-baseline gap-0.5" dir="rtl">
-                  <span>{verse?.text}</span>
-                  <span className="ayah-number" data-num={verse?.number}>{verse?.number}</span>
-                </div>
+                <div className="text-center">{verse?.text}</div>
               )}
             </div>
 
