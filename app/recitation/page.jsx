@@ -207,7 +207,10 @@ export default function RecitationPage() {
               <h2 className="text-xl font-bold text-gray-800 mb-1 font-amiri">
                 {verse?.surah}
               </h2>
-              <p className="text-gray-600 font-amiri">الآية {verse?.number}</p>
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <span className="text-gray-600 font-amiri text-sm">الآية</span>
+                <span className="ayah-number">{verse?.number}</span>
+              </div>
             </div>
 
             <div className="quran-text bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner">
