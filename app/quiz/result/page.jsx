@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 function ResultContent() {
   const searchParams = useSearchParams();
@@ -35,44 +36,53 @@ function ResultContent() {
   }
 
   const percentage = attempt.score;
-  const circumference = 2 * Math.PI * 80;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
-  const reportUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/quiz/result?id=${attemptId}`;
+  const wrongCount = attempt.questionsCount - attempt.correctCount;
+  const reportUrl = typeof window !== 'undefined' ? `${window.location.origin}/quiz/result?id=${attemptId}` : '';
 
-  const generateQRCode = () => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = 128;
-    canvas.height = 128;
-    
-    // Simple QR placeholder (you can use qrcode library later)
-    ctx.fillStyle = '#1e7850';
-    ctx.fillRect(0, 0, 128, 128);
-    ctx.fillStyle = 'white';
-    ctx.font = '12px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('QR Code', 64, 64);
-    
-    return canvas.toDataURL();
+  // بيانات الرسم البياني
+  const chartData = [
+    { name: 'صحيح', value: attempt.correctCount, color: '#10b981' },
+    { name: 'خطأ', value: wrongCount, color: '#ef4444' }
+  ];
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(reportUrl);
+    alert('✅ تم نسخ الرابط بنجاح!');
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: 'نتيجة اختبار التجويد - Tajweedy',
+        text: `حصلت على ${percentage}% في اختبار أحكام التجويد`,
+        url: reportUrl
+      });
+    } else {
+      handleCopyLink();
+    }
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 relative">
+    <div className="min-h-screen p-4 md:p-8 relative bg-gradient-to-br from-gray-50 to-gray-100">
       {/* العلامة المائية */}
-      <div className="fixed inset-0 flex items-center justify-center pointer-events-none opacity-5 z-0">
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] z-0">
         <Image 
           src="/logo.png" 
           alt="Watermark" 
-          width={600} 
-          height={600}
+          width={800} 
+          height={800}
           className="object-contain"
         />
       </div>
 
       <div className="max-w-5xl mx-auto relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 bg-white rounded-2xl p-4 shadow-md border border-gray-100">
-          <Link href="/quiz" className="text-[#1e7850] hover:text-[#155c3e] font-semibold flex items-center gap-2">
+        <div className="flex items-center justify-between mb-6 bg-white rounded-2xl p-4 shadow-md border border-gray-100 print:shadow-none">
+          <Link href="/quiz" className="text-[#1e7850] hover:text-[#155c3e] font-semibold flex items-center gap-2 text-lg print:hidden">
             <span>←</span> اختبار جديد
           </Link>
           <div className="w-16 h-16 relative">
@@ -81,11 +91,11 @@ function ResultContent() {
         </div>
 
         {/* Title */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <h1 className="text-3xl md:text-4xl font-bold text-[#1e7850] mb-2">
             🎓 تقرير أداء الاختبار
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-lg">
             {new Date(attempt.date).toLocaleString('ar-SA', {
               year: 'numeric',
               month: 'long',
@@ -130,33 +140,28 @@ function ResultContent() {
         {/* Score Card */}
         <div className="bg-white rounded-3xl shadow-lg p-8 mb-6 border border-gray-100">
           <div className="grid md:grid-cols-2 gap-8 items-center">
-            {/* Circular Progress */}
-            <div className="relative w-64 h-64 mx-auto">
-              <svg className="transform -rotate-90" width="256" height="256">
-                <circle
-                  cx="128"
-                  cy="128"
-                  r="80"
-                  stroke="#e5e7eb"
-                  strokeWidth="20"
-                  fill="none"
-                />
-                <circle
-                  cx="128"
-                  cy="128"
-                  r="80"
-                  stroke="#10b981"
-                  strokeWidth="20"
-                  fill="none"
-                  strokeDasharray={circumference}
-                  strokeDashoffset={strokeDashoffset}
-                  strokeLinecap="round"
-                  className="transition-all duration-1000"
-                />
-              </svg>
+            {/* Donut Chart */}
+            <div className="relative">
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={80}
+                    outerRadius={120}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
-                  <p className="text-6xl font-bold text-[#1e7850]">{attempt.score}%</p>
+                  <p className="text-6xl font-bold text-[#1e7850]">{percentage}%</p>
                   <p className="text-gray-600 mt-2 text-lg">النسبة النهائية</p>
                 </div>
               </div>
@@ -171,9 +176,7 @@ function ResultContent() {
               
               <div className="bg-red-50 p-5 rounded-2xl border-2 border-red-200">
                 <p className="text-red-800 font-semibold text-xl mb-2">❌ إجابات خاطئة</p>
-                <p className="text-5xl font-bold text-red-600">
-                  {attempt.questionsCount - attempt.correctCount}
-                </p>
+                <p className="text-5xl font-bold text-red-600">{wrongCount}</p>
               </div>
 
               <div className="bg-blue-50 p-5 rounded-2xl border-2 border-blue-200">
@@ -185,7 +188,7 @@ function ResultContent() {
         </div>
 
         {/* Actions */}
-        <div className="grid md:grid-cols-3 gap-4 mb-6">
+        <div className="grid md:grid-cols-4 gap-4 mb-6 print:hidden">
           <button
             onClick={() => setShowDetails(!showDetails)}
             className="bg-blue-500 text-white px-6 py-4 rounded-full font-bold text-lg hover:bg-blue-600 transition-all shadow-md"
@@ -194,45 +197,58 @@ function ResultContent() {
           </button>
 
           <button
-            onClick={() => window.print()}
+            onClick={handlePrint}
             className="bg-gray-500 text-white px-6 py-4 rounded-full font-bold text-lg hover:bg-gray-600 transition-all shadow-md"
           >
-            🖨️ طباعة التقرير
+            🖨️ طباعة
           </button>
 
           <button
-            onClick={() => {
-              navigator.clipboard.writeText(reportUrl);
-              alert('تم نسخ الرابط!');
-            }}
+            onClick={handleCopyLink}
             className="bg-[#1e7850] text-white px-6 py-4 rounded-full font-bold text-lg hover:bg-[#155c3e] transition-all shadow-md"
           >
             🔗 نسخ الرابط
           </button>
+
+          <button
+            onClick={handleShare}
+            className="bg-purple-500 text-white px-6 py-4 rounded-full font-bold text-lg hover:bg-purple-600 transition-all shadow-md"
+          >
+            📤 مشاركة
+          </button>
         </div>
 
-        {/* QR Code Section */}
+        {/* QR Code & Logo */}
         <div className="bg-white rounded-3xl shadow-lg p-6 mb-6 border border-gray-100">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-32 h-32 bg-[#1e7850] rounded-2xl flex items-center justify-center">
-                <p className="text-white font-bold text-center text-sm">QR Code<br/>Placeholder</p>
+              <div className="w-32 h-32 bg-gradient-to-br from-[#1e7850] to-[#155c3e] rounded-2xl flex items-center justify-center text-white font-bold text-center text-sm p-4">
+                <div>
+                  <p className="text-2xl mb-1">QR</p>
+                  <p className="text-xs">امسح للوصول</p>
+                </div>
               </div>
               <div>
-                <p className="text-gray-700 font-semibold text-lg mb-1">📱 مسح للوصول للتقرير</p>
-                <p className="text-gray-500 text-sm">امسح الرمز للوصول السريع</p>
+                <p className="text-gray-700 font-semibold text-lg mb-1">📱 رمز الاستجابة السريع</p>
+                <p className="text-gray-500 text-sm">امسح الرمز للوصول للتقرير مباشرة</p>
               </div>
             </div>
             
-            <div className="w-20 h-20 relative">
-              <Image src="/logo.png" alt="Tajweedy" fill className="object-contain" />
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-gray-700 font-bold text-xl">منصة Tajweedy</p>
+                <p className="text-gray-500 text-sm">التعليم التفاعلي للتجويد</p>
+              </div>
+              <div className="w-20 h-20 relative">
+                <Image src="/logo.png" alt="Tajweedy" fill className="object-contain" />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Details */}
         {showDetails && (
-          <div className="bg-white rounded-3xl shadow-lg p-6 md:p-8 border border-gray-100">
+          <div className="bg-white rounded-3xl shadow-lg p-6 md:p-8 border border-gray-100 print:block">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 font-amiri">
               📊 تفاصيل الإجابات
             </h2>
@@ -295,17 +311,25 @@ function ResultContent() {
       {/* Print Styles */}
       <style jsx global>{`
         @media print {
-          body * {
-            visibility: hidden;
+          body {
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
           }
-          .print-area, .print-area * {
-            visibility: visible;
+          .print\\:hidden {
+            display: none !important;
+          }
+          .print\\:block {
+            display: block !important;
+          }
+          .print\\:shadow-none {
+            box-shadow: none !important;
           }
           button {
             display: none !important;
           }
-          .fixed {
-            position: absolute;
+          @page {
+            size: A4;
+            margin: 1cm;
           }
         }
       `}</style>
