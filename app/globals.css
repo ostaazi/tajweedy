@@ -64,60 +64,101 @@ body::before {
   }
 }
 
-/* Ayah number decoration like Madinah Mushaf */
+/* Ayah number ornate frame - Like luxurious mushaf decoration */
 .ayah-number {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border: 2px solid #cbd5e1;
-  border-radius: 50%;
-  color: #475569;
+  position: relative;
+  width: 1.5rem;
+  height: 1.2rem;
+  margin: 0 0.2rem;
+  vertical-align: super;
+  top: -0.15em;
   font-family: var(--font-amiri);
   font-weight: 700;
-  font-size: 1.125rem;
+  font-size: 0.8rem;
+  color: #1e293b;
   line-height: 1;
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  position: relative;
   z-index: 1;
+  
+  /* Main frame: Oval with light blue border */
+  background: #f8faff;
+  border: 2px solid #a5b4fc;
+  border-radius: 50% / 40%; /* Oval shape */
+  box-shadow: 
+    0 1px 3px rgba(165, 180, 252, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
+/* Outer decorative border with swirls */
 .ayah-number::before {
   content: '';
   position: absolute;
-  top: 50%;
+  top: -0.2rem;
   left: 50%;
-  transform: translate(-50%, -50%);
-  width: 0.75rem;
-  height: 0.75rem;
-  background: radial-gradient(circle, #1e7850 40%, transparent 60%);
-  border-radius: 50%;
-  opacity: 0.7;
+  transform: translateX(-50%);
+  width: 1.8rem;
+  height: 1.6rem;
+  border: 1px solid #93c5fd;
+  border-radius: 50% / 45%;
+  z-index: -1;
+  
+  /* Subtle swirl pattern using radial gradients */
+  background: 
+    radial-gradient(ellipse at 20% 20%, rgba(147, 197, 253, 0.2) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(147, 197, 253, 0.2) 0%, transparent 50%),
+    #f8faff;
+}
+
+/* Inner white oval for the number */
+.ayah-number::after {
+  content: '';
+  position: absolute;
+  top: 0.1rem;
+  left: 0.1rem;
+  right: 0.1rem;
+  bottom: 0.1rem;
+  background: #ffffff;
+  border: 1px solid #e0e7ff;
+  border-radius: 50% / 35%;
+  z-index: -1;
+}
+
+/* Hover effect: Slight glow and scale */
+.ayah-number:hover {
+  transform: scale(1.05);
+  box-shadow: 
+    0 2px 6px rgba(165, 180, 252, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: all 0.2s ease;
+  background: #f0f9ff;
+}
+
+/* For numbers > 9, adjust width slightly */
+.ayah-number[data-num="10"],
+.ayah-number[data-num="11"] {
+  width: 1.7rem;
 }
 
 /* Responsive for mobile */
 @media (max-width: 768px) {
   .ayah-number {
-    width: 2rem;
-    height: 2rem;
-    font-size: 1rem;
+    width: 1.2rem;
+    height: 1rem;
+    font-size: 0.7rem;
+    top: -0.1em;
   }
   
   .ayah-number::before {
-    width: 0.5rem;
-    height: 0.5rem;
+    width: 1.4rem;
+    height: 1.3rem;
   }
-}
-
-/* Hover effect for interactivity */
-.ayah-number:hover {
-  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-  transform: scale(1.05);
-  transition: all 0.2s ease;
+  
+  .ayah-number[data-num="10"],
+  .ayah-number[data-num="11"] {
+    width: 1.4rem;
+  }
 }
 
 /* Smooth animations */
