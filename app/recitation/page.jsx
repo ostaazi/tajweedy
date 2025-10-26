@@ -204,10 +204,10 @@ export default function RecitationPage() {
         ) : (
           <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-8 mb-6">
             <div className="text-center mb-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-1 font-amiri">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2 font-amiri">
                 {verse?.surah}
               </h2>
-              <p className="text-gray-600 font-amiri">الآية {verse?.number}</p>
+              <p className="text-lg md:text-xl text-gray-600 font-amiri">الآية {verse?.number}</p>
             </div>
 
             <div className="quran-text bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner">
@@ -236,7 +236,7 @@ export default function RecitationPage() {
               <select
                 value={selectedReciter}
                 onChange={(e) => setSelectedReciter(Number(e.target.value))}
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white"
+                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg"
               >
                 {RECITERS.map(reciter => (
                   <option key={reciter.id} value={reciter.id}>
@@ -248,7 +248,7 @@ export default function RecitationPage() {
               <select
                 value={selectedSurah}
                 onChange={(e) => setSelectedSurah(Number(e.target.value))}
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white"
+                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg"
               >
                 {surahs.map(surah => (
                   <option key={surah.id} value={surah.id}>
@@ -263,7 +263,7 @@ export default function RecitationPage() {
                 value={selectedAyah}
                 onChange={(e) => setSelectedAyah(Number(e.target.value))}
                 disabled={selectedSurah === 0}
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white disabled:bg-gray-100 disabled:cursor-not-allowed text-lg"
               >
                 {availableAyahs.map(ayah => (
                   <option key={ayah.number} value={ayah.number}>
@@ -275,13 +275,13 @@ export default function RecitationPage() {
 
             <button
               onClick={fetchVerse}
-              className="w-full bg-[#1e7850] text-white px-6 py-4 rounded-full font-bold hover:bg-[#155c3e] transition-all shadow-md mb-4"
+              className="w-full bg-[#1e7850] text-white px-6 py-4 rounded-full font-bold text-lg hover:bg-[#155c3e] transition-all shadow-md mb-4"
             >
               🔄 تطبيق الاختيارات
             </button>
 
             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-4">
-              <p className="text-sm text-gray-600 mb-2 text-center">
+              <p className="text-base md:text-lg text-gray-600 mb-2 text-center">
                 استمع للتلاوة الصحيحة - القارئ: <span className="font-bold">{verse?.reciter}</span>
               </p>
               {verse?.audio ? (
@@ -290,7 +290,7 @@ export default function RecitationPage() {
                   المتصفح لا يدعم تشغيل الصوت
                 </audio>
               ) : (
-                <p className="text-center text-gray-500 text-sm">جاري تحميل الصوت...</p>
+                <p className="text-center text-gray-500 text-base">جاري تحميل الصوت...</p>
               )}
             </div>
 
