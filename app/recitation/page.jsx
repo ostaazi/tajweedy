@@ -5,19 +5,60 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 const RECITERS = [
-  { id: 0, name: 'اسم القارئ', subtext: 'غير محدد (عشوائي)', reciterId: null, oldEdition: null },
-  { id: 1, name: 'مشاري العفاسي', subtext: null, reciterId: 7, oldEdition: 'ar.alafasy' },
-  { id: 2, name: 'عبد الباسط عبد الصمد', subtext: null, reciterId: 1, oldEdition: 'ar.abdulbasitmurattal' },
-  { id: 3, name: 'عبد الرحمن السديس', subtext: null, reciterId: 9, oldEdition: 'ar.abdurrahmaansudais' },
-  { id: 4, name: 'محمد صديق المنشاوي', subtext: null, reciterId: 3, oldEdition: 'ar.minshawi' },
-  { id: 5, name: 'محمود خليل الحصري', subtext: null, reciterId: 2, oldEdition: 'ar.husary' },
-  { id: 6, name: 'أبو بكر الشاطري', subtext: null, reciterId: 5, oldEdition: 'ar.shaatree' },
+  { 
+    id: 0, 
+    name: 'اسم القارئ', 
+    subtext: 'غير محدد (عشوائي)', 
+    folder: null,
+    oldEdition: null 
+  },
+  { 
+    id: 1, 
+    name: 'مشاري العفاسي', 
+    subtext: null, 
+    folder: 'Alafasy_128kbps',
+    oldEdition: 'ar.alafasy' 
+  },
+  { 
+    id: 2, 
+    name: 'عبد الباسط عبد الصمد', 
+    subtext: null, 
+    folder: 'Abdul_Basit_Mujawwad_128kbps',
+    oldEdition: 'ar.abdulbasitmurattal' 
+  },
+  { 
+    id: 3, 
+    name: 'عبد الرحمن السديس', 
+    subtext: null, 
+    folder: 'Abdurrahmaan_As-Sudais_192kbps',
+    oldEdition: 'ar.abdurrahmaansudais' 
+  },
+  { 
+    id: 4, 
+    name: 'محمد صديق المنشاوي', 
+    subtext: null, 
+    folder: 'Minshawy_Mujawwad_192kbps',
+    oldEdition: 'ar.minshawi' 
+  },
+  { 
+    id: 5, 
+    name: 'محمود خليل الحصري', 
+    subtext: null, 
+    folder: 'Husary_128kbps',
+    oldEdition: 'ar.husary' 
+  },
+  { 
+    id: 6, 
+    name: 'أبو بكر الشاطري', 
+    subtext: null, 
+    folder: 'Abu_Bakr_Ash-Shaatree_128kbps',
+    oldEdition: 'ar.shaatree' 
+  },
 ];
 
 export default function RecitationPage() {
   const [verse, setVerse] = useState(null);
   const [words, setWords] = useState([]);
-  const [wordTimings, setWordTimings] = useState([]);
   const [surahs, setSurahs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
@@ -79,7 +120,6 @@ export default function RecitationPage() {
     setAudioBlob(null);
     setHighlightedWordIndex(-1);
     setCurrentPlayingWordIndex(-1);
-    setWordTimings([]);
     
     try {
       let surahNum = selectedSurah === 0 
@@ -98,80 +138,44 @@ export default function RecitationPage() {
         ? RECITERS[Math.floor(Math.random() * (RECITERS.length - 1)) + 1]
         : RECITERS.find(r => r.id === selectedReciter);
 
-      const verseKey = `${surahNum}:${ayahNum}`;
-      const reciterId = reciterData.reciterId;
+      // Build audio URL (EveryAyah.com - most reliable)
+      const paddedSurah = String(surahNum).padStart(3, '0');
+      const paddedAyah = String(ayahNum).padStart(3, '0');
+      const audioUrl = `https://everyayah.com/data/${reciterData.folder}/${paddedSurah}${paddedAyah}.mp3`;
 
-      // Try Quran.com API v4 first for words and timestamps
-      try {
-        const wordsResponse = await fetch(
-          `https://api.quran.com/api/v4/verses/by_key/${verseKey}?language=ar&words=true&word_fields=text_uthmani,audio&audio=${reciterId}`
-        );
-        const wordsData = await wordsResponse.json();
+      // Fetch verse text from API
+      const verseResponse = await fetch(
+        `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/quran-uthmani`
+      );
+      const verseData = await verseResponse.json();
 
-        if (wordsData.verse) {
-          const verseInfo = wordsData.verse;
-          
-          // Build audio URL manually (more reliable)
-          const paddedSurah = String(surahNum).padStart(3, '0');
-          const paddedAyah = String(ayahNum).padStart(3, '0');
-          const audioUrl = `https://verses.quran.com/${reciterData.oldEdition?.split('.')[1] || 'Alafasy'}/mp3/${paddedSurah}${paddedAyah}.mp3`;
-          
-          setVerse({
-            text: verseInfo.text_uthmani,
-            surah: surahs.find(s => s.id === surahNum)?.name || 'السورة',
-            surahNumber: surahNum,
-            number: ayahNum,
-            audio: audioUrl,
-            reciter: reciterData.name
-          });
+      if (verseData.status === 'OK') {
+        const textData = verseData.data;
 
-          if (verseInfo.words) {
-            setWords(verseInfo.words);
-            
-            // Extract word timings if available
-            const timings = verseInfo.words
-              .filter(word => word.audio && word.audio.timestamp_from !== undefined)
-              .map(word => ({
-                timestamp_from: word.audio.timestamp_from || 0,
-                timestamp_to: word.audio.timestamp_to || 0,
-              }));
-            
-            setWordTimings(timings);
-          }
-        }
-      } catch (apiError) {
-        console.log('Fallback to old API');
-        // Fallback to old API
-        const verseResponse = await fetch(
-          `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/editions/quran-uthmani,${reciterData.oldEdition}`
-        );
-        const verseData = await verseResponse.json();
-        
-        if (verseData.status === 'OK' && verseData.data.length >= 2) {
-          const textData = verseData.data[0];
-          const audioData = verseData.data[1];
+        setVerse({
+          text: textData.text,
+          surah: textData.surah.name,
+          surahNumber: surahNum,
+          number: ayahNum,
+          audio: audioUrl,
+          reciter: reciterData.name
+        });
 
-          setVerse({
-            text: textData.text,
-            surah: textData.surah.name,
-            surahNumber: surahNum,
-            number: ayahNum,
-            audio: audioData.audio || audioData.audioSecondary?.[0] || null,
-            reciter: reciterData.name
-          });
-
-          // Try to get words from Quran.com without audio data
-          try {
-            const wordsResponse = await fetch(
-              `https://api.quran.com/api/v4/verses/by_key/${verseKey}?language=ar&words=true&word_fields=text_uthmani`
-            );
-            const wordsData = await wordsResponse.json();
-            if (wordsData.verse && wordsData.verse.words) {
-              setWords(wordsData.verse.words);
-            }
-          } catch (err) {
+        // Fetch words from Quran.com API
+        try {
+          const verseKey = `${surahNum}:${ayahNum}`;
+          const wordsResponse = await fetch(
+            `https://api.quran.com/api/v4/verses/by_key/${verseKey}?language=ar&words=true&word_fields=text_uthmani`
+          );
+          const wordsData = await wordsResponse.json();
+          if (wordsData.verse && wordsData.verse.words) {
+            setWords(wordsData.verse.words);
+          } else {
             setWords([]);
           }
+        } catch (err) {
+          console.log('تعذر جلب الكلمات');
+          setWords([]);
         }
       }
     } catch (error) {
@@ -181,7 +185,7 @@ export default function RecitationPage() {
         surah: 'الفاتحة',
         surahNumber: 1,
         number: 1,
-        audio: 'https://verses.quran.com/Alafasy/mp3/001001.mp3',
+        audio: 'https://everyayah.com/data/Alafasy_128kbps/001001.mp3',
         reciter: RECITERS[1].name
       });
       setWords([]);
@@ -190,56 +194,38 @@ export default function RecitationPage() {
     }
   };
 
-  // Precise word-by-word highlighting with timestamps
+  // Word-by-word highlighting (estimated timing)
   const handleAudioPlay = () => {
-    if (!audioRef.current) return;
+    if (!audioRef.current || words.length === 0) return;
 
     const audio = audioRef.current;
     setCurrentPlayingWordIndex(-1);
 
-    // Clear any existing timers
     if (highlightTimerRef.current) {
       clearInterval(highlightTimerRef.current);
     }
 
-    // If we have precise timestamps, use them
-    if (wordTimings.length > 0) {
-      highlightTimerRef.current = setInterval(() => {
-        const currentTime = audio.currentTime * 1000; // Convert to milliseconds
-        
-        const currentIndex = wordTimings.findIndex(
-          timing => currentTime >= timing.timestamp_from && currentTime <= timing.timestamp_to
-        );
-        
-        if (currentIndex !== -1) {
-          setCurrentPlayingWordIndex(currentIndex);
-        }
-        
-        if (audio.ended || audio.paused) {
-          clearInterval(highlightTimerRef.current);
-          setCurrentPlayingWordIndex(-1);
-        }
-      }, 50);
-    } else if (words.length > 0) {
-      // Fallback: estimate timing
-      const duration = audio.duration;
-      const wordCount = words.length;
-      const timePerWord = duration / wordCount;
-
-      highlightTimerRef.current = setInterval(() => {
+    let currentIndex = 0;
+    
+    highlightTimerRef.current = setInterval(() => {
+      if (audio.duration && !isNaN(audio.duration)) {
         const currentTime = audio.currentTime;
+        const duration = audio.duration;
+        const wordCount = words.length;
+        const timePerWord = duration / wordCount;
         const newIndex = Math.floor(currentTime / timePerWord);
         
-        if (newIndex < wordCount) {
+        if (newIndex < wordCount && newIndex !== currentIndex) {
+          currentIndex = newIndex;
           setCurrentPlayingWordIndex(newIndex);
         }
-        
-        if (audio.ended || audio.paused) {
-          clearInterval(highlightTimerRef.current);
-          setCurrentPlayingWordIndex(-1);
-        }
-      }, 100);
-    }
+      }
+      
+      if (audio.ended || audio.paused) {
+        clearInterval(highlightTimerRef.current);
+        setCurrentPlayingWordIndex(-1);
+      }
+    }, 100);
   };
 
   const handleAudioPause = () => {
@@ -419,6 +405,7 @@ export default function RecitationPage() {
                   onPlay={handleAudioPlay}
                   onPause={handleAudioPause}
                   onEnded={handleAudioEnded}
+                  preload="metadata"
                 >
                   <source src={verse.audio} type="audio/mpeg" />
                   المتصفح لا يدعم تشغيل الصوت
