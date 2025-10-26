@@ -2,13 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+
+:root {
+  --font-cairo: 'Cairo', sans-serif;
+}
+
+.font-cairo {
+  font-family: var(--font-cairo);
+}
+
+.animate-fade-in {
+  animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.quran-verse {
+  font-family: 'Amiri Quran', serif;
+  font-size: 1.8rem;
+  line-height: 2.2;
+  color: #1a5f3f;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
 body {
-  font-family: 'Cairo', sans-serif;
-  direction: rtl;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
 }
