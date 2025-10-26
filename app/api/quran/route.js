@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs'; // مهم أحياناً مع بعض حسابات Vercel
+export const runtime = 'nodejs'; // يضمن بيئة Node على Vercel
 
 const ALLOWED_HOSTS = new Set(['api.quran.com']);
 
@@ -16,7 +16,7 @@ function badRequest(msg) {
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
-    const u = searchParams.get('u'); // مثل: /api/v4/recitations?language=ar
+    const u = searchParams.get('u'); // مثال: /api/v4/recitations?language=ar
     if (!u || !u.startsWith('/')) return badRequest('missing or invalid "u"');
 
     const target = new URL(`https://api.quran.com${u}`);
