@@ -27,26 +27,56 @@ export default function QuizPage() {
   const startQuiz = () => {
     if (!questionsBank) return;
 
-    const allQuestions = [];
+    // تجميع الأسئلة حسب الأقسام الرئيسية الثلاثة
+    const sectionGroups = {
+      section1: [], // القسم الأول
+      section2: [], // القسم الثاني
+      section3: []  // القسم الثالث
+    };
+
     Object.keys(questionsBank.sections).forEach(sectionKey => {
       const section = questionsBank.sections[sectionKey];
+      const sectionGroup = sectionGroups[sectionKey] || [];
+      
       Object.keys(section.parts).forEach(partKey => {
         const questions = section.parts[partKey];
         questions.forEach(q => {
-          allQuestions.push({
+          sectionGroup.push({
             ...q,
             section: section.title,
             part: partKey
           });
         });
       });
+      
+      sectionGroups[sectionKey] = sectionGroup;
     });
 
-    const shuffled = allQuestions.sort(() => Math.random() - 0.5);
-    const selected = shuffled.slice(0, questionsCount);
+    // حساب عدد الأسئلة لكل قسم (بالتساوي)
+    const questionsPerSection = Math.floor(questionsCount / 3);
+    const remainder = questionsCount % 3;
+
+    const selectedQuestions = [];
+
+    // اختيار أسئلة من كل قسم
+    Object.keys(sectionGroups).forEach((key, index) => {
+      const sectionQuestions = sectionGroups[key];
+      
+      // إضافة سؤال إضافي للأقسام الأولى إذا كان هناك باقي
+      const count = questionsPerSection + (index < remainder ? 1 : 0);
+      
+      // خلط وتحديد الأسئلة
+      const shuffled = sectionQuestions.sort(() => Math.random() - 0.5);
+      const selected = shuffled.slice(0, Math.min(count, sectionQuestions.length));
+      
+      selectedQuestions.push(...selected);
+    });
+
+    // خلط الأسئلة النهائية
+    const finalQuestions = selectedQuestions.sort(() => Math.random() - 0.5);
     
-    setSelectedQuestions(selected);
-    setUserAnswers(new Array(questionsCount).fill(null));
+    setSelectedQuestions(finalQuestions);
+    setUserAnswers(new Array(finalQuestions.length).fill(null));
     setQuizStarted(true);
     setCurrentQuestionIndex(0);
   };
