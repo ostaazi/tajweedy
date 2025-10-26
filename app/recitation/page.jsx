@@ -18,7 +18,7 @@ export default function RecitationPage() {
   const [verse, setVerse] = useState(null);
   const [words, setWords] = useState([]);
   const [surahs, setSurahs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [highlightedWordIndex, setHighlightedWordIndex] = useState(-1);
 
   const [selectedReciter, setSelectedReciter] = useState(1);
@@ -43,10 +43,6 @@ export default function RecitationPage() {
       }
     }
   }, [selectedSurah, surahs]);
-
-  useEffect(() => {
-    if (surahs.length > 0) fetchVerse();
-  }, [selectedReciter, selectedSurah, selectedAyah]);
 
   const fetchSurahs = async () => {
     try {
@@ -131,9 +127,11 @@ export default function RecitationPage() {
       const surah = surahs.find(s => s.id === selectedSurah);
       if (surah && selectedAyah < surah.verses_count) {
         setSelectedAyah(selectedAyah + 1);
+        setTimeout(fetchVerse, 300);
       } else if (selectedSurah < 114) {
         setSelectedSurah(selectedSurah + 1);
         setSelectedAyah(1);
+        setTimeout(fetchVerse, 300);
       }
     }
   };
@@ -151,8 +149,8 @@ export default function RecitationPage() {
 
         <h1 className="text-3xl font-bold text-center text-[#1e7850] mb-6">قسم التلاوة والتدريب</h1>
 
-        {/* 🕌 قوائم الاختيار */}
-        <div className="bg-white p-4 rounded-2xl border border-gray-100 mb-6 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* 🕌 القوائم */}
+        <div className="bg-white p-4 rounded-2xl border border-gray-100 mb-4 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4">
           <select
             className="border border-gray-200 rounded-xl p-3 text-gray-700 focus:border-[#1e7850] focus:ring-1 focus:ring-[#1e7850]"
             value={selectedReciter}
@@ -190,83 +188,70 @@ export default function RecitationPage() {
           </select>
         </div>
 
+        {/* زر تطبيق الاختيارات */}
+        <div className="text-center mb-6">
+          <button
+            onClick={fetchVerse}
+            className="bg-[#1e7850] text-white px-8 py-3 rounded-full font-bold hover:bg-[#155c3e] transition-all shadow-md"
+          >
+            تطبيق الاختيارات 📖
+          </button>
+        </div>
+
         {/* محتوى الآية */}
         {loading ? (
-          <div className="text-center py-20 text-gray-600">جاري تحميل الآية...</div>
+          <div className="text-center text-gray-600 mt-10">جاري تحميل الآية...</div>
         ) : (
-          <div className="bg-white rounded-3xl shadow-md border border-gray-100 p-6 mb-6">
-            <h2 className="text-xl text-center font-bold mb-2 text-gray-700">{verse?.surah}</h2>
-            <p className="text-center text-gray-500 mb-6">الآية {verse?.number}</p>
+          verse && (
+            <div className="bg-white rounded-3xl shadow-md border border-gray-100 p-6 mb-6">
+              <h2 className="text-xl text-center font-bold mb-2 text-gray-700">{verse?.surah}</h2>
+              <p className="text-center text-gray-500 mb-6">الآية {verse?.number}</p>
 
-            <div className="bg-green-50 p-6 rounded-2xl border border-green-100 mb-6">
-              <div className="text-3xl text-center leading-relaxed font-amiri" dir="rtl">
-                {words.map((word, i) => (
-                  <span
-                    key={i}
-                    className={`mx-1 transition-all ${
-                      highlightedWordIndex === i
-                        ? 'bg-green-300 px-1 rounded-lg shadow-sm scale-110'
-                        : 'hover:bg-green-100'
-                    }`}
+              <div className="bg-green-50 p-6 rounded-2xl border border-green-100 mb-6">
+                <div className="text-3xl text-center leading-relaxed font-amiri" dir="rtl">
+                  {words.map((word, i) => (
+                    <span
+                      key={i}
+                      className={`mx-1 transition-all ${
+                        highlightedWordIndex === i
+                          ? 'bg-green-300 px-1 rounded-lg shadow-sm scale-110'
+                          : 'hover:bg-green-100'
+                      }`}
+                    >
+                      {word.text_uthmani}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 text-center mb-4">
+                <p className="text-sm text-gray-700 mb-2">
+                  استمع للتلاوة الصحيحة - القارئ: <strong>{verse?.reciter}</strong>
+                </p>
+                {verse?.audio && (
+                  <audio
+                    ref={audioRef}
+                    controls
+                    onPlay={handlePlay}
+                    onEnded={handleEnded}
+                    className="w-full rounded-full"
                   >
-                    {word.text_uthmani}
-                  </span>
-                ))}
+                    <source src={verse.audio} type="audio/mpeg" />
+                  </audio>
+                )}
+              </div>
+
+              <div className="flex items-center justify-center gap-3">
+                <label className="font-semibold text-gray-700">تشغيل تلقائي حتى نهاية المصحف</label>
+                <input
+                  type="checkbox"
+                  checked={autoContinue}
+                  onChange={e => setAutoContinue(e.target.checked)}
+                  className="w-6 h-6 accent-[#1e7850]"
+                />
               </div>
             </div>
-
-            <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 text-center mb-4">
-              <p className="text-sm text-gray-700 mb-2">
-                استمع للتلاوة الصحيحة - القارئ: <strong>{verse?.reciter}</strong>
-              </p>
-              {verse?.audio && (
-                <audio
-                  ref={audioRef}
-                  controls
-                  onPlay={handlePlay}
-                  onEnded={handleEnded}
-                  className="w-full rounded-full"
-                >
-                  <source src={verse.audio} type="audio/mpeg" />
-                </audio>
-              )}
-            </div>
-
-            {/* أزرار التحكم */}
-            <div className="flex justify-between items-center mb-6">
-              <button
-                onClick={() => setSelectedAyah(a => Math.max(1, a - 1))}
-                className="border-2 border-[#1e7850] text-[#1e7850] px-6 py-2 rounded-full font-bold hover:bg-[#1e7850] hover:text-white transition"
-              >
-                ⬅️ الآية السابقة
-              </button>
-              <button
-                onClick={() => {
-                  const surah = surahs.find(s => s.id === selectedSurah);
-                  if (surah && selectedAyah < surah.verses_count) {
-                    setSelectedAyah(a => a + 1);
-                  } else if (selectedSurah < 114) {
-                    setSelectedSurah(s => s + 1);
-                    setSelectedAyah(1);
-                  }
-                }}
-                className="bg-[#1e7850] text-white px-6 py-2 rounded-full font-bold hover:bg-[#155c3e] transition"
-              >
-                الآية التالية ➡️
-              </button>
-            </div>
-
-            {/* تشغيل تلقائي */}
-            <div className="flex items-center justify-center gap-3">
-              <label className="font-semibold text-gray-700">تشغيل تلقائي حتى نهاية المصحف</label>
-              <input
-                type="checkbox"
-                checked={autoContinue}
-                onChange={e => setAutoContinue(e.target.checked)}
-                className="w-6 h-6 accent-[#1e7850]"
-              />
-            </div>
-          </div>
+          )
         )}
       </div>
     </div>
