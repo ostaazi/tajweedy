@@ -24,7 +24,7 @@ export default function QuizPage() {
       .catch(err => console.error('خطأ في تحميل بنك الأسئلة:', err));
   }, []);
 
-  // دالة خلط عميقة وعشوائية
+  // دالة خلط عميقة
   const deepShuffle = (array) => {
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -37,65 +37,55 @@ export default function QuizPage() {
   const startQuiz = () => {
     if (!questionsBank) return;
 
-    // تجميع الأسئلة حسب الأقسام الرئيسية الثلاثة
-    const sectionGroups = {
-      section1: [], // القسم الأول
-      section2: [], // القسم الثاني
-      section3: []  // القسم الثالث
-    };
-
+    // جمع جميع الأسئلة مع تعريف القسم
+    const allQuestions = [];
+    
     Object.keys(questionsBank.sections).forEach(sectionKey => {
       const section = questionsBank.sections[sectionKey];
-      const sectionQuestions = [];
       
       Object.keys(section.parts).forEach(partKey => {
         const questions = section.parts[partKey];
         questions.forEach(q => {
-          sectionQuestions.push({
+          allQuestions.push({
             ...q,
+            sectionKey: sectionKey,
             section: section.title,
-            part: partKey,
-            originalIndex: Math.random() // لضمان التنوع
+            part: partKey
           });
         });
       });
-      
-      // خلط عميق للأسئلة داخل كل قسم
-      sectionGroups[sectionKey] = deepShuffle(sectionQuestions);
     });
 
-    // حساب عدد الأسئلة لكل قسم (بالتساوي)
-    const questionsPerSection = Math.floor(questionsCount / 3);
-    const remainder = questionsCount % 3;
+    // خلط عميق لجميع الأسئلة
+    const fullyShuffled = deepShuffle(allQuestions);
 
+    // تحديد الأقسام الثلاثة
+    const sections = Object.keys(questionsBank.sections);
+    const questionsPerSection = Math.floor(questionsCount / sections.length);
+    const remainder = questionsCount % sections.length;
+
+    // تجميع الأسئلة حسب القسم
+    const sectionGroups = {};
+    sections.forEach(key => {
+      sectionGroups[key] = fullyShuffled.filter(q => q.sectionKey === key);
+    });
+
+    // اختيار الأسئلة بالتساوي
     const selectedQuestions = [];
-
-    // اختيار أسئلة من كل قسم بشكل عشوائي
-    Object.keys(sectionGroups).forEach((key, index) => {
+    
+    sections.forEach((key, index) => {
+      const count = questionsPerSection + (index < remainder ? 1 : 0);
       const sectionQuestions = sectionGroups[key];
       
-      // إضافة سؤال إضافي للأقسام الأولى إذا كان هناك باقي
-      const count = questionsPerSection + (index < remainder ? 1 : 0);
-      
-      if (sectionQuestions.length > 0) {
-        // خلط عميق ثانٍ
-        const deepShuffled = deepShuffle(sectionQuestions);
-        
-        // اختيار الأسئلة بطريقة متباعدة
-        const selected = [];
-        const step = Math.floor(deepShuffled.length / count) || 1;
-        
-        for (let i = 0; i < count && i < deepShuffled.length; i++) {
-          const randomOffset = Math.floor(Math.random() * step);
-          const idx = (i * step + randomOffset) % deepShuffled.length;
-          selected.push(deepShuffled[idx]);
-        }
-        
+      if (sectionQuestions && sectionQuestions.length > 0) {
+        // خلط وأخذ العدد المطلوب
+        const shuffled = deepShuffle(sectionQuestions);
+        const selected = shuffled.slice(0, Math.min(count, shuffled.length));
         selectedQuestions.push(...selected);
       }
     });
 
-    // خلط نهائي شامل
+    // خلط نهائي
     const finalQuestions = deepShuffle(selectedQuestions);
     
     setSelectedQuestions(finalQuestions);
