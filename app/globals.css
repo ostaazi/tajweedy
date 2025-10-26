@@ -7,9 +7,9 @@
 :root {
   --color-primary: #1e7850;
   --color-primary-dark: #155c3e;
-  --color-secondary: #f8f9fa;
+  --color-primary-light: #2a9d68;
   --font-cairo: 'Cairo', sans-serif;
-  --font-quran: 'Amiri', serif;
+  --font-amiri: 'Amiri', serif;
 }
 
 * {
@@ -24,9 +24,9 @@ body {
   background-attachment: fixed;
   min-height: 100vh;
   position: relative;
+  color: #1f2937;
 }
 
-/* Islamic pattern background */
 body::before {
   content: '';
   position: fixed;
@@ -35,37 +35,109 @@ body::before {
   width: 100%;
   height: 100%;
   background-image: 
-    repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(30, 120, 80, 0.03) 35px, rgba(30, 120, 80, 0.03) 70px);
+    repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(30, 120, 80, 0.03) 35px, rgba(30, 120, 80, 0.03) 70px),
+    repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(30, 120, 80, 0.02) 35px, rgba(30, 120, 80, 0.02) 70px);
   pointer-events: none;
   z-index: 0;
 }
 
 .quran-text {
-  font-family: var(--font-quran);
-  font-size: 1.75rem;
-  line-height: 2.5;
+  font-family: var(--font-amiri);
+  font-size: 1.875rem;
+  line-height: 2.8;
+  direction: rtl;
+  text-align: center;
+  color: #1e293b;
+}
+
+.arabic-text {
+  font-family: var(--font-amiri);
   direction: rtl;
 }
 
-/* Smooth animations */
-* {
-  transition: all 0.3s ease;
+@media (max-width: 768px) {
+  .quran-text {
+    font-size: 1.5rem;
+    line-height: 2.5;
+  }
 }
 
-/* Custom scrollbar */
+* {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 ::-webkit-scrollbar {
   width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f1f5f9;
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--color-primary);
-  border-radius: 5px;
+  border-radius: 10px;
+  border: 2px solid #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary-dark);
+}
+
+button, a {
+  cursor: pointer;
+}
+
+button:active, a:active {
+  transform: scale(0.98);
+}
+
+::selection {
+  background-color: rgba(30, 120, 80, 0.2);
+  color: var(--color-primary-dark);
+}
+
+button:focus, a:focus, input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
 }
