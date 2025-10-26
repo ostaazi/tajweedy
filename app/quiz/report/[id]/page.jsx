@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import QRCode from 'qrcode.react';
+//import QRCode from 'qrcode.react';
 
 export default function ReportPage() {
   const params = useParams();
