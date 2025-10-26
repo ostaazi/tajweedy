@@ -212,7 +212,7 @@ export default function RecitationPage() {
 
             <div className="quran-text bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner">
               {words.length > 0 ? (
-                <div className="flex flex-wrap justify-center gap-3" dir="rtl">
+                <div className="flex flex-wrap justify-center gap-1.5" dir="rtl">
                   {words.map((word, index) => (
                     <span
                       key={index}
