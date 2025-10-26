@@ -429,4 +429,4 @@ export default function RecitationPage() {
       />
     </div>
   );
-    }
+}
