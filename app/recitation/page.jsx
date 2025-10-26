@@ -4,57 +4,15 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-// قائمة القراء مع روابط مباشرة
+// قائمة القراء من Al-Quran Cloud
 const RECITERS = [
-  { 
-    id: 0, 
-    name: 'اسم القارئ', 
-    subtext: 'غير محدد (عشوائي)', 
-    apiId: null,
-    baseUrl: null 
-  },
-  { 
-    id: 1, 
-    name: 'مشاري العفاسي', 
-    subtext: null, 
-    apiId: 'ar.alafasy',
-    baseUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy'
-  },
-  { 
-    id: 2, 
-    name: 'عبد الباسط عبد الصمد', 
-    subtext: null, 
-    apiId: 'ar.abdulbasitmurattal',
-    baseUrl: 'https://cdn.islamic.network/quran/audio/128/ar.abdulbasitmurattal'
-  },
-  { 
-    id: 3, 
-    name: 'عبد الرحمن السديس', 
-    subtext: null, 
-    apiId: 'ar.abdurrahmaansudais',
-    baseUrl: 'https://cdn.islamic.network/quran/audio/128/ar.abdurrahmaansudais'
-  },
-  { 
-    id: 4, 
-    name: 'محمد صديق المنشاوي', 
-    subtext: null, 
-    apiId: 'ar.minshawi',
-    baseUrl: 'https://cdn.islamic.network/quran/audio/128/ar.minshawi'
-  },
-  { 
-    id: 5, 
-    name: 'محمود خليل الحصري', 
-    subtext: null, 
-    apiId: 'ar.husary',
-    baseUrl: 'https://cdn.islamic.network/quran/audio/128/ar.husary'
-  },
-  { 
-    id: 6, 
-    name: 'أبو بكر الشاطري', 
-    subtext: null, 
-    apiId: 'ar.shaatree',
-    baseUrl: 'https://cdn.islamic.network/quran/audio/128/ar.shaatree'
-  },
+  { id: 0, name: 'اسم القارئ', subtext: 'غير محدد (عشوائي)', edition: null },
+  { id: 1, name: 'مشاري العفاسي', subtext: null, edition: 'ar.alafasy' },
+  { id: 2, name: 'عبد الباسط عبد الصمد', subtext: null, edition: 'ar.abdulbasitmurattal' },
+  { id: 3, name: 'عبد الرحمن السديس', subtext: null, edition: 'ar.abdurrahmaansudais' },
+  { id: 4, name: 'محمد صديق المنشاوي', subtext: null, edition: 'ar.minshawi' },
+  { id: 5, name: 'محمود خليل الحصري', subtext: null, edition: 'ar.husary' },
+  { id: 6, name: 'أبو بكر الشاطري', subtext: null, edition: 'ar.shaatree' },
 ];
 
 export default function RecitationPage() {
@@ -116,17 +74,7 @@ export default function RecitationPage() {
     }
   }, [selectedSurah, surahs]);
 
-  // دالة لحساب رقم الآية العالمي (لرابط الصوت)
-  const getVerseKey = (surahNum, ayahNum) => {
-    let verseNumber = 0;
-    for (let i = 1; i < surahNum; i++) {
-      const surah = surahs.find(s => s.id === i);
-      if (surah) verseNumber += surah.verses_count;
-    }
-    return verseNumber + ayahNum;
-  };
-
-  // جلب الآية مع الكلمات
+  // جلب الآية مع الصوت
   const fetchVerse = async () => {
     setLoading(true);
     setAudioBlob(null);
@@ -139,9 +87,11 @@ export default function RecitationPage() {
         : selectedSurah;
       
       let ayahNum = selectedAyah;
-      if (ayahNum === 0 || !surahs.length) {
+      if (ayahNum === 0 && surahs.length > 0) {
         const surah = surahs.find(s => s.id === surahNum) || { verses_count: 7 };
         ayahNum = Math.floor(Math.random() * surah.verses_count) + 1;
+      } else if (ayahNum === 0) {
+        ayahNum = 1;
       }
 
       // تحديد القارئ
@@ -149,29 +99,26 @@ export default function RecitationPage() {
         ? RECITERS[Math.floor(Math.random() * (RECITERS.length - 1)) + 1]
         : RECITERS.find(r => r.id === selectedReciter);
 
-      // جلب بيانات الآية
+      // جلب الآية مع الصوت من نفس الـ API call
       const verseResponse = await fetch(
-        `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/editions/quran-uthmani`
+        `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/editions/quran-uthmani,${reciterData.edition}`
       );
       const verseData = await verseResponse.json();
       
-      if (verseData.status === 'OK') {
-        const ayahData = verseData.data[0];
-        
-        // بناء رابط الصوت المباشر
-        const verseKey = getVerseKey(surahNum, ayahNum);
-        const audioUrl = `${reciterData.baseUrl}/${verseKey}.mp3`;
+      if (verseData.status === 'OK' && verseData.data.length >= 2) {
+        const textData = verseData.data[0]; // النص
+        const audioData = verseData.data[1]; // الصوت
 
         setVerse({
-          text: ayahData.text,
-          surah: ayahData.surah.name,
+          text: textData.text,
+          surah: textData.surah.name,
           surahNumber: surahNum,
           number: ayahNum,
-          audio: audioUrl,
+          audio: audioData.audio || audioData.audioSecondary?.[0] || null,
           reciter: reciterData.name
         });
 
-        // جلب الكلمات من Quran.com (اختياري)
+        // جلب الكلمات من Quran.com (للتمييز)
         try {
           const wordsResponse = await fetch(
             `https://api.quran.com/api/v4/verses/by_key/${surahNum}:${ayahNum}?language=ar&words=true&word_fields=text_uthmani`
@@ -183,7 +130,7 @@ export default function RecitationPage() {
             setWords([]);
           }
         } catch (err) {
-          console.log('تعذر جلب الكلمات، سيتم عرض الآية كاملة');
+          console.log('تعذر جلب الكلمات');
           setWords([]);
         }
       }
@@ -194,7 +141,7 @@ export default function RecitationPage() {
         surah: 'الفاتحة',
         surahNumber: 1,
         number: 1,
-        audio: `${RECITERS[1].baseUrl}/1.mp3`,
+        audio: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3',
         reciter: RECITERS[1].name
       });
       setWords([]);
@@ -353,7 +300,7 @@ export default function RecitationPage() {
               🔄 تطبيق الاختيارات
             </button>
 
-            {/* Audio Player - يظهر دائماً */}
+            {/* Audio Player */}
             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-4">
               <p className="text-sm text-gray-600 mb-2 text-center">
                 استمع للتلاوة الصحيحة - القارئ: <span className="font-bold">{verse?.reciter}</span>
@@ -396,7 +343,7 @@ export default function RecitationPage() {
             {/* Tip */}
             <div className="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg">
               <p className="text-sm text-gray-700">
-                💡 <strong>تلميح:</strong> اضغط على "تطبيق الاختيارات" لتحميل الآية والاستماع للقارئ. انقر على أي كلمة لتمييزها.
+                💡 <strong>تلميح:</strong> اضغط على "تطبيق الاختيارات" لتحميل الآية والصوت الصحيح. انقر على أي كلمة لتمييزها.
               </p>
             </div>
           </div>
