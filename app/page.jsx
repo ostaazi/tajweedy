@@ -26,7 +26,7 @@ export default function Home() {
         </h1>
         
         <h2 className="text-2xl md:text-3xl font-semibold text-gray-700 text-center mb-3">
-          مُذيّب أحكام التجويد
+          مُدرّب أحكام التجويد
         </h2>
         
         <p className="text-lg text-gray-600 text-center mb-10">
