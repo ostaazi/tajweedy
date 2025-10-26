@@ -7,31 +7,21 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        cairo: ['var(--font-cairo)', 'Cairo', 'sans-serif'],
+        quran: ['Amiri', 'serif'],
+      },
       colors: {
         primary: {
-          DEFAULT: '#1a5f3f',
-          50: '#f0f9f4',
-          100: '#daf2e4',
-          200: '#b8e4cd',
-          300: '#88d0ad',
-          400: '#54b487',
-          500: '#329968',
-          600: '#237b52',
-          700: '#1a5f3f',
-          800: '#184d35',
-          900: '#15402d',
-        },
-        secondary: {
-          DEFAULT: '#2d8659',
-          light: '#4db87f',
-          dark: '#1a5f3f',
+          DEFAULT: '#1e7850',
+          dark: '#155c3e',
+          light: '#2a9d68',
         },
       },
-      fontFamily: {
-        sans: ['Cairo', 'sans-serif'],
-        quran: ['Amiri Quran', 'serif'],
+      borderRadius: {
+        '4xl': '2rem',
       },
     },
   },
   plugins: [],
-}
+};
