@@ -6,12 +6,12 @@ import Image from 'next/image';
 
 // قائمة القراء من Quran.com API
 const RECITERS = [
-  { id: 0, name: 'غير محدد (عشوائي)', slug: null },
-  { id: 7, name: 'مشاري العفاسي', slug: 'ar.alafasy' },
-  { id: 1, name: 'عبد الباسط عبد الصمد', slug: 'ar.abdulbasit' },
-  { id: 3, name: 'عبد الرحمن السديس', slug: 'ar.sudais' },
-  { id: 5, name: 'محمد صديق المنشاوي', slug: 'ar.minshawi' },
-  { id: 6, name: 'محمود خليل الحصري', slug: 'ar.husary' },
+  { id: 0, name: 'اسم القارئ', subtext: 'غير محدد (عشوائي)', slug: null },
+  { id: 7, name: 'مشاري العفاسي', subtext: null, slug: 'ar.alafasy' },
+  { id: 1, name: 'عبد الباسط عبد الصمد', subtext: null, slug: 'ar.abdulbasit' },
+  { id: 3, name: 'عبد الرحمن السديس', subtext: null, slug: 'ar.sudais' },
+  { id: 5, name: 'محمد صديق المنشاوي', subtext: null, slug: 'ar.minshawi' },
+  { id: 6, name: 'محمود خليل الحصري', subtext: null, slug: 'ar.husary' },
 ];
 
 export default function RecitationPage() {
@@ -42,10 +42,11 @@ export default function RecitationPage() {
       const response = await fetch('https://api.quran.com/api/v4/chapters?language=ar');
       const data = await response.json();
       const surahsList = [
-        { id: 0, name: 'غير محدد (عشوائي)', verses_count: 0 },
+        { id: 0, name: 'اسم السورة', subtext: 'غير محدد (عشوائي)', verses_count: 0 },
         ...data.chapters.map(s => ({
           id: s.id,
           name: s.name_arabic,
+          subtext: null,
           verses_count: s.verses_count
         }))
       ];
@@ -60,15 +61,15 @@ export default function RecitationPage() {
     if (selectedSurah > 0) {
       const surah = surahs.find(s => s.id === selectedSurah);
       if (surah) {
-        const ayahs = [{ number: 0, label: 'غير محدد (عشوائي)' }];
+        const ayahs = [{ number: 0, label: 'رقم الآية', subtext: 'غير محدد (عشوائي)' }];
         for (let i = 1; i <= surah.verses_count; i++) {
-          ayahs.push({ number: i, label: `الآية ${i}` });
+          ayahs.push({ number: i, label: `الآية ${i}`, subtext: null });
         }
         setAvailableAyahs(ayahs);
         setSelectedAyah(0);
       }
     } else {
-      setAvailableAyahs([{ number: 0, label: 'غير محدد (عشوائي)' }]);
+      setAvailableAyahs([{ number: 0, label: 'رقم الآية', subtext: 'غير محدد (عشوائي)' }]);
     }
   }, [selectedSurah, surahs]);
 
@@ -86,8 +87,8 @@ export default function RecitationPage() {
       
       let ayahNum = selectedAyah;
       if (ayahNum === 0) {
-        const surah = surahs.find(s => s.id === surahNum);
-        ayahNum = Math.floor(Math.random() * (surah?.verses_count || 7)) + 1;
+        const surah = surahs.find(s => s.id === surahNum) || { verses_count: 7 };
+        ayahNum = Math.floor(Math.random() * surah.verses_count) + 1;
       }
 
       // جلب بيانات الآية مع الكلمات
@@ -220,12 +221,12 @@ export default function RecitationPage() {
             {/* Quranic Text with Word Highlighting */}
             <div className="quran-text bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner">
               {words.length > 0 ? (
-                <div className="flex flex-wrap justify-center gap-2">
+                <div className="flex flex-wrap justify-center gap-2" dir="rtl">
                   {words.map((word, index) => (
                     <span
                       key={index}
                       onClick={() => setHighlightedWordIndex(index)}
-                      className={`cursor-pointer px-2 py-1 rounded transition-all ${
+                      className={`cursor-pointer px-2 py-1 rounded-lg transition-all ${
                         highlightedWordIndex === index
                           ? 'bg-green-200 shadow-md scale-110'
                           : 'hover:bg-green-50'
@@ -243,97 +244,131 @@ export default function RecitationPage() {
             {/* Selection Dropdowns */}
             <div className="flex flex-col gap-3 mb-6">
               {/* Reciter */}
-              <select
-                value={selectedReciter}
-                onChange={(e) => setSelectedReciter(Number(e.target.value))}
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white"
-              >
-                {RECITERS.map(reciter => (
-                  <option key={reciter.id} value={reciter.id}>
-                    {reciter.name}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <select
+                  value={selectedReciter}
+                  onChange={(e) => setSelectedReciter(Number(e.target.value))}
+                  className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white"
+                >
+                  {RECITERS.map(reciter => (
+                    <option key={reciter.id} value={reciter.id}>
+                      {reciter.subtext ? `${reciter.name}  ${reciter.subtext}` : reciter.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               {/* Surah */}
-              <select
-                value={selectedSurah}
-                onChange={(e) => setSelectedSurah(Number(e.target.value))}
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white"
-              >
-                {surahs.map(surah => (
-                  <option key={surah.id} value={surah.id}>
-                    {surah.id === 0 ? surah.name : `${surah.id}. ${surah.name}`}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <select
+                  value={selectedSurah}
+                  onChange={(e) => setSelectedSurah(Number(e.target.value))}
+                  className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white"
+                >
+                  {surahs.map(surah => (
+                    <option key={surah.id} value={surah.id}>
+                      {surah.subtext 
+                        ? `${surah.name}  ${surah.subtext}` 
+                        : `${surah.id}. ${surah.name}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               {/* Ayah */}
-              <select
-                value={selectedAyah}
-                onChange={(e) => setSelectedAyah(Number(e.target.value))}
-                disabled={selectedSurah === 0}
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white disabled:bg-gray-100"
-              >
-                {availableAyahs.map(ayah => (
-                  <option key={ayah.number} value={ayah.number}>
-                    {ayah.label}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <select
+                  value={selectedAyah}
+                  onChange={(e) => setSelectedAyah(Number(e.target.value))}
+                  disabled={selectedSurah === 0}
+                  className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                >
+                  {availableAyahs.map(ayah => (
+                    <option key={ayah.number} value={ayah.number}>
+                      {ayah.subtext ? `${ayah.label}  ${ayah.subtext}` : ayah.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            {/* Buttons */}
-            <div className="flex flex-col gap-4">
-              <button
-                onClick={fetchVerse}
-                className="bg-[#1e7850] text-white px-6 py-4 rounded-full font-bold hover:bg-[#155c3e] transition-all shadow-md"
-              >
-                🔄 تطبيق الاختيارات
-              </button>
+            {/* Apply Button */}
+            <button
+              onClick={fetchVerse}
+              className="w-full bg-[#1e7850] text-white px-6 py-4 rounded-full font-bold hover:bg-[#155c3e] transition-all shadow-md mb-4"
+            >
+              🔄 تطبيق الاختيارات
+            </button>
 
-              {verse?.audio && (
-                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
-                  <p className="text-sm text-gray-600 mb-2 text-center">
-                    القارئ: <span className="font-bold">{verse.reciter}</span>
-                  </p>
-                  <audio controls className="w-full">
-                    <source src={verse.audio} type="audio/mpeg" />
-                  </audio>
-                </div>
-              )}
+            {/* Audio Player - المكان الصحيح فوق زر التسجيل */}
+            {verse?.audio && (
+              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-4">
+                <p className="text-sm text-gray-600 mb-2 text-center">
+                  استمع للتلاوة الصحيحة:
+                </p>
+                <audio controls className="w-full rounded-full">
+                  <source src={verse.audio} type="audio/mpeg" />
+                  المتصفح لا يدعم تشغيل الصوت
+                </audio>
+              </div>
+            )}
 
-              <button
-                onClick={isRecording ? stopRecording : startRecording}
-                className={`${
-                  isRecording 
-                    ? 'bg-red-500 animate-pulse' 
-                    : 'bg-white border-2 border-[#1e7850] text-[#1e7850] hover:bg-[#1e7850] hover:text-white'
-                } px-6 py-4 rounded-full font-bold transition-all shadow-md`}
-              >
-                {isRecording ? '⏹ إيقاف التسجيل' : '🎤 ابدأ التسجيل'}
-              </button>
+            {/* Recording Button */}
+            <button
+              onClick={isRecording ? stopRecording : startRecording}
+              className={`w-full ${
+                isRecording 
+                  ? 'bg-red-500 animate-pulse' 
+                  : 'bg-white border-2 border-[#1e7850] text-[#1e7850] hover:bg-[#1e7850] hover:text-white'
+              } px-6 py-4 rounded-full font-bold transition-all shadow-md mb-4`}
+            >
+              {isRecording ? '⏹ إيقاف التسجيل' : '🎤 ابدأ التسجيل'}
+            </button>
 
-              {audioBlob && (
-                <div className="bg-blue-50 p-4 rounded-2xl border border-blue-200">
-                  <p className="text-sm text-blue-700 mb-2 text-center font-semibold">✅ تم التسجيل!</p>
-                  <audio controls className="w-full">
-                    <source src={URL.createObjectURL(audioBlob)} type="audio/wav" />
-                  </audio>
-                  <p className="text-xs text-gray-600 text-center mt-2">
-                    💡 سيتم تحليل التلاوة قريباً
-                  </p>
-                </div>
-              )}
-            </div>
+            {/* Recorded Audio Playback */}
+            {audioBlob && (
+              <div className="bg-blue-50 p-4 rounded-2xl border border-blue-200 mb-4">
+                <p className="text-sm text-blue-700 mb-2 text-center font-semibold">✅ تم التسجيل بنجاح!</p>
+                <audio controls className="w-full rounded-full">
+                  <source src={URL.createObjectURL(audioBlob)} type="audio/wav" />
+                </audio>
+                <p className="text-xs text-gray-600 text-center mt-2">
+                  💡 ميزة تحليل الصوت بالذكاء الاصطناعي ستكون متاحة قريباً
+                </p>
+              </div>
+            )}
 
-            <div className="mt-6 bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg">
+            {/* Tip */}
+            <div className="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg">
               <p className="text-sm text-gray-700">
-                💡 <strong>تلميح:</strong> اضغط على أي كلمة لتمييزها باللون الأخضر
+                💡 <strong>تلميح:</strong> اضغط على أي كلمة لتمييزها باللون الأخضر. اختر القارئ والسورة والآية ثم اضغط "تطبيق الاختيارات"
               </p>
             </div>
           </div>
         )}
+
+        {/* Instructions Card */}
+        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-8">
+          <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">كيفية الاستخدام</h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-green-50 to-white rounded-xl border border-green-100">
+              <span className="text-3xl">1️⃣</span>
+              <p className="text-gray-700">اختر القارئ والسورة والآية (أو اترك "عشوائي")</p>
+            </div>
+            <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-blue-50 to-white rounded-xl border border-blue-100">
+              <span className="text-3xl">2️⃣</span>
+              <p className="text-gray-700">استمع للتلاوة الصحيحة</p>
+            </div>
+            <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-purple-50 to-white rounded-xl border border-purple-100">
+              <span className="text-3xl">3️⃣</span>
+              <p className="text-gray-700">سجّل تلاوتك بالضغط على زر التسجيل</p>
+            </div>
+            <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-orange-50 to-white rounded-xl border border-orange-100">
+              <span className="text-3xl">4️⃣</span>
+              <p className="text-gray-700">احصل على تقرير تفصيلي (قريباً)</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
