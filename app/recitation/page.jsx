@@ -70,7 +70,6 @@ const makeEveryAyahUrl = (folder, s, a) => {
   const S = String(s).padStart(3, '0'); const A = String(a).padStart(3, '0');
   return `https://everyayah.com/data/${folder}/${S}${A}.mp3`;
 };
-// دالة صغيرة لبناء رابط البروكسي
 const Q = (pathAndQuery) => `/api/quran?u=${encodeURIComponent(pathAndQuery)}`;
 
 /* ========================= الصفحة ========================= */
@@ -93,6 +92,10 @@ export default function RecitationPage() {
   const [probing, setProbing] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // مراقبة حالة الشبكة مع البروكسي
+  const [netOK, setNetOK] = useState(null);      // true/false/null
+  const [lastError, setLastError] = useState(''); // آخر خطأ
+
   const audioRef = useRef(null);
   useWordSync(audioRef, segmentsAbs, pos2idx, setHighlight);
 
@@ -104,15 +107,19 @@ export default function RecitationPage() {
     (async () => {
       try {
         const r = await fetch(Q('/api/v4/resources/recitations?language=ar'), { cache: 'no-store' });
+        setNetOK(r.ok);
+        if (!r.ok) { setLastError(`recitations ${r.status}`); setRecitations([]); return; }
         const j = await r.json();
         setRecitations(j?.recitations ?? []);
-      } catch {
+      } catch (e) {
+        setNetOK(false);
+        setLastError(String(e));
         setRecitations([]);
       }
     })();
   }, []);
 
-  // 2) نص الآية والكلمات (الكلمات فقط من quran.com عبر البروكسي)
+  // 2) نص الآية (alquran.cloud) + الكلمات (quran.com عبر البروكسي)
   const fetchTextAndWords = async () => {
     const vRes = await fetch(`https://api.alquran.cloud/v1/ayah/${verseKey}/quran-uthmani`);
     const vJson = await vRes.json();
@@ -121,6 +128,7 @@ export default function RecitationPage() {
       setVerse({ surahNumber: surah, number: ayah, surahName: vJson.data.surah.name, audioUrl: null });
     }
     const wRes = await fetch(Q(`/api/v4/verses/by_key/${verseKey}?language=ar&words=true&word_fields=text_uthmani,position,type`), { cache: 'no-store' });
+    if (!wRes.ok) { setLastError(`words ${wRes.status}`); return; }
     const wJson = await wRes.json();
     const all = wJson?.verse?.words ?? [];
     const onlyWords = all.filter((w) => w.type === 'word');
@@ -132,18 +140,15 @@ export default function RecitationPage() {
 
   // 3) محاولة تحميل مقاطع تلاوة عبر البروكسي
   const tryLoadRecitation = async (rid) => {
-    const url = Q(`/api/v4/recitations/${rid}/by_chapter/${surah}?segments=true`);
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) return null;
+    const res = await fetch(Q(`/api/v4/recitations/${rid}/by_chapter/${surah}?segments=true`), { cache: 'no-store' });
+    if (!res.ok) { setLastError(`by_chapter ${rid} → ${res.status}`); return null; }
     const data = await res.json();
     const file = data?.audio_file ?? null;
     const ts = file?.timestamps ?? [];
     const verseTs = ts.find((t) => t.verse_key === verseKey);
     if (verseTs?.segments && verseTs.segments.length > 0 && file?.audio_url) {
       const base = verseTs.timestamp_from || 0;
-      const segsAbs = verseTs.segments
-        .map((s) => [s[0], base + s[1], base + s[2]])
-        .sort((a, b) => a[1] - b[1]);
+      const segsAbs = verseTs.segments.map((s) => [s[0], base + s[1], base + s[2]]).sort((a, b) => a[1] - b[1]);
       return { id: rid, url: file.audio_url, segsAbs };
     }
     return null;
@@ -175,9 +180,7 @@ export default function RecitationPage() {
       setLS(cacheKey, JSON.stringify({ preferred: null, supported: [] }));
       setSupportedForAyah([]);
       return null;
-    } finally {
-      setProbing(false);
-    }
+    } finally { setProbing(false); }
   };
 
   // 5) الجلب الشامل
@@ -207,10 +210,9 @@ export default function RecitationPage() {
       }
     } catch (e) {
       console.error('fetchAll error', e);
+      setLastError(String(e));
       setAudioUrl(makeEveryAyahUrl('Alafasy_128kbps', surah, ayah));
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   useEffect(() => { fetchAll(); /* eslint-disable-next-line */ }, []);
@@ -276,6 +278,23 @@ export default function RecitationPage() {
           <div>First seg (ms): {segmentsAbs[0]?.[1]} → {segmentsAbs[0]?.[2] ?? ''}</div>
         </div>
 
+        {/* حالة الشبكة + اختبار البروكسي */}
+        <div className="text-xs bg-yellow-50 border rounded p-2 font-mono mt-2">
+          <div>Network via proxy: {netOK === null ? '…' : netOK ? 'OK' : 'FAILED'}</div>
+          <div>Last error: {lastError || '—'}</div>
+          <button
+            onClick={async () => {
+              try {
+                const t = await fetch(Q('/api/v4/resources/recitations?language=ar'), { cache: 'no-store' });
+                setNetOK(t.ok); setLastError(t.ok ? '' : `test ${t.status}`);
+              } catch (e) { setNetOK(false); setLastError(String(e)); }
+            }}
+            className="mt-1 px-2 py-1 rounded border border-blue-300 hover:bg-blue-50"
+          >
+            Test Proxy
+          </button>
+        </div>
+
         {loading && <div className="mt-3 text-sm text-gray-600">جاري التحميل...</div>}
       </div>
 
@@ -287,7 +306,7 @@ export default function RecitationPage() {
         segmentsAbs={segmentsAbs}
         supportedForAyah={supportedForAyah}
         onProbe={probeForSegments}
-        onDump={() => { console.clear(); window.__DBG = { verseKey, audioUrl, segmentsAbs, activeRecitationId, supportedForAyah }; console.log('__DBG', window.__DBG); alert('تم الطباعة إلى Console باسم __DBG'); }}
+        onDump={() => { console.clear(); window.__DBG = { verseKey, audioUrl, segmentsAbs, activeRecitationId, supportedForAyah, netOK, lastError }; console.log('__DBG', window.__DBG); alert(`OK:${netOK} • ${lastError||'no-error'}`); }}
         onJumpFirst={() => { if (!audioRef.current) return; if (!segmentsAbs.length) return alert('لا توجد مقاطع'); audioRef.current.currentTime = segmentsAbs[0][1] / 1000; audioRef.current.play().catch(()=>{}); }}
       />
     </div>
