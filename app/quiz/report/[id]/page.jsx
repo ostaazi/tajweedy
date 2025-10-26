@@ -37,14 +37,48 @@ export default function ReportPage() {
     setLoading(false);
   }, [attemptId]);
 
-  // بناء QR Code بعد توفر attemptId
+  // ✅ توليد QR مع التبديل التلقائي + fallback محلي
   useEffect(() => {
     if (!attemptId || typeof window === 'undefined') return;
-    
+
     const url = `${window.location.origin}/quiz/report/${attemptId}`;
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
-    
-    setQrSrc(qrUrl);
+    const services = [
+      `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`,
+      `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(url)}`,
+      `https://quickchart.io/qr?text=${encodeURIComponent(url)}&size=300`
+    ];
+
+    let idx = 0;
+    let cancelled = false;
+
+    const tryNext = async () => {
+      if (cancelled) return;
+
+      // جرّب خدمة خارجية
+      if (idx < services.length) {
+        const candidate = services[idx++];
+        const img = new Image();
+        img.onload = () => { 
+          if (!cancelled) setQrSrc(candidate); 
+        };
+        img.onerror = tryNext; // جرّب التي بعدها
+        img.referrerPolicy = 'no-referrer';
+        img.src = candidate;
+        return;
+      }
+
+      // Fallback محلي: توليد DataURL عبر مكتبة qrcode
+      try {
+        const QR = (await import('qrcode')).default; // lazy import
+        const dataUrl = await QR.toDataURL(url, { width: 300, margin: 1 });
+        if (!cancelled) setQrSrc(dataUrl);
+      } catch {
+        if (!cancelled) setQrSrc(''); // سيظهر Placeholder في الواجهة
+      }
+    };
+
+    tryNext();
+    return () => { cancelled = true; };
   }, [attemptId]);
 
   const saveNames = () => {
@@ -68,7 +102,7 @@ export default function ReportPage() {
           <p className="text-gray-600 mb-6">لم يتم العثور على تقرير مطابق لهذا المعرّف</p>
           <Link 
             href="/quiz"
-            className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-xl"
+            className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-xl inline-block"
           >
             ← العودة للاختبار
           </Link>
@@ -186,14 +220,16 @@ export default function ReportPage() {
           
           <button
             onClick={() => {
-              const link = document.createElement('a');
-              link.href = qrSrc;
-              link.download = 'qr-code.png';
-              link.click();
+              if (qrSrc) {
+                const link = document.createElement('a');
+                link.href = qrSrc;
+                link.download = 'qr-code.png';
+                link.click();
+              }
             }}
             className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl transition-all transform hover:scale-105"
           >
-            📥 التفاصيل
+            📥 تحميل QR
           </button>
           
           <button
@@ -233,27 +269,26 @@ export default function ReportPage() {
           </h2>
           
           <div className="flex justify-center mb-6">
-            {qrSrc ? (
-              <div className="p-6 bg-white border-4 border-primary rounded-3xl shadow-lg">
+            <div className="p-6 bg-white border-4 border-primary rounded-3xl shadow-lg">
+              {qrSrc ? (
                 <img
                   src={qrSrc}
                   alt="QR Code"
                   className="w-72 h-72"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
+                  referrerPolicy="no-referrer"
+                  onError={(e) => { 
+                    e.currentTarget.style.display = 'none'; 
+                    const fallback = e.currentTarget.nextElementSibling;
+                    if (fallback) fallback.classList.remove('hidden');
                   }}
                 />
-                <div className="hidden w-72 h-72 items-center justify-center text-gray-400 flex-col gap-4">
-                  <span className="text-6xl">⚠️</span>
-                  <p className="text-lg">تعذر تحميل QR Code</p>
-                </div>
+              ) : null}
+              <div className={`${qrSrc ? 'hidden' : 'flex'} w-72 h-72 items-center justify-center flex-col gap-4 text-gray-500`}>
+                <span className="text-5xl">⚠️</span>
+                <p className="text-center">تعذّر توليد رمز QR</p>
+                <p className="text-xs text-gray-400">تحقّق من الشبكة</p>
               </div>
-            ) : (
-              <div className="w-72 h-72 flex items-center justify-center border-4 border-dashed border-gray-300 rounded-3xl">
-                <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent" />
-              </div>
-            )}
+            </div>
           </div>
           
           <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-6 inline-block">
