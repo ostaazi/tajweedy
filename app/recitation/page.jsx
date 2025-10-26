@@ -29,6 +29,10 @@ export default function RecitationPage() {
   const [selectedAyah, setSelectedAyah] = useState(0);
   const [availableAyahs, setAvailableAyahs] = useState([]);
 
+  // ✅ جديد: التشغيل التلقائي والمرجع الصوتي
+  const [autoContinue, setAutoContinue] = useState(false);
+  const [audioRef, setAudioRef] = useState(null);
+
   useEffect(() => {
     fetchSurahs();
     fetchVerse();
@@ -232,66 +236,89 @@ export default function RecitationPage() {
               )}
             </div>
 
-            <div className="flex flex-col gap-3 mb-6">
-              <select
-                value={selectedReciter}
-                onChange={(e) => setSelectedReciter(Number(e.target.value))}
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white"
-              >
-                {RECITERS.map(reciter => (
-                  <option key={reciter.id} value={reciter.id}>
-                    {reciter.subtext ? `${reciter.name}  ${reciter.subtext}` : reciter.name}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                value={selectedSurah}
-                onChange={(e) => setSelectedSurah(Number(e.target.value))}
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white"
-              >
-                {surahs.map(surah => (
-                  <option key={surah.id} value={surah.id}>
-                    {surah.subtext 
-                      ? `${surah.name}  ${surah.subtext}` 
-                      : `${surah.id}. ${surah.name}`}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                value={selectedAyah}
-                onChange={(e) => setSelectedAyah(Number(e.target.value))}
-                disabled={selectedSurah === 0}
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-              >
-                {availableAyahs.map(ayah => (
-                  <option key={ayah.number} value={ayah.number}>
-                    {ayah.subtext ? `${ayah.label}  ${ayah.subtext}` : ayah.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <button
-              onClick={fetchVerse}
-              className="w-full bg-[#1e7850] text-white px-6 py-4 rounded-full font-bold hover:bg-[#155c3e] transition-all shadow-md mb-4"
-            >
-              🔄 تطبيق الاختيارات
-            </button>
-
             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-4">
               <p className="text-sm text-gray-600 mb-2 text-center">
                 استمع للتلاوة الصحيحة - القارئ: <span className="font-bold">{verse?.reciter}</span>
               </p>
               {verse?.audio ? (
-                <audio key={verse.audio} controls className="w-full rounded-full">
+                <audio
+                  key={verse.audio}
+                  controls
+                  className="w-full rounded-full"
+                  ref={setAudioRef}
+                  onEnded={() => {
+                    if (autoContinue) {
+                      const surah = surahs.find(s => s.id === selectedSurah);
+                      if (surah && selectedAyah < surah.verses_count) {
+                        setSelectedAyah(selectedAyah + 1);
+                        setTimeout(fetchVerse, 300);
+                      } else if (selectedSurah < 114) {
+                        setSelectedSurah(selectedSurah + 1);
+                        setSelectedAyah(1);
+                        setTimeout(fetchVerse, 300);
+                      }
+                    }
+                  }}
+                >
                   <source src={verse.audio} type="audio/mpeg" />
                   المتصفح لا يدعم تشغيل الصوت
                 </audio>
               ) : (
                 <p className="text-center text-gray-500 text-sm">جاري تحميل الصوت...</p>
               )}
+            </div>
+
+            {/* أزرار الآية السابقة والتالية */}
+            <div className="flex justify-between items-center mb-6">
+              <button
+                onClick={() => {
+                  if (selectedAyah > 1) {
+                    setSelectedAyah(selectedAyah - 1);
+                    fetchVerse();
+                  } else if (selectedSurah > 1) {
+                    const prevSurah = surahs.find(s => s.id === selectedSurah - 1);
+                    if (prevSurah) {
+                      setSelectedSurah(prevSurah.id);
+                      setSelectedAyah(prevSurah.verses_count);
+                      setTimeout(fetchVerse, 300);
+                    }
+                  }
+                }}
+                className="bg-white border-2 border-[#1e7850] text-[#1e7850] hover:bg-[#1e7850] hover:text-white px-6 py-3 rounded-full font-bold transition-all shadow-md"
+              >
+                ⬅️ الآية السابقة
+              </button>
+
+              <button
+                onClick={() => {
+                  const surah = surahs.find(s => s.id === selectedSurah);
+                  if (surah && selectedAyah < surah.verses_count) {
+                    setSelectedAyah(selectedAyah + 1);
+                    fetchVerse();
+                  } else if (selectedSurah < 114) {
+                    setSelectedSurah(selectedSurah + 1);
+                    setSelectedAyah(1);
+                    setTimeout(fetchVerse, 300);
+                  }
+                }}
+                className="bg-[#1e7850] text-white px-6 py-3 rounded-full font-bold hover:bg-[#155c3e] transition-all shadow-md"
+              >
+                الآية التالية ➡️
+              </button>
+            </div>
+
+            {/* التبديل بين التشغيل التلقائي */}
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <label htmlFor="autoContinue" className="font-semibold text-gray-700">
+                تشغيل تلقائي حتى نهاية المصحف
+              </label>
+              <input
+                id="autoContinue"
+                type="checkbox"
+                checked={autoContinue}
+                onChange={(e) => setAutoContinue(e.target.checked)}
+                className="w-6 h-6 accent-[#1e7850] cursor-pointer"
+              />
             </div>
 
             <button
