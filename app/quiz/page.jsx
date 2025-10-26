@@ -24,6 +24,16 @@ export default function QuizPage() {
       .catch(err => console.error('خطأ في تحميل بنك الأسئلة:', err));
   }, []);
 
+  // دالة خلط عميقة وعشوائية
+  const deepShuffle = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
   const startQuiz = () => {
     if (!questionsBank) return;
 
@@ -36,20 +46,22 @@ export default function QuizPage() {
 
     Object.keys(questionsBank.sections).forEach(sectionKey => {
       const section = questionsBank.sections[sectionKey];
-      const sectionGroup = sectionGroups[sectionKey] || [];
+      const sectionQuestions = [];
       
       Object.keys(section.parts).forEach(partKey => {
         const questions = section.parts[partKey];
         questions.forEach(q => {
-          sectionGroup.push({
+          sectionQuestions.push({
             ...q,
             section: section.title,
-            part: partKey
+            part: partKey,
+            originalIndex: Math.random() // لضمان التنوع
           });
         });
       });
       
-      sectionGroups[sectionKey] = sectionGroup;
+      // خلط عميق للأسئلة داخل كل قسم
+      sectionGroups[sectionKey] = deepShuffle(sectionQuestions);
     });
 
     // حساب عدد الأسئلة لكل قسم (بالتساوي)
@@ -58,22 +70,33 @@ export default function QuizPage() {
 
     const selectedQuestions = [];
 
-    // اختيار أسئلة من كل قسم
+    // اختيار أسئلة من كل قسم بشكل عشوائي
     Object.keys(sectionGroups).forEach((key, index) => {
       const sectionQuestions = sectionGroups[key];
       
       // إضافة سؤال إضافي للأقسام الأولى إذا كان هناك باقي
       const count = questionsPerSection + (index < remainder ? 1 : 0);
       
-      // خلط وتحديد الأسئلة
-      const shuffled = sectionQuestions.sort(() => Math.random() - 0.5);
-      const selected = shuffled.slice(0, Math.min(count, sectionQuestions.length));
-      
-      selectedQuestions.push(...selected);
+      if (sectionQuestions.length > 0) {
+        // خلط عميق ثانٍ
+        const deepShuffled = deepShuffle(sectionQuestions);
+        
+        // اختيار الأسئلة بطريقة متباعدة
+        const selected = [];
+        const step = Math.floor(deepShuffled.length / count) || 1;
+        
+        for (let i = 0; i < count && i < deepShuffled.length; i++) {
+          const randomOffset = Math.floor(Math.random() * step);
+          const idx = (i * step + randomOffset) % deepShuffled.length;
+          selected.push(deepShuffled[idx]);
+        }
+        
+        selectedQuestions.push(...selected);
+      }
     });
 
-    // خلط الأسئلة النهائية
-    const finalQuestions = selectedQuestions.sort(() => Math.random() - 0.5);
+    // خلط نهائي شامل
+    const finalQuestions = deepShuffle(selectedQuestions);
     
     setSelectedQuestions(finalQuestions);
     setUserAnswers(new Array(finalQuestions.length).fill(null));
