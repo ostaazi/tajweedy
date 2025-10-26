@@ -57,4 +57,60 @@ export default function QuizPage() {
                 <li>• أحكام النون الساكنة والتنوين (الإظهار، الإدغام، الإخفاء، الإقلاب)</li>
                 <li>• أحكام الميم الساكنة</li>
                 <li>• أحكام المدود</li>
-                <li>• المجموع:
+                <li>• المجموع: أكثر من 300 سؤال</li>
+              </ul>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white p-8 rounded-xl shadow-lg">
+            <div className="text-center">
+              <div className="text-6xl mb-4">📝</div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                جاري تحضير الاختبار...
+              </h2>
+              <p className="text-gray-600 mb-6">
+                سيتم توليد {questionCount} سؤال عشوائي من بنك الأسئلة
+              </p>
+              <div className="animate-pulse bg-blue-100 h-4 rounded-full mb-4"></div>
+              <p className="text-sm text-gray-500">
+                💡 ميزة الاختبارات الكاملة ستكون متاحة بعد إضافة بنك الأسئلة
+              </p>
+              <button
+                onClick={() => setQuizStarted(false)}
+                className="mt-6 bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700"
+              >
+                العودة للإعداد
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="mt-8 bg-white p-6 rounded-xl shadow-lg">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4">المميزات القادمة</h3>
+          <ul className="space-y-3 text-gray-700">
+            <li className="flex items-start">
+              <span className="text-2xl ml-3">✅</span>
+              <span>أسئلة عشوائية متوازنة من جميع الفئات</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-2xl ml-3">✅</span>
+              <span>عرض النتائج في رسوم بيانية دائرية (Donut Charts)</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-2xl ml-3">✅</span>
+              <span>تقرير تفصيلي لكل سؤال مع الشرح</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-2xl ml-3">✅</span>
+              <span>تدريبات علاجية تلقائية بناءً على نقاط الضعف</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-2xl ml-3">✅</span>
+              <span>حفظ سجل المحاولات وتتبع التقدم</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
