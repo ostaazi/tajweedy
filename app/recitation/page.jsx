@@ -57,7 +57,7 @@ export default function RecitationPage() {
             <h2 className="text-xl font-bold text-gray-700 mb-4 text-center">
               {verse?.surah} - الآية {verse?.number}
             </h2>
-            <div className="quran-text text-3xl leading-relaxed mb-6 p-6 bg-green-50 rounded-lg text-center" style={{fontFamily: 'Amiri, serif'}}>
+            <div className="text-3xl leading-relaxed mb-6 p-6 bg-green-50 rounded-lg text-center" style={{fontFamily: 'Amiri, serif'}}>
               {verse?.text}
             </div>
 
