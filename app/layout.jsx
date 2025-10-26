@@ -1,23 +1,24 @@
-import './globals.css';
 import { Cairo } from 'next/font/google';
+import './globals.css';
 
-const cairo = Cairo({
+const cairo = Cairo({ 
   subsets: ['arabic'],
-  display: 'swap',
-  variable: '--font-cairo',
+  weight: ['400', '600', '700'],
+  variable: '--font-cairo'
 });
 
 export const metadata = {
-  title: 'Tajweedy - منصة تجويد القرآن',
-  description: 'منصة تفاعلية للتدريب على قواعد التجويد بالذكاء الاصطناعي',
+  title: 'Tajweedy - مُذيب أحكام التجويد',
+  description: 'منصة تفاعلية لتعلم قواعد تجويد القرآن الكريم بالذكاء الاصطناعي',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="ar" dir="rtl" className={`${cairo.variable}`}>
-      <body className="bg-gray-50 font-cairo">
-        {children}
-      </body>
+    <html lang="ar" dir="rtl">
+      <body className={cairo.variable}>{children}</body>
     </html>
   );
 }
