@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 function ResultContent() {
   const searchParams = useSearchParams();
@@ -34,8 +34,8 @@ function ResultContent() {
   }
 
   const chartData = [
-    { name: 'صحيح', value: attempt.correctCount, color: '#10b981' },
-    { name: 'خطأ', value: attempt.questionsCount - attempt.correctCount, color: '#ef4444' }
+    { name: 'صحيح', value: attempt.correctCount },
+    { name: 'خطأ', value: attempt.questionsCount - attempt.correctCount }
   ];
 
   const COLORS = ['#10b981', '#ef4444'];
@@ -93,7 +93,7 @@ function ResultContent() {
               </ResponsiveContainer>
               
               {/* Score in center */}
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="text-center">
                   <p className="text-6xl font-bold text-[#1e7850]">{attempt.score}%</p>
                   <p className="text-gray-600 mt-2">النسبة النهائية</p>
@@ -124,19 +124,12 @@ function ResultContent() {
         </div>
 
         {/* Actions */}
-        <div className="grid md:grid-cols-3 gap-4 mb-6">
+        <div className="grid md:grid-cols-2 gap-4 mb-6">
           <button
             onClick={() => setShowDetails(!showDetails)}
             className="bg-blue-500 text-white px-6 py-4 rounded-full font-bold hover:bg-blue-600 transition-all shadow-md"
           >
             {showDetails ? 'إخفاء التفاصيل' : 'عرض التفاصيل'}
-          </button>
-          
-          <button
-            onClick={() => router.push(`/quiz/report/${attempt.id}`)}
-            className="bg-purple-500 text-white px-6 py-4 rounded-full font-bold hover:bg-purple-600 transition-all shadow-md"
-          >
-            📄 التقرير الكامل
           </button>
 
           <button
@@ -236,12 +229,6 @@ function ResultContent() {
           }
           .print-area, .print-area * {
             visibility: visible;
-          }
-          .print-area {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
           }
           button {
             display: none !important;
