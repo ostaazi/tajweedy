@@ -34,10 +34,14 @@ function useWordSync(audioRef, segmentsAbs, pos2idx, setHighlighted) {
 }
 
 /* ==================== لوحة تشخيص عائمة ==================== */
-function DebugPanel({ verseKey, audioRef, sourceLabel, recitationId, segmentsAbs, supportedForAyah, onProbe, onDump, onJumpFirst }) {
+function DebugPanel({
+  verseKey, audioRef, sourceLabel, recitationId, segmentsAbs,
+  supportedForAyah, onProbe, onDump, onJumpFirst,
+  tries, hits, lastTriedId, lastError
+}) {
   const [open, setOpen] = React.useState(true);
   return (
-    <div style={{ position: 'fixed', left: 12, bottom: 12, zIndex: 9999, maxWidth: 360 }}>
+    <div style={{ position: 'fixed', left: 12, bottom: 12, zIndex: 9999, maxWidth: 380 }}>
       <div className="bg-white/95 backdrop-blur border border-gray-200 shadow-lg rounded-xl">
         <div className="px-3 py-2 border-b border-gray-200 flex items-center justify-between">
           <strong className="text-xs">Debug • {verseKey}</strong>
@@ -50,6 +54,8 @@ function DebugPanel({ verseKey, audioRef, sourceLabel, recitationId, segmentsAbs
             <div>Segments: <span className="font-semibold">{segmentsAbs.length}</span></div>
             <div>First seg (ms): <span className="font-semibold">{segmentsAbs[0]?.[1] ?? '—'} → {segmentsAbs[0]?.[2] ?? '—'}</span></div>
             <div className="break-words">Supported IDs: {supportedForAyah?.length ? supportedForAyah.join(', ') : '—'}</div>
+            <div className="pt-1">Probe: tried <b>{tries}</b> • hits <b>{hits}</b> • lastId <b>{lastTriedId ?? '—'}</b></div>
+            <div className="text-red-600 break-words">Last error: {lastError || '—'}</div>
             <div className="pt-2 flex gap-2 flex-wrap">
               <button onClick={onProbe} className="px-2 py-1 rounded border border-blue-300 hover:bg-blue-50">🔎 Probe IDs</button>
               <button onClick={onJumpFirst} className="px-2 py-1 rounded border border-green-300 hover:bg-green-50">▶️ Jump first</button>
@@ -71,6 +77,8 @@ const makeEveryAyahUrl = (folder, s, a) => {
   return `https://everyayah.com/data/${folder}/${S}${A}.mp3`;
 };
 const Q = (pathAndQuery) => `/api/quran?u=${encodeURIComponent(pathAndQuery)}`;
+const looksLikeQuranCdn = (url='') =>
+  /api\.quran\.com|qurancdn\.com|verses\.quran\.com|download\.quranicaudio\.com/i.test(url);
 
 /* ========================= الصفحة ========================= */
 export default function RecitationPage() {
@@ -89,12 +97,16 @@ export default function RecitationPage() {
   const [recitations, setRecitations] = useState([]);
   const [activeRecitationId, setActiveRecitationId] = useState(null);
   const [supportedForAyah, setSupportedForAyah] = useState([]);
+
   const [probing, setProbing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [netOK, setNetOK] = useState(null);
+  const [lastError, setLastError] = useState('');
 
-  // مراقبة حالة الشبكة مع البروكسي
-  const [netOK, setNetOK] = useState(null);      // true/false/null
-  const [lastError, setLastError] = useState(''); // آخر خطأ
+  // عدّاد التشخيص أثناء الفحص
+  const [tries, setTries] = useState(0);
+  const [hits, setHits] = useState(0);
+  const [lastTriedId, setLastTriedId] = useState(null);
 
   const audioRef = useRef(null);
   useWordSync(audioRef, segmentsAbs, pos2idx, setHighlight);
@@ -102,7 +114,7 @@ export default function RecitationPage() {
   const verseKey = `${surah}:${ayah}`;
   const cacheKey = `syncSupport:${surah}:${ayah}`;
 
-  // 1) recitations عبر البروكسي
+  // 1) recitations عبر البروكسي (قد تعود فارغة في بعض البيئات)
   useEffect(() => {
     (async () => {
       try {
@@ -119,7 +131,7 @@ export default function RecitationPage() {
     })();
   }, []);
 
-  // 2) نص الآية (alquran.cloud) + الكلمات (quran.com عبر البروكسي)
+  // 2) نص الآية (alquran.cloud) + كلمات (quran.com عبر البروكسي)
   const fetchTextAndWords = async () => {
     const vRes = await fetch(`https://api.alquran.cloud/v1/ayah/${verseKey}/quran-uthmani`);
     const vJson = await vRes.json();
@@ -127,7 +139,10 @@ export default function RecitationPage() {
       setFullText(vJson.data.text);
       setVerse({ surahNumber: surah, number: ayah, surahName: vJson.data.surah.name, audioUrl: null });
     }
-    const wRes = await fetch(Q(`/api/v4/verses/by_key/${verseKey}?language=ar&words=true&word_fields=text_uthmani,position,type`), { cache: 'no-store' });
+    const wRes = await fetch(
+      Q(`/api/v4/verses/by_key/${verseKey}?language=ar&words=true&word_fields=text_uthmani,position,type`),
+      { cache: 'no-store' }
+    );
     if (!wRes.ok) { setLastError(`words ${wRes.status}`); return; }
     const wJson = await wRes.json();
     const all = wJson?.verse?.words ?? [];
@@ -140,6 +155,7 @@ export default function RecitationPage() {
 
   // 3) محاولة تحميل مقاطع تلاوة عبر البروكسي
   const tryLoadRecitation = async (rid) => {
+    setLastTriedId(rid);
     const res = await fetch(Q(`/api/v4/recitations/${rid}/by_chapter/${surah}?segments=true`), { cache: 'no-store' });
     if (!res.ok) { setLastError(`by_chapter ${rid} → ${res.status}`); return null; }
     const data = await res.json();
@@ -154,31 +170,40 @@ export default function RecitationPage() {
     return null;
   };
 
-  // 4) فاحص تلقائي
+  // 4) فاحص تلقائي مع مسح احتياطي من 1→120 عند الحاجة
   const probeForSegments = async () => {
-    setProbing(true);
+    setProbing(true); setTries(0); setHits(0); setLastTriedId(null);
+    const ok = [];
     try {
+      // إن وُجدت لائحة قراء، جرّبها أولًا؛ وإلا جرّب نطاقًا رقميًا احتياطيًا
       const preferred = ['Mishari', 'Husary', 'Minshawi', 'Abdul', 'Sudais', 'Shatri'];
-      const sorted = [...recitations].sort((a, b) => {
-        const aw = preferred.some((p) => (a.reciter_name || '').toLowerCase().includes(p.toLowerCase())) ? -1 : 0;
-        const bw = preferred.some((p) => (b.reciter_name || '').toLowerCase().includes(p.toLowerCase())) ? -1 : 0;
-        return aw - bw;
-      });
-      const MAX = Math.min(sorted.length, 30);
+      let pool = recitations && recitations.length
+        ? [...recitations].sort((a, b) => {
+            const aw = preferred.some((p) => (a.reciter_name || '').toLowerCase().includes(p.toLowerCase())) ? -1 : 0;
+            const bw = preferred.some((p) => (b.reciter_name || '').toLowerCase().includes(p.toLowerCase())) ? -1 : 0;
+            return aw - bw;
+          }).map(r => r.id)
+        : Array.from({ length: 120 }, (_, i) => i + 1); // احتياطي
+
+      const MAX = Math.min(pool.length, 120);
       for (let i = 0; i < MAX; i++) {
-        const rid = sorted[i].id;
+        const rid = pool[i];
+        setTries((t) => t + 1);
         const loaded = await tryLoadRecitation(rid);
         if (loaded) {
+          setHits((h) => h + 1);
+          ok.push(rid);
+          // استخدم أول ناجح مباشرة
           setActiveRecitationId(loaded.id);
           setSegmentsAbs(loaded.segsAbs);
           setAudioUrl(loaded.url);
-          setSupportedForAyah([loaded.id]);
-          setLS(cacheKey, JSON.stringify({ preferred: loaded.id, supported: [loaded.id] }));
+          setSupportedForAyah((list) => Array.from(new Set([...list, loaded.id])));
+          setLS(cacheKey, JSON.stringify({ preferred: loaded.id, supported: Array.from(new Set([...ok])) }));
           return loaded.id;
         }
       }
-      setLS(cacheKey, JSON.stringify({ preferred: null, supported: [] }));
-      setSupportedForAyah([]);
+      setLS(cacheKey, JSON.stringify({ preferred: null, supported: ok }));
+      setSupportedForAyah(ok);
       return null;
     } finally { setProbing(false); }
   };
@@ -191,8 +216,12 @@ export default function RecitationPage() {
     setHighlight(-1);
     setActiveRecitationId(null);
     setSupportedForAyah([]);
+    setLastError('');
+
     try {
       await fetchTextAndWords();
+
+      // جرّب الكاش
       let cachedPreferred = null;
       try { const cached = getLS(cacheKey); if (cached) cachedPreferred = JSON.parse(cached)?.preferred ?? null; } catch {}
       if (cachedPreferred) {
@@ -204,9 +233,14 @@ export default function RecitationPage() {
           setSupportedForAyah([loaded.id]);
         }
       }
+
+      // إن لم ينجح الكاش — افحص تلقائيًا
       if (!audioUrl && segmentsAbs.length === 0) {
         const id = await probeForSegments();
-        if (!id) setAudioUrl(makeEveryAyahUrl('Alafasy_128kbps', surah, ayah)); // صوت فقط
+        if (!id) {
+          // لا يوجد مقاطع — استخدم EveryAyah (صوت فقط)
+          setAudioUrl(makeEveryAyahUrl('Alafasy_128kbps', surah, ayah));
+        }
       }
     } catch (e) {
       console.error('fetchAll error', e);
@@ -219,7 +253,11 @@ export default function RecitationPage() {
   useEffect(() => { fetchAll(); /* eslint-disable-next-line */ }, [surah, ayah]);
 
   const syncOn = useMemo(() => segmentsAbs.length > 0 && (pos2idx?.size ?? 0) > 0, [segmentsAbs, pos2idx]);
-  const sourceLabel = !audioUrl ? '—' : audioUrl.includes('api.quran.com') ? 'Quran.com (chapter)' : audioUrl.includes('everyayah.com') ? 'EveryAyah (single ayah)' : 'Other';
+  const sourceLabel = !audioUrl
+    ? '—'
+    : looksLikeQuranCdn(audioUrl) ? 'Quran.com (chapter)'
+    : audioUrl.includes('everyayah.com') ? 'EveryAyah (single ayah)'
+    : 'Other';
 
   return (
     <div className="min-h-screen p-4 md:p-8 bg-[#f7faf7]">
@@ -260,7 +298,8 @@ export default function RecitationPage() {
 
         <div className="bg-gray-50 border rounded p-3 mb-3">
           <p className="text-sm text-center mb-2">
-            {syncOn ? '✓ مزامنة الكلمة فعّالة' : '— لا توجد مقاطع لهذه الآية (سيُشغَّل الصوت فقط)'}{probing ? ' • جارِ البحث عن قارئ مدعوم...' : ''}
+            {syncOn ? '✓ مزامنة الكلمة فعّالة' : '— لا توجد مقاطع لهذه الآية (سيُشغَّل الصوت فقط)'}
+            {probing ? ' • جارِ البحث عن قارئ مدعوم...' : ''}
           </p>
           {audioUrl ? (
             <audio ref={audioRef} key={audioUrl} controls className="w-full" preload="metadata">
@@ -276,12 +315,12 @@ export default function RecitationPage() {
           <div>Active Recitation ID: {activeRecitationId ?? '—'}</div>
           <div>Segments: {segmentsAbs.length}</div>
           <div>First seg (ms): {segmentsAbs[0]?.[1]} → {segmentsAbs[0]?.[2] ?? ''}</div>
+          <div>Probe: tried {tries} • hits {hits} • lastId {lastTriedId ?? '—'}</div>
+          <div className="text-red-600">Last error: {lastError || '—'}</div>
         </div>
 
-        {/* حالة الشبكة + اختبار البروكسي */}
         <div className="text-xs bg-yellow-50 border rounded p-2 font-mono mt-2">
           <div>Network via proxy: {netOK === null ? '…' : netOK ? 'OK' : 'FAILED'}</div>
-          <div>Last error: {lastError || '—'}</div>
           <button
             onClick={async () => {
               try {
@@ -305,10 +344,11 @@ export default function RecitationPage() {
         recitationId={activeRecitationId}
         segmentsAbs={segmentsAbs}
         supportedForAyah={supportedForAyah}
+        tries={tries} hits={hits} lastTriedId={lastTriedId} lastError={lastError}
         onProbe={probeForSegments}
-        onDump={() => { console.clear(); window.__DBG = { verseKey, audioUrl, segmentsAbs, activeRecitationId, supportedForAyah, netOK, lastError }; console.log('__DBG', window.__DBG); alert(`OK:${netOK} • ${lastError||'no-error'}`); }}
+        onDump={() => { console.clear(); window.__DBG = { verseKey, audioUrl, segmentsAbs, activeRecitationId, supportedForAyah, netOK, lastError, tries, hits, lastTriedId }; console.log('__DBG', window.__DBG); alert(`Dumped to console as __DBG`); }}
         onJumpFirst={() => { if (!audioRef.current) return; if (!segmentsAbs.length) return alert('لا توجد مقاطع'); audioRef.current.currentTime = segmentsAbs[0][1] / 1000; audioRef.current.play().catch(()=>{}); }}
       />
     </div>
   );
-}
+                          }
