@@ -2,44 +2,25 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-/* ======================= Types ======================= */
-type WordSegment = [number, number, number]; // [position(1-based), startMs, endMs] — سنخزنها مطلقة
-type VerseTimestamp = {
-  verse_key: string;
-  timestamp_from: number; // بداية الآية داخل ملف السورة (ms)
-  timestamp_to: number;
-  segments?: WordSegment[]; // نسبية لبداية الآية
-};
-type ChapterAudioWithSegments = {
-  audio_url: string;
-  timestamps?: VerseTimestamp[];
-};
-type VerseWord = { text_uthmani: string; position?: number; type?: string };
-
-type VerseState = {
-  surahNumber: number;
-  number: number; // ayah
-  surahName: string;
-  audioUrl: string | null;
-} | null;
-
 /* ================ Hook: تظليل متزامن بكفاءة ================ */
-function useWordSync(
-  audioRef: React.RefObject<HTMLAudioElement>,
-  segmentsAbs: WordSegment[],
-  pos2idx: Map<number, number> | null,
-  setHighlighted: (i: number) => void
-) {
+function useWordSync(audioRef, segmentsAbs, pos2idx, setHighlighted) {
   useEffect(() => {
     const el = audioRef.current;
     if (!el || segmentsAbs.length === 0 || !pos2idx) return;
 
-    const starts = segmentsAbs.map(s => s[1]); // startMs مصفوفة مرتبة
-    const findSegIndex = (tMs: number) => {
-      let lo = 0, hi = starts.length - 1, ans = -1;
+    const starts = segmentsAbs.map((s) => s[1]);
+    const findSegIndex = (tMs) => {
+      let lo = 0,
+        hi = starts.length - 1,
+        ans = -1;
       while (lo <= hi) {
         const mid = (lo + hi) >> 1;
-        if (starts[mid] <= tMs) { ans = mid; lo = mid + 1; } else { hi = mid - 1; }
+        if (starts[mid] <= tMs) {
+          ans = mid;
+          lo = mid + 1;
+        } else {
+          hi = mid - 1;
+        }
       }
       if (ans === -1) return -1;
       return tMs < segmentsAbs[ans][2] ? ans : -1;
@@ -53,19 +34,23 @@ function useWordSync(
         const idx = pos2idx.get(pos1);
         if (typeof idx === 'number') {
           setHighlighted(idx);
-          const node = document.querySelector(`[data-word-idx="${idx}"]`) as HTMLElement | null;
+          const node = document.querySelector(`[data-word-idx="${idx}"]`);
           node?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
         }
       }
     };
 
-    const attach = () => { el.addEventListener('timeupdate', onTime); el.addEventListener('seeked', onTime); };
-    if (el.readyState >= 1) attach(); else el.addEventListener('loadedmetadata', attach, { once: true });
+    const attach = () => {
+      el.addEventListener('timeupdate', onTime);
+      el.addEventListener('seeked', onTime);
+    };
+    if (el.readyState >= 1) attach();
+    else el.addEventListener('loadedmetadata', attach, { once: true });
 
     return () => {
       el.removeEventListener('timeupdate', onTime);
       el.removeEventListener('seeked', onTime);
-      el.removeEventListener('loadedmetadata', attach as any);
+      el.removeEventListener('loadedmetadata', attach);
     };
   }, [audioRef, segmentsAbs, pos2idx, setHighlighted]);
 }
@@ -81,16 +66,6 @@ function DebugPanel({
   onProbe,
   onDump,
   onJumpFirst,
-}: {
-  verseKey: string;
-  audioRef: React.RefObject<HTMLAudioElement>;
-  sourceLabel: string;
-  recitationId: number | null;
-  segmentsAbs: [number, number, number][];
-  supportedForAyah: number[];
-  onProbe: () => void;
-  onDump: () => void;
-  onJumpFirst: () => void;
 }) {
   const [open, setOpen] = React.useState(true);
   return (
@@ -108,18 +83,42 @@ function DebugPanel({
         </div>
         {open && (
           <div className="p-3 text-[11px] space-y-1 font-mono">
-            <div>Source: <span className="font-semibold">{sourceLabel}</span></div>
-            <div>Recitation ID: <span className="font-semibold">{recitationId ?? '—'}</span></div>
-            <div>Segments: <span className="font-semibold">{segmentsAbs.length}</span></div>
-            <div>First seg (ms): <span className="font-semibold">{segmentsAbs[0]?.[1] ?? '—'} → {segmentsAbs[0]?.[2] ?? '—'}</span></div>
-            <div className="break-words">Supported IDs: {supportedForAyah.length ? supportedForAyah.join(', ') : '—'}</div>
+            <div>
+              Source: <span className="font-semibold">{sourceLabel}</span>
+            </div>
+            <div>
+              Recitation ID: <span className="font-semibold">{recitationId ?? '—'}</span>
+            </div>
+            <div>
+              Segments: <span className="font-semibold">{segmentsAbs.length}</span>
+            </div>
+            <div>
+              First seg (ms):{' '}
+              <span className="font-semibold">
+                {segmentsAbs[0]?.[1] ?? '—'} → {segmentsAbs[0]?.[2] ?? '—'}
+              </span>
+            </div>
+            <div className="break-words">
+              Supported IDs: {supportedForAyah?.length ? supportedForAyah.join(', ') : '—'}
+            </div>
 
             <div className="pt-2 flex gap-2 flex-wrap">
-              <button onClick={onProbe} className="px-2 py-1 rounded border border-blue-300 hover:bg-blue-50">🔎 Probe IDs</button>
-              <button onClick={onJumpFirst} className="px-2 py-1 rounded border border-green-300 hover:bg-green-50">▶️ Jump first</button>
-              <button onClick={onDump} className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-50">📜 Dump</button>
+              <button onClick={onProbe} className="px-2 py-1 rounded border border-blue-300 hover:bg-blue-50">
+                🔎 Probe IDs
+              </button>
+              <button onClick={onJumpFirst} className="px-2 py-1 rounded border border-green-300 hover:bg-green-50">
+                ▶️ Jump first
+              </button>
+              <button onClick={onDump} className="px-2 py-1 rounded border border-gray-300 hover:bg-gray-50">
+                📜 Dump
+              </button>
               <button
-                onClick={() => { if (audioRef.current) { audioRef.current.pause(); audioRef.current.currentTime = 0; } }}
+                onClick={() => {
+                  if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current.currentTime = 0;
+                  }
+                }}
                 className="px-2 py-1 rounded border border-red-300 hover:bg-red-50"
               >
                 ⏹ Stop
@@ -133,44 +132,47 @@ function DebugPanel({
 }
 
 /* ===================== أدوات مساعدة ===================== */
-const getLS = (k: string) => (typeof window === 'undefined' ? null : window.localStorage.getItem(k));
-const setLS = (k: string, v: string) => { if (typeof window !== 'undefined') window.localStorage.setItem(k, v); };
-const makeEveryAyahUrl = (folder: string, s: number, a: number) => {
-  const S = String(s).padStart(3, '0'); const A = String(a).padStart(3, '0');
+const getLS = (k) => (typeof window === 'undefined' ? null : window.localStorage.getItem(k));
+const setLS = (k, v) => {
+  if (typeof window !== 'undefined') window.localStorage.setItem(k, v);
+};
+const makeEveryAyahUrl = (folder, s, a) => {
+  const S = String(s).padStart(3, '0');
+  const A = String(a).padStart(3, '0');
   return `https://everyayah.com/data/${folder}/${S}${A}.mp3`;
 };
 
 /* ========================= الصفحة ========================= */
 export default function RecitationPage() {
   // اختيار السورة والآية
-  const [surah, setSurah] = useState<number>(43); // مثال: الزخرف
-  const [ayah, setAyah] = useState<number>(1);
+  const [surah, setSurah] = useState(43); // مثال: الزخرف
+  const [ayah, setAyah] = useState(1);
 
   // نص وكلمات
-  const [verse, setVerse] = useState<VerseState>(null);
+  const [verse, setVerse] = useState(null);
   const [fullText, setFullText] = useState('');
-  const [words, setWords] = useState<VerseWord[]>([]);
-  const [pos2idx, setPos2idx] = useState<Map<number, number> | null>(null);
+  const [words, setWords] = useState([]);
+  const [pos2idx, setPos2idx] = useState(null);
 
   // الصوت والمقاطع
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [segmentsAbs, setSegmentsAbs] = useState<WordSegment[]>([]);
-  const [highlight, setHighlight] = useState<number>(-1);
+  const [audioUrl, setAudioUrl] = useState(null);
+  const [segmentsAbs, setSegmentsAbs] = useState([]);
+  const [highlight, setHighlight] = useState(-1);
 
   // دعم وتشخيص
-  const [recitations, setRecitations] = useState<{ id: number; reciter_name: string }[]>([]);
-  const [activeRecitationId, setActiveRecitationId] = useState<number | null>(null);
-  const [supportedForAyah, setSupportedForAyah] = useState<number[]>([]);
+  const [recitations, setRecitations] = useState([]);
+  const [activeRecitationId, setActiveRecitationId] = useState(null);
+  const [supportedForAyah, setSupportedForAyah] = useState([]);
   const [probing, setProbing] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef(null);
   useWordSync(audioRef, segmentsAbs, pos2idx, setHighlight);
 
   const verseKey = `${surah}:${ayah}`;
   const cacheKey = `syncSupport:${surah}:${ayah}`;
 
-  /* -------- جلب قائمة التلاوات الرسمية مرّة واحدة -------- */
+  // جلب قائمة التلاوات الرسمية مرّة واحدة
   useEffect(() => {
     (async () => {
       try {
@@ -183,7 +185,7 @@ export default function RecitationPage() {
     })();
   }, []);
 
-  /* -------- جلب نص الآية والكلمات -------- */
+  // جلب نص الآية والكلمات
   const fetchTextAndWords = async () => {
     const vRes = await fetch(`https://api.alquran.cloud/v1/ayah/${verseKey}/quran-uthmani`);
     const vJson = await vRes.json();
@@ -196,54 +198,51 @@ export default function RecitationPage() {
       `https://api.quran.com/api/v4/verses/by_key/${verseKey}?language=ar&words=true&word_fields=text_uthmani,position,type`
     );
     const wJson = await wRes.json();
-    const all: VerseWord[] = wJson?.verse?.words ?? [];
-    const onlyWords = all.filter(w => w.type === 'word');
-    const map = new Map<number, number>();
-    onlyWords.forEach((w, i) => { if (typeof w.position === 'number') map.set(w.position, i); });
+    const all = wJson?.verse?.words ?? [];
+    const onlyWords = all.filter((w) => w.type === 'word');
+    const map = new Map();
+    onlyWords.forEach((w, i) => {
+      if (typeof w.position === 'number') map.set(w.position, i);
+    });
     setWords(onlyWords);
     setPos2idx(map);
   };
 
-  /* -------- تجربة recitation_id وإرجاع المقاطع إن وُجدت -------- */
-  const tryLoadRecitation = async (rid: number) => {
+  // تجربة recitation_id وإرجاع المقاطع إن وُجدت
+  const tryLoadRecitation = async (rid) => {
     const url = `https://api.quran.com/api/v4/recitations/${rid}/by_chapter/${surah}?segments=true`;
     const res = await fetch(url);
     if (!res.ok) return null;
     const data = await res.json();
-    const file: ChapterAudioWithSegments | null = data?.audio_file ?? null;
+    const file = data?.audio_file ?? null;
     const ts = file?.timestamps ?? [];
-    const verseTs = ts.find((t: VerseTimestamp) => t.verse_key === verseKey);
+    const verseTs = ts.find((t) => t.verse_key === verseKey);
     if (verseTs?.segments && verseTs.segments.length > 0 && file?.audio_url) {
       const base = verseTs.timestamp_from || 0;
-      const segsAbs: WordSegment[] = verseTs.segments
-        .map(s => [s[0], base + s[1], base + s[2]])
-        .sort((a, b) => a[1] - b[1]); // مهم جدًا
+      const segsAbs = verseTs.segments
+        .map((s) => [s[0], base + s[1], base + s[2]])
+        .sort((a, b) => a[1] - b[1]);
       return { id: rid, url: file.audio_url, segsAbs };
     }
     return null;
   };
 
-  /* -------- مُفحّص تلقائي: ابحث عن أول ID يدعم الآية -------- */
+  // مُفحّص تلقائي: ابحث عن أول ID يدعم الآية
   const probeForSegments = async () => {
     setProbing(true);
-    const ok: number[] = [];
     try {
-      // جرّب المفضّلين أولًا لتقليل الزمن
       const preferred = ['Mishari', 'Husary', 'Minshawi', 'Abdul', 'Sudais', 'Shatri'];
       const sorted = [...recitations].sort((a, b) => {
-        const aw = preferred.some(p => (a.reciter_name || '').toLowerCase().includes(p.toLowerCase())) ? -1 : 0;
-        const bw = preferred.some(p => (b.reciter_name || '').toLowerCase().includes(p.toLowerCase())) ? -1 : 0;
+        const aw = preferred.some((p) => (a.reciter_name || '').toLowerCase().includes(p.toLowerCase())) ? -1 : 0;
+        const bw = preferred.some((p) => (b.reciter_name || '').toLowerCase().includes(p.toLowerCase())) ? -1 : 0;
         return aw - bw;
       });
 
-      // جرّب حتى 30 قارئًا
       const MAX = Math.min(sorted.length, 30);
       for (let i = 0; i < MAX; i++) {
         const rid = sorted[i].id;
         const loaded = await tryLoadRecitation(rid);
         if (loaded) {
-          ok.push(rid);
-          // اختر أوّل واحد يعمل وارجع مباشرة
           setActiveRecitationId(loaded.id);
           setSegmentsAbs(loaded.segsAbs);
           setAudioUrl(loaded.url);
@@ -252,7 +251,6 @@ export default function RecitationPage() {
           return loaded.id;
         }
       }
-      // خزّن قائمة فارغة (لا يوجد دعم)
       setLS(cacheKey, JSON.stringify({ preferred: null, supported: [] }));
       setSupportedForAyah([]);
       return null;
@@ -261,7 +259,7 @@ export default function RecitationPage() {
     }
   };
 
-  /* -------- الجلب الشامل للآية + محاولة التزامن -------- */
+  // الجلب الشامل للآية + محاولة التزامن
   const fetchAll = async () => {
     setLoading(true);
     setAudioUrl(null);
@@ -274,10 +272,10 @@ export default function RecitationPage() {
       await fetchTextAndWords();
 
       // جرّب الكاش
-      let cachedPreferred: number | null = null;
+      let cachedPreferred = null;
       try {
         const cached = getLS(cacheKey);
-        if (cached) cachedPreferred = (JSON.parse(cached) as any)?.preferred ?? null;
+        if (cached) cachedPreferred = JSON.parse(cached)?.preferred ?? null;
       } catch {}
 
       if (cachedPreferred) {
@@ -294,7 +292,7 @@ export default function RecitationPage() {
       if (!audioUrl && segmentsAbs.length === 0) {
         const id = await probeForSegments();
         if (!id) {
-          // لا يوجد مقاطع — استخدم EveryAyah (صوت فقط) كي ترى/تسمع شيئًا
+          // لا يوجد مقاطع — استخدم EveryAyah (صوت فقط)
           setAudioUrl(makeEveryAyahUrl('Alafasy_128kbps', surah, ayah));
         }
       }
@@ -307,13 +305,22 @@ export default function RecitationPage() {
   };
 
   // أول تحميل + عند تغيير السورة/الآية
-  useEffect(() => { fetchAll(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
-  useEffect(() => { fetchAll(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [surah, ayah]);
+  useEffect(() => {
+    fetchAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    fetchAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [surah, ayah]);
 
   const syncOn = useMemo(() => segmentsAbs.length > 0 && (pos2idx?.size ?? 0) > 0, [segmentsAbs, pos2idx]);
-  const sourceLabel = !audioUrl ? '—'
-    : audioUrl.includes('api.quran.com') ? 'Quran.com (chapter)'
-    : audioUrl.includes('everyayah.com') ? 'EveryAyah (single ayah)'
+  const sourceLabel = !audioUrl
+    ? '—'
+    : audioUrl.includes('api.quran.com')
+    ? 'Quran.com (chapter)'
+    : audioUrl.includes('everyayah.com')
+    ? 'EveryAyah (single ayah)'
     : 'Other';
 
   return (
@@ -330,14 +337,21 @@ export default function RecitationPage() {
         {/* اختيارات بسيطة للسورة/الآية */}
         <div className="flex gap-3 mb-4 justify-center">
           <input
-            type="number" min={1} max={114} value={surah}
-            onChange={(e) => setSurah(Math.max(1, Math.min(114, Number(e.target.value)||1)))}
-            className="w-28 p-2 border rounded text-center" placeholder="سورة"
+            type="number"
+            min={1}
+            max={114}
+            value={surah}
+            onChange={(e) => setSurah(Math.max(1, Math.min(114, Number(e.target.value) || 1)))}
+            className="w-28 p-2 border rounded text-center"
+            placeholder="سورة"
           />
           <input
-            type="number" min={1} value={ayah}
-            onChange={(e) => setAyah(Math.max(1, Number(e.target.value)||1))}
-            className="w-28 p-2 border rounded text-center" placeholder="آية"
+            type="number"
+            min={1}
+            value={ayah}
+            onChange={(e) => setAyah(Math.max(1, Number(e.target.value) || 1))}
+            className="w-28 p-2 border rounded text-center"
+            placeholder="آية"
           />
           <button onClick={fetchAll} className="px-4 py-2 rounded bg-[#1e7850] text-white font-semibold">
             تطبيق الاختيارات
@@ -356,9 +370,9 @@ export default function RecitationPage() {
                     setHighlight(i);
                     if (syncOn && audioRef.current) {
                       const pos1 = w.position ?? -1;
-                      const seg = segmentsAbs.find(s => s[0] === pos1);
+                      const seg = segmentsAbs.find((s) => s[0] === pos1);
                       if (seg) {
-                        audioRef.current.currentTime = seg[1] / 1000; // seg مطلق
+                        audioRef.current.currentTime = seg[1] / 1000; // مطلق
                         audioRef.current.play().catch(() => {});
                       }
                     }
@@ -379,7 +393,8 @@ export default function RecitationPage() {
         {/* الصوت */}
         <div className="bg-gray-50 border rounded p-3 mb-3">
           <p className="text-sm text-center mb-2">
-            {syncOn ? '✓ مزامنة الكلمة فعّالة' : '— لا توجد مقاطع لهذه الآية (سيُشغَّل الصوت فقط)'}{probing ? ' • جارِ البحث عن قارئ مدعوم...' : ''}
+            {syncOn ? '✓ مزامنة الكلمة فعّالة' : '— لا توجد مقاطع لهذه الآية (سيُشغَّل الصوت فقط)'}
+            {probing ? ' • جارِ البحث عن قارئ مدعوم...' : ''}
           </p>
           {audioUrl ? (
             <audio ref={audioRef} key={audioUrl} controls className="w-full" preload="metadata">
@@ -393,11 +408,15 @@ export default function RecitationPage() {
 
         {/* تشخيص مختصر داخل الصفحة */}
         <div className="text-xs bg-gray-50 border rounded p-2 font-mono">
-          <div>Surah: {surah} — Ayah: {ayah}</div>
+          <div>
+            Surah: {surah} — Ayah: {ayah}
+          </div>
           <div>Source: {sourceLabel}</div>
           <div>Active Recitation ID: {activeRecitationId ?? '—'}</div>
           <div>Segments: {segmentsAbs.length}</div>
-          <div>First seg (ms): {segmentsAbs[0]?.[1]} → {segmentsAbs[0]?.[2] ?? ''}</div>
+          <div>
+            First seg (ms): {segmentsAbs[0]?.[1]} → {segmentsAbs[0]?.[2] ?? ''}
+          </div>
         </div>
 
         {loading && <div className="mt-3 text-sm text-gray-600">جاري التحميل...</div>}
@@ -414,10 +433,9 @@ export default function RecitationPage() {
         onProbe={probeForSegments}
         onDump={() => {
           console.clear();
-          // @ts-ignore
           window.__DBG = { verseKey, audioUrl, segmentsAbs, activeRecitationId, supportedForAyah };
           // eslint-disable-next-line no-console
-          console.log('__DBG', (window as any).__DBG);
+          console.log('__DBG', window.__DBG);
           alert('تم الطباعة إلى Console باسم __DBG');
         }}
         onJumpFirst={() => {
