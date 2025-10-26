@@ -1,33 +1,38 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 const RECITERS = [
-  { id: 0, name: 'اسم القارئ', subtext: 'غير محدد (عشوائي)', edition: null },
-  { id: 1, name: 'مشاري العفاسي', subtext: null, edition: 'ar.alafasy' },
-  { id: 2, name: 'عبد الباسط عبد الصمد', subtext: null, edition: 'ar.abdulbasitmurattal' },
-  { id: 3, name: 'عبد الرحمن السديس', subtext: null, edition: 'ar.abdurrahmaansudais' },
-  { id: 4, name: 'محمد صديق المنشاوي', subtext: null, edition: 'ar.minshawi' },
-  { id: 5, name: 'محمود خليل الحصري', subtext: null, edition: 'ar.husary' },
-  { id: 6, name: 'أبو بكر الشاطري', subtext: null, edition: 'ar.shaatree' },
+  { id: 0, name: 'اسم القارئ', subtext: 'غير محدد (عشوائي)', reciterId: null },
+  { id: 1, name: 'مشاري العفاسي', subtext: null, reciterId: 7 },
+  { id: 2, name: 'عبد الباسط عبد الصمد', subtext: null, reciterId: 1 },
+  { id: 3, name: 'عبد الرحمن السديس', subtext: null, reciterId: 9 },
+  { id: 4, name: 'محمد صديق المنشاوي', subtext: null, reciterId: 3 },
+  { id: 5, name: 'محمود خليل الحصري', subtext: null, reciterId: 2 },
+  { id: 6, name: 'أبو بكر الشاطري', subtext: null, reciterId: 5 },
 ];
 
 export default function RecitationPage() {
   const [verse, setVerse] = useState(null);
   const [words, setWords] = useState([]);
+  const [wordTimings, setWordTimings] = useState([]);
   const [surahs, setSurahs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioBlob, setAudioBlob] = useState(null);
   const [highlightedWordIndex, setHighlightedWordIndex] = useState(-1);
+  const [currentPlayingWordIndex, setCurrentPlayingWordIndex] = useState(-1);
 
   const [selectedReciter, setSelectedReciter] = useState(0);
   const [selectedSurah, setSelectedSurah] = useState(0);
   const [selectedAyah, setSelectedAyah] = useState(0);
   const [availableAyahs, setAvailableAyahs] = useState([]);
+
+  const audioRef = useRef(null);
+  const highlightTimerRef = useRef(null);
 
   useEffect(() => {
     fetchSurahs();
@@ -73,6 +78,8 @@ export default function RecitationPage() {
     setLoading(true);
     setAudioBlob(null);
     setHighlightedWordIndex(-1);
+    setCurrentPlayingWordIndex(-1);
+    setWordTimings([]);
     
     try {
       let surahNum = selectedSurah === 0 
@@ -91,54 +98,112 @@ export default function RecitationPage() {
         ? RECITERS[Math.floor(Math.random() * (RECITERS.length - 1)) + 1]
         : RECITERS.find(r => r.id === selectedReciter);
 
-      const verseResponse = await fetch(
-        `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/editions/quran-uthmani,${reciterData.edition}`
-      );
-      const verseData = await verseResponse.json();
-      
-      if (verseData.status === 'OK' && verseData.data.length >= 2) {
-        const textData = verseData.data[0];
-        const audioData = verseData.data[1];
+      const reciterId = reciterData.reciterId;
 
+      // Fetch verse text and words from Quran.com API v4
+      const verseKey = `${surahNum}:${ayahNum}`;
+      const wordsResponse = await fetch(
+        `https://api.quran.com/api/v4/verses/by_key/${verseKey}?language=ar&words=true&word_fields=text_uthmani,audio&audio=${reciterId}`
+      );
+      const wordsData = await wordsResponse.json();
+
+      if (wordsData.verse) {
+        const verseInfo = wordsData.verse;
+        
         setVerse({
-          text: textData.text,
-          surah: textData.surah.name,
+          text: verseInfo.text_uthmani,
+          surah: surahs.find(s => s.id === surahNum)?.name || 'السورة',
           surahNumber: surahNum,
           number: ayahNum,
-          audio: audioData.audio || audioData.audioSecondary?.[0] || null,
+          audio: verseInfo.audio?.url || null,
           reciter: reciterData.name
         });
 
-        try {
-          const wordsResponse = await fetch(
-            `https://api.quran.com/api/v4/verses/by_key/${surahNum}:${ayahNum}?language=ar&words=true&word_fields=text_uthmani`
-          );
-          const wordsData = await wordsResponse.json();
-          if (wordsData.verse && wordsData.verse.words) {
-            setWords(wordsData.verse.words);
-          } else {
-            setWords([]);
-          }
-        } catch (err) {
-          console.log('تعذر جلب الكلمات');
-          setWords([]);
+        if (verseInfo.words) {
+          setWords(verseInfo.words);
+          
+          // Extract word timings from audio segments
+          const timings = verseInfo.words
+            .filter(word => word.audio)
+            .map(word => ({
+              timestamp_from: word.audio.timestamp_from || 0,
+              timestamp_to: word.audio.timestamp_to || 0,
+            }));
+          
+          setWordTimings(timings);
         }
       }
     } catch (error) {
       console.error('خطأ في جلب الآية:', error);
+      // Fallback to old API
       setVerse({
         text: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
         surah: 'الفاتحة',
         surahNumber: 1,
         number: 1,
-        audio: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3',
+        audio: 'https://verses.quran.com/Alafasy/mp3/001001.mp3',
         reciter: RECITERS[1].name
       });
       setWords([]);
+      setWordTimings([]);
     } finally {
       setLoading(false);
     }
   };
+
+  // Precise word-by-word highlighting with timestamps
+  const handleAudioPlay = () => {
+    if (!audioRef.current || wordTimings.length === 0) return;
+
+    const audio = audioRef.current;
+    setCurrentPlayingWordIndex(-1);
+
+    // Clear any existing timers
+    if (highlightTimerRef.current) {
+      clearInterval(highlightTimerRef.current);
+    }
+
+    highlightTimerRef.current = setInterval(() => {
+      const currentTime = audio.currentTime * 1000; // Convert to milliseconds
+      
+      // Find the current word based on timestamp
+      const currentIndex = wordTimings.findIndex(
+        timing => currentTime >= timing.timestamp_from && currentTime <= timing.timestamp_to
+      );
+      
+      if (currentIndex !== -1 && currentIndex !== currentPlayingWordIndex) {
+        setCurrentPlayingWordIndex(currentIndex);
+      }
+      
+      if (audio.ended || audio.paused) {
+        clearInterval(highlightTimerRef.current);
+        setCurrentPlayingWordIndex(-1);
+      }
+    }, 50); // Check every 50ms for smooth highlighting
+  };
+
+  const handleAudioPause = () => {
+    if (highlightTimerRef.current) {
+      clearInterval(highlightTimerRef.current);
+    }
+    setCurrentPlayingWordIndex(-1);
+  };
+
+  const handleAudioEnded = () => {
+    if (highlightTimerRef.current) {
+      clearInterval(highlightTimerRef.current);
+    }
+    setCurrentPlayingWordIndex(-1);
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (highlightTimerRef.current) {
+        clearInterval(highlightTimerRef.current);
+      }
+    };
+  }, []);
 
   const startRecording = async () => {
     try {
@@ -218,7 +283,9 @@ export default function RecitationPage() {
                       key={index}
                       onClick={() => setHighlightedWordIndex(index)}
                       className={`cursor-pointer px-2 py-1 rounded-lg transition-all ${
-                        highlightedWordIndex === index
+                        currentPlayingWordIndex === index
+                          ? 'bg-green-100/40 text-[#1e7850] font-bold shadow-sm scale-105'
+                          : highlightedWordIndex === index
                           ? 'bg-green-200 shadow-md scale-110'
                           : 'hover:bg-green-50'
                       }`}
@@ -285,7 +352,15 @@ export default function RecitationPage() {
                 استمع للتلاوة الصحيحة - القارئ: <span className="font-bold">{verse?.reciter}</span>
               </p>
               {verse?.audio ? (
-                <audio key={verse.audio} controls className="w-full rounded-full">
+                <audio 
+                  ref={audioRef}
+                  key={verse.audio} 
+                  controls 
+                  className="w-full rounded-full"
+                  onPlay={handleAudioPlay}
+                  onPause={handleAudioPause}
+                  onEnded={handleAudioEnded}
+                >
                   <source src={verse.audio} type="audio/mpeg" />
                   المتصفح لا يدعم تشغيل الصوت
                 </audio>
@@ -319,7 +394,7 @@ export default function RecitationPage() {
 
             <div className="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg">
               <p className="text-sm text-gray-700">
-                💡 <strong>تلميح:</strong> اضغط على "تطبيق الاختيارات" لتحميل الآية والصوت الصحيح. انقر على أي كلمة لتمييزها.
+                💡 <strong>تلميح:</strong> عند تشغيل الصوت، سيتم تظليل الكلمات تلقائياً بدقة عالية متزامنة مع القارئ.
               </p>
             </div>
           </div>
