@@ -212,12 +212,12 @@ export default function RecitationPage() {
 
             <div className="quran-text bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner">
               {words.length > 0 ? (
-                <div className="flex flex-wrap justify-center gap-2" dir="rtl">
+                <div className="flex flex-wrap justify-center gap-3" dir="rtl">
                   {words.map((word, index) => (
                     <span
                       key={index}
                       onClick={() => setHighlightedWordIndex(index)}
-                      className={`cursor-pointer px-2 py-1 rounded-lg transition-all ${
+                      className={`cursor-pointer px-3 py-2 rounded-lg transition-all text-3xl md:text-4xl ${
                         highlightedWordIndex === index
                           ? 'bg-green-200 shadow-md scale-110'
                           : 'hover:bg-green-50'
@@ -228,7 +228,7 @@ export default function RecitationPage() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center">{verse?.text}</div>
+                <div className="text-center text-3xl md:text-4xl">{verse?.text}</div>
               )}
             </div>
 
@@ -236,7 +236,7 @@ export default function RecitationPage() {
               <select
                 value={selectedReciter}
                 onChange={(e) => setSelectedReciter(Number(e.target.value))}
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg"
+                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg font-amiri"
               >
                 {RECITERS.map(reciter => (
                   <option key={reciter.id} value={reciter.id}>
@@ -248,7 +248,7 @@ export default function RecitationPage() {
               <select
                 value={selectedSurah}
                 onChange={(e) => setSelectedSurah(Number(e.target.value))}
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg"
+                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg font-amiri"
               >
                 {surahs.map(surah => (
                   <option key={surah.id} value={surah.id}>
@@ -263,7 +263,7 @@ export default function RecitationPage() {
                 value={selectedAyah}
                 onChange={(e) => setSelectedAyah(Number(e.target.value))}
                 disabled={selectedSurah === 0}
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white disabled:bg-gray-100 disabled:cursor-not-allowed text-lg"
+                className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white disabled:bg-gray-100 disabled:cursor-not-allowed text-lg font-amiri"
               >
                 {availableAyahs.map(ayah => (
                   <option key={ayah.number} value={ayah.number}>
