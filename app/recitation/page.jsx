@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-// قائمة القراء من Al-Quran Cloud
 const RECITERS = [
   { id: 0, name: 'اسم القارئ', subtext: 'غير محدد (عشوائي)', edition: null },
   { id: 1, name: 'مشاري العفاسي', subtext: null, edition: 'ar.alafasy' },
@@ -25,19 +24,16 @@ export default function RecitationPage() {
   const [audioBlob, setAudioBlob] = useState(null);
   const [highlightedWordIndex, setHighlightedWordIndex] = useState(-1);
 
-  // State للقوائم المنسدلة
   const [selectedReciter, setSelectedReciter] = useState(0);
   const [selectedSurah, setSelectedSurah] = useState(0);
   const [selectedAyah, setSelectedAyah] = useState(0);
   const [availableAyahs, setAvailableAyahs] = useState([]);
 
-  // جلب قائمة السور عند التحميل
   useEffect(() => {
     fetchSurahs();
     fetchVerse();
   }, []);
 
-  // جلب قائمة السور من API
   const fetchSurahs = async () => {
     try {
       const response = await fetch('https://api.alquran.cloud/v1/meta');
@@ -57,7 +53,6 @@ export default function RecitationPage() {
     }
   };
 
-  // تحديث قائمة الآيات عند تغيير السورة
   useEffect(() => {
     if (selectedSurah > 0) {
       const surah = surahs.find(s => s.id === selectedSurah);
@@ -74,14 +69,12 @@ export default function RecitationPage() {
     }
   }, [selectedSurah, surahs]);
 
-  // جلب الآية مع الصوت
   const fetchVerse = async () => {
     setLoading(true);
     setAudioBlob(null);
     setHighlightedWordIndex(-1);
     
     try {
-      // تحديد السورة والآية
       let surahNum = selectedSurah === 0 
         ? Math.floor(Math.random() * 114) + 1 
         : selectedSurah;
@@ -94,20 +87,18 @@ export default function RecitationPage() {
         ayahNum = 1;
       }
 
-      // تحديد القارئ
       let reciterData = selectedReciter === 0 
         ? RECITERS[Math.floor(Math.random() * (RECITERS.length - 1)) + 1]
         : RECITERS.find(r => r.id === selectedReciter);
 
-      // جلب الآية مع الصوت من نفس الـ API call
       const verseResponse = await fetch(
         `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/editions/quran-uthmani,${reciterData.edition}`
       );
       const verseData = await verseResponse.json();
       
       if (verseData.status === 'OK' && verseData.data.length >= 2) {
-        const textData = verseData.data[0]; // النص
-        const audioData = verseData.data[1]; // الصوت
+        const textData = verseData.data[0];
+        const audioData = verseData.data[1];
 
         setVerse({
           text: textData.text,
@@ -118,7 +109,6 @@ export default function RecitationPage() {
           reciter: reciterData.name
         });
 
-        // جلب الكلمات من Quran.com (للتمييز)
         try {
           const wordsResponse = await fetch(
             `https://api.quran.com/api/v4/verses/by_key/${surahNum}:${ayahNum}?language=ar&words=true&word_fields=text_uthmani`
@@ -191,7 +181,6 @@ export default function RecitationPage() {
   return (
     <div className="min-h-screen p-4 md:p-8 relative z-10">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="flex items-center justify-between mb-6 bg-white rounded-2xl p-4 shadow-md border border-gray-100">
           <Link href="/" className="text-[#1e7850] hover:text-[#155c3e] font-semibold flex items-center gap-2">
             <span>←</span> العودة للرئيسية
@@ -201,14 +190,12 @@ export default function RecitationPage() {
           </div>
         </div>
 
-        {/* Title */}
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-[#1e7850] mb-2">
             قسم التلاوة والتدريب
           </h1>
         </div>
 
-        {/* Main Card */}
         {loading ? (
           <div className="bg-white p-12 rounded-3xl shadow-lg border border-gray-100 text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#1e7850] border-t-transparent mx-auto mb-4"></div>
@@ -216,15 +203,13 @@ export default function RecitationPage() {
           </div>
         ) : (
           <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-8 mb-6">
-            {/* Surah Info */}
             <div className="text-center mb-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-1">
+              <h2 className="text-xl font-bold text-gray-800 mb-1 font-amiri">
                 {verse?.surah}
               </h2>
-              <p className="text-gray-600">الآية {verse?.number}</p>
+              <p className="text-gray-600 font-amiri">الآية {verse?.number}</p>
             </div>
 
-            {/* Quranic Text with Word Highlighting */}
             <div className="quran-text bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner">
               {words.length > 0 ? (
                 <div className="flex flex-wrap justify-center gap-2" dir="rtl">
@@ -247,9 +232,7 @@ export default function RecitationPage() {
               )}
             </div>
 
-            {/* Selection Dropdowns */}
             <div className="flex flex-col gap-3 mb-6">
-              {/* Reciter */}
               <select
                 value={selectedReciter}
                 onChange={(e) => setSelectedReciter(Number(e.target.value))}
@@ -262,7 +245,6 @@ export default function RecitationPage() {
                 ))}
               </select>
 
-              {/* Surah */}
               <select
                 value={selectedSurah}
                 onChange={(e) => setSelectedSurah(Number(e.target.value))}
@@ -277,7 +259,6 @@ export default function RecitationPage() {
                 ))}
               </select>
 
-              {/* Ayah */}
               <select
                 value={selectedAyah}
                 onChange={(e) => setSelectedAyah(Number(e.target.value))}
@@ -292,7 +273,6 @@ export default function RecitationPage() {
               </select>
             </div>
 
-            {/* Apply Button */}
             <button
               onClick={fetchVerse}
               className="w-full bg-[#1e7850] text-white px-6 py-4 rounded-full font-bold hover:bg-[#155c3e] transition-all shadow-md mb-4"
@@ -300,7 +280,6 @@ export default function RecitationPage() {
               🔄 تطبيق الاختيارات
             </button>
 
-            {/* Audio Player */}
             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-4">
               <p className="text-sm text-gray-600 mb-2 text-center">
                 استمع للتلاوة الصحيحة - القارئ: <span className="font-bold">{verse?.reciter}</span>
@@ -315,7 +294,6 @@ export default function RecitationPage() {
               )}
             </div>
 
-            {/* Recording Button */}
             <button
               onClick={isRecording ? stopRecording : startRecording}
               className={`w-full ${
@@ -327,7 +305,6 @@ export default function RecitationPage() {
               {isRecording ? '⏹ إيقاف التسجيل' : '🎤 ابدأ التسجيل'}
             </button>
 
-            {/* Recorded Audio Playback */}
             {audioBlob && (
               <div className="bg-blue-50 p-4 rounded-2xl border border-blue-200 mb-4">
                 <p className="text-sm text-blue-700 mb-2 text-center font-semibold">✅ تم التسجيل بنجاح!</p>
@@ -340,7 +317,6 @@ export default function RecitationPage() {
               </div>
             )}
 
-            {/* Tip */}
             <div className="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg">
               <p className="text-sm text-gray-700">
                 💡 <strong>تلميح:</strong> اضغط على "تطبيق الاختيارات" لتحميل الآية والصوت الصحيح. انقر على أي كلمة لتمييزها.
