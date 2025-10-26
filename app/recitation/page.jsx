@@ -65,7 +65,6 @@ export default function RecitationPage() {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioBlob, setAudioBlob] = useState(null);
   const [highlightedWordIndex, setHighlightedWordIndex] = useState(-1);
-  const [currentPlayingWordIndex, setCurrentPlayingWordIndex] = useState(-1);
 
   const [selectedReciter, setSelectedReciter] = useState(0);
   const [selectedSurah, setSelectedSurah] = useState(0);
@@ -73,7 +72,6 @@ export default function RecitationPage() {
   const [availableAyahs, setAvailableAyahs] = useState([]);
 
   const audioRef = useRef(null);
-  const highlightTimerRef = useRef(null);
 
   useEffect(() => {
     fetchSurahs();
@@ -119,7 +117,6 @@ export default function RecitationPage() {
     setLoading(true);
     setAudioBlob(null);
     setHighlightedWordIndex(-1);
-    setCurrentPlayingWordIndex(-1);
     
     try {
       let surahNum = selectedSurah === 0 
@@ -138,12 +135,10 @@ export default function RecitationPage() {
         ? RECITERS[Math.floor(Math.random() * (RECITERS.length - 1)) + 1]
         : RECITERS.find(r => r.id === selectedReciter);
 
-      // Build audio URL (EveryAyah.com - most reliable)
       const paddedSurah = String(surahNum).padStart(3, '0');
       const paddedAyah = String(ayahNum).padStart(3, '0');
       const audioUrl = `https://everyayah.com/data/${reciterData.folder}/${paddedSurah}${paddedAyah}.mp3`;
 
-      // Fetch verse text from API
       const verseResponse = await fetch(
         `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/quran-uthmani`
       );
@@ -161,7 +156,6 @@ export default function RecitationPage() {
           reciter: reciterData.name
         });
 
-        // Fetch words from Quran.com API
         try {
           const verseKey = `${surahNum}:${ayahNum}`;
           const wordsResponse = await fetch(
@@ -193,62 +187,6 @@ export default function RecitationPage() {
       setLoading(false);
     }
   };
-
-  // Word-by-word highlighting (estimated timing)
-  const handleAudioPlay = () => {
-    if (!audioRef.current || words.length === 0) return;
-
-    const audio = audioRef.current;
-    setCurrentPlayingWordIndex(-1);
-
-    if (highlightTimerRef.current) {
-      clearInterval(highlightTimerRef.current);
-    }
-
-    let currentIndex = 0;
-    
-    highlightTimerRef.current = setInterval(() => {
-      if (audio.duration && !isNaN(audio.duration)) {
-        const currentTime = audio.currentTime;
-        const duration = audio.duration;
-        const wordCount = words.length;
-        const timePerWord = duration / wordCount;
-        const newIndex = Math.floor(currentTime / timePerWord);
-        
-        if (newIndex < wordCount && newIndex !== currentIndex) {
-          currentIndex = newIndex;
-          setCurrentPlayingWordIndex(newIndex);
-        }
-      }
-      
-      if (audio.ended || audio.paused) {
-        clearInterval(highlightTimerRef.current);
-        setCurrentPlayingWordIndex(-1);
-      }
-    }, 100);
-  };
-
-  const handleAudioPause = () => {
-    if (highlightTimerRef.current) {
-      clearInterval(highlightTimerRef.current);
-    }
-    setCurrentPlayingWordIndex(-1);
-  };
-
-  const handleAudioEnded = () => {
-    if (highlightTimerRef.current) {
-      clearInterval(highlightTimerRef.current);
-    }
-    setCurrentPlayingWordIndex(-1);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (highlightTimerRef.current) {
-        clearInterval(highlightTimerRef.current);
-      }
-    };
-  }, []);
 
   const startRecording = async () => {
     try {
@@ -328,9 +266,7 @@ export default function RecitationPage() {
                       key={index}
                       onClick={() => setHighlightedWordIndex(index)}
                       className={`cursor-pointer px-2 py-1 rounded-lg transition-all ${
-                        currentPlayingWordIndex === index
-                          ? 'bg-green-100/40 text-[#1e7850] font-bold shadow-sm scale-105'
-                          : highlightedWordIndex === index
+                        highlightedWordIndex === index
                           ? 'bg-green-200 shadow-md scale-110'
                           : 'hover:bg-green-50'
                       }`}
@@ -402,9 +338,6 @@ export default function RecitationPage() {
                   key={verse.audio} 
                   controls 
                   className="w-full rounded-full"
-                  onPlay={handleAudioPlay}
-                  onPause={handleAudioPause}
-                  onEnded={handleAudioEnded}
                   preload="metadata"
                 >
                   <source src={verse.audio} type="audio/mpeg" />
@@ -440,7 +373,7 @@ export default function RecitationPage() {
 
             <div className="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg">
               <p className="text-sm text-gray-700">
-                💡 <strong>تلميح:</strong> عند تشغيل الصوت، سيتم تظليل الكلمات تلقائياً.
+                💡 <strong>تلميح:</strong> انقر على أي كلمة لتمييزها. المزامنة التلقائية الدقيقة ستكون متاحة قريباً.
               </p>
             </div>
           </div>
