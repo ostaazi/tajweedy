@@ -2,57 +2,38 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
 
-export default function ReportPage() {
-  const params = useParams();
-  const attemptId = params?.id;
+export default function ResultPage() {
+  const [score, setScore] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [qrSrc, setQrSrc] = useState('');
 
-  const [attempt, setAttempt] = useState(null);
-  const [userName, setUserName] = useState('');
-  const [trainerName, setTrainerName] = useState('');
-  const [qrSrc, setQrSrc] = useState('');         // رابط صورة الـ QR المختبرة والصالحة
-  const [loading, setLoading] = useState(true);   // حالة تحميل البيانات
-
-  // ——————————————————————————————————————————
-  // 1) جلب بيانات المحاولة من localStorage (عميل فقط)
-  // ——————————————————————————————————————————
+  // استرجاع نتيجة المستخدم من التخزين المحلي
   useEffect(() => {
-    const run = () => {
-      if (!attemptId) { setLoading(false); return; }
+    const lastAttempt = JSON.parse(localStorage.getItem('quizAttempts') || '[]').slice(-1)[0];
+    if (lastAttempt) {
+      setScore(lastAttempt.score || 0);
+      setTotal(lastAttempt.total || 0);
+    }
+  }, []);
 
-      const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
-      const found = attempts.find(
-        (a) => String(a?.id) === String(attemptId) || Number(a?.id) === Number(attemptId)
-      );
-      if (found) setAttempt(found);
+  const percentage = total ? Math.round((score / total) * 100) : 0;
 
-      setUserName(localStorage.getItem('userName') || '');
-      setTrainerName(localStorage.getItem('trainerName') || '');
-      setLoading(false);
-    };
-    run();
-  }, [attemptId]);
-
-  // ——————————————————————————————————————————
-  // 2) بناء رابط التقرير بأمان (لا يشتغل على السيرفر)
-  // ——————————————————————————————————————————
+  // رابط التقرير الفعلي
   const reportUrl = useMemo(() => {
-    if (typeof window === 'undefined' || !attemptId) return '';
-    return `${window.location.origin}/quiz/report/${attemptId}`;
-  }, [attemptId]);
+    if (typeof window === 'undefined' || !total) return '';
+    const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
+    const latestId = attempts?.slice(-1)[0]?.id || '';
+    return `${window.location.origin}/quiz/report/${latestId}`;
+  }, [total]);
 
-  // ——————————————————————————————————————————
-  // 3) توليد رابط صورة QR بالاعتماد على خدمات عامة (بدون مكتبات)
-  //    مع التجربة التسلسلية (fallback) حتى تنجح إحداها
-  // ——————————————————————————————————————————
+  // توليد رمز QR تلقائيًا من خدمات خارجية آمنة
   useEffect(() => {
     if (!reportUrl) return;
-
     const services = [
-      `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(reportUrl)}`,
-      `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(reportUrl)}`,
-      `https://quickchart.io/qr?text=${encodeURIComponent(reportUrl)}&size=300`,
+      `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(reportUrl)}`,
+      `https://chart.googleapis.com/chart?cht=qr&chs=250x250&chl=${encodeURIComponent(reportUrl)}`,
+      `https://quickchart.io/qr?text=${encodeURIComponent(reportUrl)}&size=250`,
     ];
 
     let i = 0;
@@ -61,185 +42,69 @@ export default function ReportPage() {
     const tryNext = () => {
       if (cancelled) return;
       if (i >= services.length) { setQrSrc(''); return; }
-
       const candidate = services[i++];
       const img = new Image();
       img.onload = () => { if (!cancelled) setQrSrc(candidate); };
       img.onerror = () => { if (!cancelled) tryNext(); };
-      img.referrerPolicy = 'no-referrer';
       img.src = candidate;
+      img.referrerPolicy = 'no-referrer';
     };
 
     tryNext();
     return () => { cancelled = true; };
   }, [reportUrl]);
 
-  // ——————————————————————————————————————————
-  // 4) حفظ الأسماء
-  // ——————————————————————————————————————————
-  const saveNames = () => {
-    if (userName) localStorage.setItem('userName', userName);
-    if (trainerName) localStorage.setItem('trainerName', trainerName);
-  };
-
-  // ——————————————————————————————————————————
-  // 5) شاشات الحالات
-  // ——————————————————————————————————————————
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-green-50 flex items-center justify-center p-4">
-        <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent" />
-      </div>
-    );
-  }
-
-  if (!attempt) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-green-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <p className="text-2xl font-bold text-gray-700 mb-4">❌ لا توجد محاولة</p>
-          <p className="text-gray-600 mb-6">لم يتم العثور على تقرير مطابق لهذا المعرّف</p>
-          <Link
-            href="/quiz"
-            className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-xl inline-block"
-          >
-            ← العودة للاختبار
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  // ——————————————————————————————————————————
-  // 6) حساب الإحصاءات
-  // ——————————————————————————————————————————
-  const score = attempt.score ?? 0;
-  const total = attempt.total ?? 0;
-  const percentage = total ? Math.round((score / total) * 100) : 0;
-
-  // ——————————————————————————————————————————
-  // 7) واجهة التقرير
-  // ——————————————————————————————————————————
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-green-50 p-4 md:p-8" dir="rtl">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-white to-green-50 p-6" dir="rtl">
+      <div className="max-w-3xl mx-auto text-center">
 
-        {/* Header */}
-        <div className="bg-white rounded-3xl shadow-card p-6 mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center">
-              <span className="text-white text-3xl font-bold">TJ</span>
-            </div>
-            <Link
-              href="/quiz"
-              className="flex items-center gap-2 text-primary hover:text-primary-dark transition-colors font-bold text-lg"
-            >
-              <span>اختبار جديد</span>
-              <span className="text-2xl">←</span>
-            </Link>
-          </div>
+        <h1 className="text-3xl font-bold text-green-700 mb-6">نتيجة الاختبار 🎓</h1>
 
-          <h1 className="text-3xl md:text-4xl font-bold text-center text-primary mb-2">
-            🎓 تقرير أداء الاختبار
-          </h1>
-          <p className="text-center text-gray-600 text-lg">
-            {new Date(attempt.date || Date.now()).toLocaleDateString('ar-EG', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </p>
-        </div>
-
-        {/* Names */}
-        <div className="bg-white rounded-3xl shadow-card p-6 mb-6">
-          <div className="space-y-4">
-            <div>
-              <label className="flex items-center gap-2 text-lg font-bold text-gray-700 mb-2">
-                👤 اسم المتدرب
-              </label>
-              <input
-                type="text"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                onBlur={saveNames}
-                placeholder="أدخل اسمك..."
-                className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl focus:border-primary focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="flex items-center gap-2 text-lg font-bold text-gray-700 mb-2">
-                👨‍🏫 اسم المدرب (اختياري)
-              </label>
-              <input
-                type="text"
-                value={trainerName}
-                onChange={(e) => setTrainerName(e.target.value)}
-                onBlur={saveNames}
-                placeholder="أدخل اسم المدرب..."
-                className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl focus:border-primary focus:outline-none"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Score Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-green-50 border-4 border-green-200 rounded-2xl p-6 text-center">
-            <p className="text-green-700 text-lg font-bold mb-2">✅ إجابات صحيحة</p>
-            <p className="text-6xl font-bold text-green-600">{score}</p>
+          <div className="bg-green-100 border-2 border-green-300 rounded-2xl p-6">
+            <p className="text-green-800 font-bold mb-2">إجابات صحيحة ✅</p>
+            <p className="text-5xl font-bold">{score}</p>
           </div>
 
-          <div className="bg-red-50 border-4 border-red-200 rounded-2xl p-6 text-center">
-            <p className="text-red-700 text-lg font-bold mb-2">❌ إجابات خاطئة</p>
-            <p className="text-6xl font-bold text-red-600">{total - score}</p>
+          <div className="bg-red-100 border-2 border-red-300 rounded-2xl p-6">
+            <p className="text-red-800 font-bold mb-2">إجابات خاطئة ❌</p>
+            <p className="text-5xl font-bold">{total - score}</p>
           </div>
 
-          <div className="bg-blue-50 border-4 border-blue-200 rounded-2xl p-6 text-center">
-            <p className="text-blue-700 text-lg font-bold mb-2">📝 إجمالي الأسئلة</p>
-            <p className="text-6xl font-bold text-blue-600">{total}</p>
+          <div className="bg-blue-100 border-2 border-blue-300 rounded-2xl p-6">
+            <p className="text-blue-800 font-bold mb-2">إجمالي الأسئلة 📝</p>
+            <p className="text-5xl font-bold">{total}</p>
           </div>
         </div>
 
-        {/* Percentage */}
-        <div className="bg-gradient-to-br from-primary to-primary-dark rounded-3xl shadow-card-hover p-8 mb-6 text-center">
-          <p className="text-white text-2xl font-bold mb-4">النسبة المئوية</p>
-          <p className="text-9xl font-bold text-white mb-2">{percentage}%</p>
-          <p className="text-white/80 text-lg">
-            {percentage >= 80 ? '🎉 ممتاز!' : percentage >= 60 ? '👍 جيد' : '📚 يحتاج مراجعة'}
+        <div className="bg-green-700 text-white rounded-3xl p-8 mb-6">
+          <p className="text-8xl font-bold mb-3">{percentage}%</p>
+          <p className="text-lg">
+            {percentage >= 80 ? '🎉 ممتاز جداً!' : percentage >= 60 ? '👏 أداء جيد' : '📖 حاول مرة أخرى'}
           </p>
         </div>
 
-        {/* Actions */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <button
             onClick={() => window.print()}
-            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-4 px-6 rounded-2xl transition-all transform hover:scale-105"
+            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-2xl"
           >
-            🖨️ طباعة
+            طباعة 🖨️
           </button>
 
-          <button
-            onClick={() => {
-              if (qrSrc) {
-                const a = document.createElement('a');
-                a.href = qrSrc;
-                a.download = `qr-code-${attemptId}.png`;
-                a.click();
-              }
-            }}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl transition-all transform hover:scale-105"
+          <Link
+            href={reportUrl}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-2xl flex items-center justify-center"
           >
-            📥 تحميل QR
-          </button>
+            التفاصيل 📄
+          </Link>
 
           <button
             onClick={() => {
               if (navigator.share) {
                 navigator.share({
-                  title: 'تقرير الاختبار',
-                  text: `حصلت على ${percentage}% في اختبار التجويد!`,
+                  title: 'تقرير التجويد',
+                  text: `حصلت على ${percentage}% في اختبار التجويد`,
                   url: reportUrl,
                 });
               } else {
@@ -247,9 +112,9 @@ export default function ReportPage() {
                 alert('تم نسخ الرابط!');
               }
             }}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-2xl transition-all transform hover:scale-105"
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-2xl"
           >
-            📤 مشاركة
+            مشاركة 📤
           </button>
 
           <button
@@ -257,46 +122,38 @@ export default function ReportPage() {
               navigator.clipboard.writeText(reportUrl);
               alert('تم نسخ الرابط!');
             }}
-            className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-2xl transition-all transform hover:scale-105"
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-2xl"
           >
-            🔗 نسخ
+            نسخ 🔗
           </button>
         </div>
 
-        {/* QR */}
-        <div className="bg-white rounded-3xl shadow-card p-8 text-center">
-          <h2 className="text-3xl font-bold text-primary mb-6 flex items-center justify-center gap-3">
-            <span className="text-5xl">📱</span>
-            رمز الاستجابة السريع
+        {/* ✅ QR Code Section */}
+        <div className="bg-white border-2 border-green-200 rounded-3xl shadow-md p-8 text-center">
+          <h2 className="text-xl font-bold text-gray-700 mb-4 flex justify-center items-center gap-2">
+            <span>📱</span> رمز الاستجابة السريع للوصول السريع
           </h2>
 
-          <div className="flex justify-center mb-6">
-            <div className="p-6 bg-white border-4 border-primary rounded-3xl shadow-lg">
-              {qrSrc ? (
-                <img
-                  src={qrSrc}
-                  alt="QR Code"
-                  className="w-72 h-72"
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const holder = e.currentTarget.nextElementSibling;
-                    if (holder) holder.classList.remove('hidden');
-                  }}
-                />
-              ) : null}
-
-              <div className={`${qrSrc ? 'hidden' : 'flex'} w-72 h-72 items-center justify-center flex-col gap-4 text-gray-500`}>
-                <span className="text-5xl">⚠️</span>
-                <p className="text-center">تعذّر توليد رمز QR</p>
-                <p className="text-xs text-gray-400 break-all">{reportUrl}</p>
-              </div>
+          {qrSrc ? (
+            <div className="flex justify-center">
+              <img
+                src={qrSrc}
+                alt="QR Code"
+                className="w-52 h-52 border-4 border-green-400 rounded-2xl shadow-lg"
+                referrerPolicy="no-referrer"
+              />
             </div>
-          </div>
+          ) : (
+            <p className="text-gray-500 mt-4">جارٍ توليد الكود...</p>
+          )}
 
-          <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-6 inline-block">
-            <p className="text-gray-700 text-lg font-bold mb-2">📸 امسح الكود للوصول السريع</p>
-            <p className="text-sm text-gray-600">استخدم كاميرا الهاتف أو تطبيق قارئ QR</p>
+          <p className="mt-4 text-gray-600 text-sm">
+            امسح الكود باستخدام كاميرا الهاتف أو تطبيق قارئ QR 📸
+          </p>
+
+          <div className="mt-6 flex flex-col items-center">
+            <img src="/logo.png" alt="Tajweedy Logo" className="w-20 opacity-80" />
+            <p className="text-gray-700 font-bold mt-2">Tajweedy التجويد التفاعلي</p>
           </div>
         </div>
       </div>
