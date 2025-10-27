@@ -2,7 +2,6 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 
 function toEnglishDigits(input = '') {
@@ -16,19 +15,18 @@ function toEnglishDigits(input = '') {
 }
 
 function formatDate(date) {
-  return new Date(date).toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  }).replace(///g, '/');
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
 }
 
 function formatTime(date) {
-  return new Date(date).toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  });
+  const d = new Date(date);
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
 }
 
 function ResultContent() {
@@ -37,13 +35,12 @@ function ResultContent() {
 
   const [attempt, setAttempt] = useState(null);
   const [allAttempts, setAllAttempts] = useState([]);
-  const [user, setUser] = useState({ name: 'اسم المتدرب', signature: null });
+  const [user, setUser] = useState({ name: 'اسم المتدرب' });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get user from localStorage (assume stored during login)
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
-    setUser({ name: userData.name || 'اسم المتدرب', signature: userData.signature || null });
+    setUser({ name: userData.name || 'اسم المتدرب' });
 
     if (!attemptId) {
       setLoading(false);
@@ -53,8 +50,6 @@ function ResultContent() {
     const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
     const found = attempts.find(a => String(a?.id) === String(attemptId));
     setAttempt(found);
-
-    // All attempts for the user (assume all are for current user)
     setAllAttempts(attempts.sort((a, b) => new Date(b.date) - new Date(a.date)));
 
     setLoading(false);
@@ -84,43 +79,17 @@ function ResultContent() {
   const score = attempt.score ?? 0;
   const total = attempt.total ?? 0;
   const percentage = total ? Math.round((score / total) * 100) : 0;
-  const examType = attempt.type || 'اختبار'; // Assume 'اختبار' or 'تدريب'
-  const duration = attempt.duration || '30 دقيقة'; // Assume from attempt data
+  const examType = attempt.type || 'اختبار';
   const examName = attempt.name || 'اختبار التجويد';
-  const examCode = attempt.code || `TJ-${toEnglishDigits(attemptId)}`;
-  const reportLink = `${window.location.origin}/quiz/report/${attemptId}`;
+  const examCode = `TJ-${toEnglishDigits(attemptId)}`;
 
   return (
     <>
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
         
-        body {
+        * {
           font-family: 'Cairo', sans-serif !important;
-        }
-
-        .quranic-text {
-          font-family: 'Traditional Arabic', serif !important; /* For Quranic verses and surah names */
-        }
-
-        @media screen {
-          .min-h-screen {
-            min-height: 100vh;
-          }
-          
-          .watermark {
-            background-image: url('/logo-large.png'); /* Path to large logo for watermark */
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            opacity: 0.1;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-          }
         }
 
         @media print {
@@ -134,14 +103,6 @@ function ResultContent() {
             print-color-adjust: exact !important;
           }
 
-          html, body {
-            background: white !important;
-            width: 210mm;
-            height: 297mm;
-            margin: 0;
-            padding: 0;
-          }
-
           body * {
             visibility: hidden;
           }
@@ -153,15 +114,11 @@ function ResultContent() {
 
           #result-print-area {
             position: absolute;
-            left: 15mm;
-            top: 15mm;
-            width: 180mm;
-            max-height: 267mm;
+            left: 0;
+            top: 0;
+            width: 100%;
             background: white;
-            padding: 0;
-            margin: 0;
-            overflow: hidden;
-            font-family: 'Cairo', sans-serif !important;
+            padding: 20px;
           }
 
           .no-print {
@@ -175,129 +132,85 @@ function ResultContent() {
           .shadow-lg {
             box-shadow: none !important;
           }
-
-          /* Watermark in print */
-          #result-print-area::before {
-            content: '';
-            background-image: url('/logo-large.png');
-            background-size: 100px 100px;
-            background-repeat: repeat;
-            opacity: 0.1;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 210mm;
-            height: 297mm;
-            z-index: -1;
-          }
-
-          /* Footer in print */
-          .footer-print {
-            position: fixed;
-            bottom: 15mm;
-            left: 15mm;
-            right: 15mm;
-            text-align: center;
-            font-size: 10pt;
-            color: #666;
-            border-top: 1px solid #ccc;
-            padding-top: 5mm;
-          }
-
-          .signature-area {
-            margin-top: 20mm;
-            text-align: right;
-          }
-
-          .qr-code {
-            display: inline-block;
-            margin-left: 10mm;
-          }
         }
       `}</style>
 
-      <div className="watermark"></div>
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8 relative z-10" dir="rtl">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8" dir="rtl">
         <div id="result-print-area" className="max-w-4xl mx-auto">
-          {/* Header with Logo and Project Name */}
-          <div className="text-center mb-8">
-            <Image
-              src="/logo.png" // Path to logo
-              alt="Tajweedy Logo"
-              width={100}
-              height={100}
-              className="mx-auto mb-4"
-            />
-            <h1 className="text-4xl font-bold text-primary mb-2">Tajweedy التجويد الذكي</h1>
+          
+          {/* Header with Logo */}
+          <div className="text-center mb-6">
+            <div className="w-24 h-24 rounded-full bg-primary text-white font-bold flex items-center justify-center text-4xl mx-auto mb-3">
+              TJ
+            </div>
+            <h1 className="text-3xl font-bold text-primary mb-2">Tajweedy - التجويد الذكي</h1>
           </div>
 
-          {/* Trainee Name and Exam Info - Large and Clear */}
-          <div className="bg-white rounded-3xl shadow-lg p-8 mb-6 text-center">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">{user.name}</h2>
-            <p className="text-xl text-gray-600 mb-4">
-              <strong>نوع الاختبار:</strong> {examType} | <strong>اسم الاختبار:</strong> {examName} | 
-              <strong>مدة الاختبار:</strong> {duration} | <strong>كود الاختبار:</strong> {examCode}
+          {/* Trainee Name and Exam Info */}
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 text-center">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">{user.name}</h2>
+            <p className="text-lg text-gray-600">
+              <strong>النوع:</strong> {examType} | <strong>الاسم:</strong> {examName} | <strong>الكود:</strong> {examCode}
             </p>
           </div>
 
           {/* Result Header */}
-          <div className="bg-white rounded-3xl shadow-lg p-8 mb-6 text-center">
-            <h1 className="text-3xl font-bold text-primary mb-4">
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 text-center">
+            <h1 className="text-2xl font-bold text-primary mb-3">
               {percentage >= 80 ? '🎉 ممتاز!' : percentage >= 60 ? '👍 جيد جداً' : '📚 يحتاج مراجعة'}
             </h1>
-            <p className="text-4xl font-bold text-gray-700 mb-2">{toEnglishDigits(percentage)}%</p>
-            <p className="text-xl text-gray-600">
+            <p className="text-3xl font-bold text-gray-700 mb-2">{toEnglishDigits(percentage)}%</p>
+            <p className="text-lg text-gray-600">
               حصلت على {toEnglishDigits(score)} من {toEnglishDigits(total)} نقطة
             </p>
-            <p className="text-lg text-primary mt-2">
-              تاريخ الاختبار: {formatDate(attempt.date)} | التوقيت: {formatTime(attempt.date)}
+            <p className="text-base text-primary mt-2">
+              {formatDate(attempt.date)} | {formatTime(attempt.date)}
             </p>
           </div>
 
-          {/* Progress Circle - Larger */}
-          <div className="bg-white rounded-3xl shadow-lg p-8 mb-6">
-            <div className="flex justify-center mb-6">
-              <svg width="200" height="200" viewBox="0 0 200 200">
-                <circle cx="100" cy="100" r="80" fill="none" stroke="#e5e7eb" strokeWidth="20"/>
+          {/* Progress Circle */}
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-5">
+            <div className="flex justify-center mb-4">
+              <svg width="180" height="180" viewBox="0 0 180 180">
+                <circle cx="90" cy="90" r="70" fill="none" stroke="#e5e7eb" strokeWidth="18"/>
                 <circle
-                  cx="100" cy="100" r="80" fill="none"
+                  cx="90" cy="90" r="70" fill="none"
                   stroke={percentage >= 60 ? '#10b981' : '#ef4444'}
-                  strokeWidth="20"
-                  strokeDasharray={`${(percentage / 100) * 502} 502`}
-                  transform="rotate(-90 100 100)"
+                  strokeWidth="18"
+                  strokeDasharray={`${(percentage / 100) * 440} 440`}
+                  transform="rotate(-90 90 90)"
                   strokeLinecap="round"
                 />
-                <text x="100" y="100" fontSize="40" fontWeight="bold" textAnchor="middle" dy="12" fill="#1e7850">
+                <text x="90" y="90" fontSize="36" fontWeight="bold" textAnchor="middle" dy="12" fill="#1e7850">
                   {toEnglishDigits(percentage)}%
                 </text>
               </svg>
             </div>
             <div className="text-center">
-              <div className="flex justify-center gap-12">
+              <div className="flex justify-center gap-10">
                 <div>
-                  <p className="text-3xl font-bold text-green-600">{toEnglishDigits(score)}</p>
-                  <p className="text-gray-600 text-base">صحيح ✅</p>
+                  <p className="text-2xl font-bold text-green-600">{toEnglishDigits(score)}</p>
+                  <p className="text-gray-600">صحيح ✅</p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-red-600">{toEnglishDigits(total - score)}</p>
-                  <p className="text-gray-600 text-base">خاطئ ❌</p>
+                  <p className="text-2xl font-bold text-red-600">{toEnglishDigits(total - score)}</p>
+                  <p className="text-gray-600">خاطئ ❌</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* All Attempts History Table */}
-          <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
-            <h2 className="text-2xl font-bold text-primary mb-4">📈 سجل جميع المحاولات</h2>
+          {/* Attempts History */}
+          <div className="bg-white rounded-3xl shadow-lg p-5 mb-5">
+            <h2 className="text-xl font-bold text-primary mb-3">📈 سجل المحاولات</h2>
             <div className="overflow-x-auto">
-              <table className="min-w-full text-base">
+              <table className="min-w-full text-sm">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="px-4 py-3 text-right font-bold">التاريخ</th>
-                    <th className="px-4 py-3 text-right font-bold">التوقيت</th>
-                    <th className="px-4 py-3 text-right font-bold">الدرجة</th>
-                    <th className="px-4 py-3 text-right font-bold">الإجمالي</th>
-                    <th className="px-4 py-3 text-right font-bold">النسبة %</th>
+                    <th className="px-3 py-2 text-right font-bold">التاريخ</th>
+                    <th className="px-3 py-2 text-right font-bold">التوقيت</th>
+                    <th className="px-3 py-2 text-right font-bold">الدرجة</th>
+                    <th className="px-3 py-2 text-right font-bold">النسبة %</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -307,11 +220,10 @@ function ResultContent() {
                     const attPercentage = attTotal ? Math.round((attScore / attTotal) * 100) : 0;
                     return (
                       <tr key={index} className="border-b">
-                        <td className="px-4 py-3 text-right">{formatDate(att.date)}</td>
-                        <td className="px-4 py-3 text-right">{formatTime(att.date)}</td>
-                        <td className="px-4 py-3 text-right font-bold text-green-600">{toEnglishDigits(attScore)}</td>
-                        <td className="px-4 py-3 text-right font-bold">{toEnglishDigits(attTotal)}</td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-3 py-2 text-right">{formatDate(att.date)}</td>
+                        <td className="px-3 py-2 text-right">{formatTime(att.date)}</td>
+                        <td className="px-3 py-2 text-right font-bold text-green-600">{toEnglishDigits(attScore)}</td>
+                        <td className="px-3 py-2 text-right">
                           <span className={`font-bold ${attPercentage >= 60 ? 'text-green-600' : 'text-red-600'}`}>
                             {toEnglishDigits(attPercentage)}%
                           </span>
@@ -321,26 +233,6 @@ function ResultContent() {
                   })}
                 </tbody>
               </table>
-            </div>
-          </div>
-
-          {/* Signature Area (for print) */}
-          <div className="signature-area no-print hidden print:block">
-            <div className="flex justify-between items-center mb-4">
-              <div className="qr-code">
-                {/* QR Code Placeholder - Use QR library like qrcode.react in real impl */}
-                <div className="w-20 h-20 bg-gray-200 flex items-center justify-center text-sm">QR Code</div>
-                <p className="text-xs mt-1">رابط التقرير: {reportLink}</p>
-              </div>
-              <div>
-                <p className="text-right">توقيع المدرب:</p>
-                {user.signature ? (
-                  <Image src={user.signature} alt="Signature" width={150} height={50} className="ml-auto" />
-                ) : (
-                  <div className="w-40 h-20 border-b-2 border-gray-400 ml-auto"></div> // Electronic signature placeholder
-                )}
-                <p className="text-right text-sm">اسم المدرب</p>
-              </div>
             </div>
           </div>
 
@@ -370,13 +262,6 @@ function ResultContent() {
             >
               🔄 اختبار جديد
             </Link>
-          </div>
-
-          {/* Print Footer */}
-          <div className="footer-print print:block hidden">
-            <p><strong>اسم الاختبار:</strong> {examName} | <strong>التاريخ:</strong> {formatDate(attempt.date)} | 
-               <strong>التوقيت:</strong> {formatTime(attempt.date)} | <strong>كود الاختبار:</strong> {examCode}</p>
-            <p><strong>اسم المتدرب:</strong> {user.name} | <strong>رابط التقرير:</strong> {reportLink}</p>
           </div>
         </div>
       </div>
