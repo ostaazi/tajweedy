@@ -39,6 +39,7 @@ export default function QuizReportPage() {
 
   const [attempt, setAttempt] = useState(null);
   const [qrSrc, setQrSrc] = useState('');
+  const [qrDataUrl, setQrDataUrl] = useState(''); // ✅ للطباعة وPDF
   const [loading, setLoading] = useState(true);
 
   const aggregates = useMemo(() => {
@@ -134,14 +135,26 @@ export default function QuizReportPage() {
     setLoading(false);
   }, [attemptId]);
 
+  // ✅ تحويل QR Code إلى Base64
   useEffect(() => {
     if (!attemptId) return;
+    
     const reportUrl = `${window.location.origin}/quiz/report/${attemptId}`;
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(reportUrl)}`;
     setQrSrc(qrUrl);
+
+    // تحويل إلى Base64
+    fetch(qrUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        const reader = new FileReader();
+        reader.onloadend = () => setQrDataUrl(reader.result);
+        reader.readAsDataURL(blob);
+      })
+      .catch(err => console.error('QR Error:', err));
   }, [attemptId]);
 
-  // ✅ دالة تصدير PDF مع html2pdf
+  // ✅ دالة تصدير PDF
   const handleExportPDF = async () => {
     try {
       const html2pdf = (await import('html2pdf.js')).default;
@@ -156,7 +169,11 @@ export default function QuizReportPage() {
         margin: 10,
         filename: `tajweedy-report-${attemptId}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
+        html2canvas: { 
+          scale: 2,
+          useCORS: true,
+          allowTaint: true
+        },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
@@ -195,193 +212,217 @@ export default function QuizReportPage() {
   const percentage = total ? Math.round((score / total) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8" dir="rtl">
-      <div id="report-content" className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <Link href={`/quiz/result?id=${attemptId}`} className="px-4 py-2 rounded-xl bg-gray-600 text-white font-bold hover:bg-gray-700">
-                ← رجوع
-              </Link>
-              <Link href="/" className="px-4 py-2 rounded-xl bg-gray-700 text-white font-bold hover:bg-gray-800">
-                🏠 الرئيسية
-              </Link>
-            </div>
-            <div className="w-16 h-16 rounded-2xl bg-primary text-white font-bold grid place-items-center text-2xl">TJ</div>
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-primary text-center mb-2">📊 التقرير الكامل</h1>
-          <p className="text-center text-gray-600 text-lg">{formatDateEnRtl(attempt.date || Date.now())}</p>
-        </div>
+    <>
+      {/* ✅ CSS للطباعة */}
+      <style jsx global>{`
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          #report-content,
+          #report-content * {
+            visibility: visible;
+          }
+          #report-content {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+          }
+          .no-print {
+            display: none !important;
+          }
+        }
+      `}</style>
 
-        {/* النسبة المئوية */}
-        <div className="bg-white rounded-3xl shadow-lg p-8 mb-6 text-center">
-          <h2 className="text-2xl font-bold text-primary mb-6">النسبة المئوية</h2>
-          <div className="flex justify-center mb-6">
-            <svg width="200" height="200" viewBox="0 0 200 200">
-              <circle cx="100" cy="100" r="80" fill="none" stroke="#e5e7eb" strokeWidth="20"/>
-              <circle
-                cx="100" cy="100" r="80" fill="none"
-                stroke={percentage >= 60 ? COLORS.correct : COLORS.wrong}
-                strokeWidth="20"
-                strokeDasharray={`${(percentage / 100) * 502} 502`}
-                transform="rotate(-90 100 100)"
-                strokeLinecap="round"
-              />
-              <text x="100" y="100" fontSize="40" fontWeight="bold" textAnchor="middle" dy="15" fill={COLORS.primary}>
-                {toEnglishDigits(percentage)}%
-              </text>
-            </svg>
-          </div>
-          <p className="text-xl font-bold text-gray-700">
-            {percentage >= 80 ? '🎉 ممتاز!' : percentage >= 60 ? '👍 جيد' : '📚 يحتاج مراجعة'}
-          </p>
-          <p className="text-gray-600 mt-2">
-            {toEnglishDigits(score)} / {toEnglishDigits(total)}
-          </p>
-        </div>
-
-        {/* QR Code */}
-        {qrSrc && (
-          <div className="bg-white rounded-3xl shadow-lg p-6 mb-6 text-center">
-            <h2 className="text-xl font-bold text-primary mb-4">رمز الاستجابة السريع</h2>
-            <img src={qrSrc} alt="QR Code" className="mx-auto w-48 h-48" />
-            <p className="text-gray-600 mt-3 text-sm">امسح للوصول إلى التقرير</p>
-          </div>
-        )}
-
-        {/* إحصاءات الأسئلة */}
-        {aggregates.qArr && aggregates.qArr.length > 0 && (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8" dir="rtl">
+        <div id="report-content" className="max-w-6xl mx-auto">
+          {/* Header */}
           <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
-            <h2 className="text-2xl font-bold text-primary mb-4">📝 إحصاءات الأسئلة</h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full table-auto">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="px-4 py-2 text-right font-bold">السؤال</th>
-                    <th className="px-4 py-2 text-right font-bold">القسم</th>
-                    <th className="px-4 py-2 text-right font-bold">صحيح</th>
-                    <th className="px-4 py-2 text-right font-bold">خاطئ</th>
-                    <th className="px-4 py-2 text-right font-bold">إجمالي</th>
-                    <th className="px-4 py-2 text-right font-bold">النسبة %</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {aggregates.qArr.map((q, idx) => (
-                    <tr key={idx} className="border-b hover:bg-gray-50">
-                      <td className="px-4 py-2 text-right">{q.question}</td>
-                      <td className="px-4 py-2 text-right">{q.section || '-'}</td>
-                      <td className="px-4 py-2 text-right text-green-600 font-bold">{toEnglishDigits(q.right)}</td>
-                      <td className="px-4 py-2 text-right text-red-600 font-bold">{toEnglishDigits(q.wrong)}</td>
-                      <td className="px-4 py-2 text-right font-bold">{toEnglishDigits(q.total)}</td>
-                      <td className="px-4 py-2 text-right">
-                        <span className={`font-bold ${q.pct >= 60 ? 'text-green-600' : 'text-red-600'}`}>
-                          {toEnglishDigits(q.pct)}%
-                        </span>
-                      </td>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3 no-print">
+                <Link href={`/quiz/result?id=${attemptId}`} className="px-4 py-2 rounded-xl bg-gray-600 text-white font-bold hover:bg-gray-700">
+                  ← رجوع
+                </Link>
+                <Link href="/" className="px-4 py-2 rounded-xl bg-gray-700 text-white font-bold hover:bg-gray-800">
+                  🏠 الرئيسية
+                </Link>
+              </div>
+              <div className="w-16 h-16 rounded-2xl bg-primary text-white font-bold grid place-items-center text-2xl">TJ</div>
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-primary text-center mb-2">📊 التقرير الكامل</h1>
+            <p className="text-center text-gray-600 text-lg">{formatDateEnRtl(attempt.date || Date.now())}</p>
+          </div>
+
+          {/* النسبة المئوية */}
+          <div className="bg-white rounded-3xl shadow-lg p-8 mb-6 text-center">
+            <h2 className="text-2xl font-bold text-primary mb-6">النسبة المئوية</h2>
+            <div className="flex justify-center mb-6">
+              <svg width="200" height="200" viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#e5e7eb" strokeWidth="20"/>
+                <circle
+                  cx="100" cy="100" r="80" fill="none"
+                  stroke={percentage >= 60 ? COLORS.correct : COLORS.wrong}
+                  strokeWidth="20"
+                  strokeDasharray={`${(percentage / 100) * 502} 502`}
+                  transform="rotate(-90 100 100)"
+                  strokeLinecap="round"
+                />
+                <text x="100" y="100" fontSize="40" fontWeight="bold" textAnchor="middle" dy="15" fill={COLORS.primary}>
+                  {toEnglishDigits(percentage)}%
+                </text>
+              </svg>
+            </div>
+            <p className="text-xl font-bold text-gray-700">
+              {percentage >= 80 ? '🎉 ممتاز!' : percentage >= 60 ? '👍 جيد' : '📚 يحتاج مراجعة'}
+            </p>
+            <p className="text-gray-600 mt-2">
+              {toEnglishDigits(score)} / {toEnglishDigits(total)}
+            </p>
+          </div>
+
+          {/* QR Code - ✅ استخدام Base64 */}
+          {qrDataUrl && (
+            <div className="bg-white rounded-3xl shadow-lg p-6 mb-6 text-center">
+              <h2 className="text-xl font-bold text-primary mb-4">رمز الاستجابة السريع</h2>
+              <img src={qrDataUrl} alt="QR Code" className="mx-auto w-48 h-48" crossOrigin="anonymous" />
+              <p className="text-gray-600 mt-3 text-sm">امسح للوصول إلى التقرير</p>
+            </div>
+          )}
+
+          {/* إحصاءات الأسئلة */}
+          {aggregates.qArr && aggregates.qArr.length > 0 && (
+            <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
+              <h2 className="text-2xl font-bold text-primary mb-4">📝 إحصاءات الأسئلة</h2>
+              <div className="overflow-x-auto">
+                <table className="min-w-full table-auto">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="px-4 py-2 text-right font-bold">السؤال</th>
+                      <th className="px-4 py-2 text-right font-bold">القسم</th>
+                      <th className="px-4 py-2 text-right font-bold">صحيح</th>
+                      <th className="px-4 py-2 text-right font-bold">خاطئ</th>
+                      <th className="px-4 py-2 text-right font-bold">إجمالي</th>
+                      <th className="px-4 py-2 text-right font-bold">النسبة %</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* إحصاءات الأقسام */}
-        {aggregates.sArr && aggregates.sArr.length > 0 && (
-          <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
-            <h2 className="text-2xl font-bold text-primary mb-4">📚 إحصاءات الأقسام</h2>
-            {aggregates.sArr.map((s, sIdx) => (
-              <div key={sIdx} className="mb-8">
-                <h3 className="text-xl font-bold text-primary mb-3">{s.section}</h3>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full table-auto">
-                    <thead>
-                      <tr className="bg-gray-50">
-                        <th className="px-4 py-2 text-right font-bold">القسم الفرعي</th>
-                        <th className="px-4 py-2 text-right font-bold">صحيح</th>
-                        <th className="px-4 py-2 text-right font-bold">خاطئ</th>
-                        <th className="px-4 py-2 text-right font-bold">إجمالي</th>
-                        <th className="px-4 py-2 text-right font-bold">النسبة %</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {s.subs && s.subs.length > 0 ? (
-                        s.subs.map((sub, subIdx) => (
-                          <tr key={subIdx} className="border-b hover:bg-gray-50">
-                            <td className="px-4 py-2 text-right">{sub.subsection}</td>
-                            <td className="px-4 py-2 text-right text-green-600 font-bold">{toEnglishDigits(sub.right)}</td>
-                            <td className="px-4 py-2 text-right text-red-600 font-bold">{toEnglishDigits(sub.wrong)}</td>
-                            <td className="px-4 py-2 text-right font-bold">{toEnglishDigits(sub.total)}</td>
-                            <td className="px-4 py-2 text-right">
-                              <span className={`font-bold ${sub.pct >= 60 ? 'text-green-600' : 'text-red-600'}`}>
-                                {toEnglishDigits(sub.pct)}%
-                              </span>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan="5" className="px-4 py-2 text-center text-gray-500">لا توجد بيانات فرعية</td>
-                        </tr>
-                      )}
-                      <tr className="bg-gray-100 font-bold">
-                        <td className="px-4 py-2 text-right">إجمالي القسم</td>
-                        <td className="px-4 py-2 text-right text-green-600">{toEnglishDigits(s.right)}</td>
-                        <td className="px-4 py-2 text-right text-red-600">{toEnglishDigits(s.wrong)}</td>
-                        <td className="px-4 py-2 text-right">{toEnglishDigits(s.total)}</td>
+                  </thead>
+                  <tbody>
+                    {aggregates.qArr.map((q, idx) => (
+                      <tr key={idx} className="border-b hover:bg-gray-50">
+                        <td className="px-4 py-2 text-right">{q.question}</td>
+                        <td className="px-4 py-2 text-right">{q.section || '-'}</td>
+                        <td className="px-4 py-2 text-right text-green-600 font-bold">{toEnglishDigits(q.right)}</td>
+                        <td className="px-4 py-2 text-right text-red-600 font-bold">{toEnglishDigits(q.wrong)}</td>
+                        <td className="px-4 py-2 text-right font-bold">{toEnglishDigits(q.total)}</td>
                         <td className="px-4 py-2 text-right">
-                          <span className={`font-bold ${s.pct >= 60 ? 'text-green-600' : 'text-red-600'}`}>
-                            {toEnglishDigits(s.pct)}%
+                          <span className={`font-bold ${q.pct >= 60 ? 'text-green-600' : 'text-red-600'}`}>
+                            {toEnglishDigits(q.pct)}%
                           </span>
                         </td>
                       </tr>
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          )}
 
-        {/* الأزرار */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          <button
-            onClick={handleExportPDF}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-2xl"
-          >
-            📥 تصدير PDF
-          </button>
-          <button
-            onClick={() => window.print()}
-            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-2xl"
-          >
-            🖨️ طباعة
-          </button>
-          <button
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({
-                  title: 'Tajweedy',
-                  url: window.location.href
-                }).catch(() => {});
-              } else {
-                navigator.clipboard.writeText(window.location.href);
-                alert('✅ تم نسخ الرابط');
-              }
-            }}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-2xl"
-          >
-            📤 مشاركة
-          </button>
-          <Link
-            href="/"
-            className="bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-2xl text-center flex items-center justify-center"
-          >
-            🏠 الرئيسية
-          </Link>
+          {/* إحصاءات الأقسام */}
+          {aggregates.sArr && aggregates.sArr.length > 0 && (
+            <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
+              <h2 className="text-2xl font-bold text-primary mb-4">📚 إحصاءات الأقسام</h2>
+              {aggregates.sArr.map((s, sIdx) => (
+                <div key={sIdx} className="mb-8">
+                  <h3 className="text-xl font-bold text-primary mb-3">{s.section}</h3>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full table-auto">
+                      <thead>
+                        <tr className="bg-gray-50">
+                          <th className="px-4 py-2 text-right font-bold">القسم الفرعي</th>
+                          <th className="px-4 py-2 text-right font-bold">صحيح</th>
+                          <th className="px-4 py-2 text-right font-bold">خاطئ</th>
+                          <th className="px-4 py-2 text-right font-bold">إجمالي</th>
+                          <th className="px-4 py-2 text-right font-bold">النسبة %</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {s.subs && s.subs.length > 0 ? (
+                          s.subs.map((sub, subIdx) => (
+                            <tr key={subIdx} className="border-b hover:bg-gray-50">
+                              <td className="px-4 py-2 text-right">{sub.subsection}</td>
+                              <td className="px-4 py-2 text-right text-green-600 font-bold">{toEnglishDigits(sub.right)}</td>
+                              <td className="px-4 py-2 text-right text-red-600 font-bold">{toEnglishDigits(sub.wrong)}</td>
+                              <td className="px-4 py-2 text-right font-bold">{toEnglishDigits(sub.total)}</td>
+                              <td className="px-4 py-2 text-right">
+                                <span className={`font-bold ${sub.pct >= 60 ? 'text-green-600' : 'text-red-600'}`}>
+                                  {toEnglishDigits(sub.pct)}%
+                                </span>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="5" className="px-4 py-2 text-center text-gray-500">لا توجد بيانات فرعية</td>
+                          </tr>
+                        )}
+                        <tr className="bg-gray-100 font-bold">
+                          <td className="px-4 py-2 text-right">إجمالي القسم</td>
+                          <td className="px-4 py-2 text-right text-green-600">{toEnglishDigits(s.right)}</td>
+                          <td className="px-4 py-2 text-right text-red-600">{toEnglishDigits(s.wrong)}</td>
+                          <td className="px-4 py-2 text-right">{toEnglishDigits(s.total)}</td>
+                          <td className="px-4 py-2 text-right">
+                            <span className={`font-bold ${s.pct >= 60 ? 'text-green-600' : 'text-red-600'}`}>
+                              {toEnglishDigits(s.pct)}%
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* الأزرار */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 no-print">
+            <button
+              onClick={handleExportPDF}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-2xl"
+            >
+              📥 تصدير PDF
+            </button>
+            <button
+              onClick={() => window.print()}
+              className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-2xl"
+            >
+              🖨️ طباعة
+            </button>
+            <button
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({
+                    title: 'Tajweedy',
+                    url: window.location.href
+                  }).catch(() => {});
+                } else {
+                  navigator.clipboard.writeText(window.location.href);
+                  alert('✅ تم نسخ الرابط');
+                }
+              }}
+              className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-2xl"
+            >
+              📤 مشاركة
+            </button>
+            <Link
+              href="/"
+              className="bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-2xl text-center flex items-center justify-center"
+            >
+              🏠 الرئيسية
+            </Link>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
