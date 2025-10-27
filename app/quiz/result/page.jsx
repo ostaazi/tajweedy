@@ -1,11 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { useParams } from 'next/navigation'; // للحصول على attempt ID إذا كان مسارًا ديناميكيًا
-
-/* ======================= Helpers ======================= */
+import { useSearchParams } from 'next/navigation';
 
 function toEnglishDigits(input = '') {
   const map = {
@@ -17,179 +14,43 @@ function toEnglishDigits(input = '') {
   return String(input).replace(/[٠-٩۰-۹]/g, d => map[d] ?? d);
 }
 
-function formatDateArabic(dateLike) {
-  const d = (dateLike instanceof Date) ? dateLike : new Date(dateLike || Date.now());
-  return d.toLocaleDateString('ar-EG', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  });
+function formatDate(date) {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
 }
 
-// دالة لترجمة الأقسام إلى العربية (من questions_bank.json)
-function getArabicSectionName(englishName) {
-  const map = {
-    'noon_tanween': 'أحكام النون الساكنة والتنوين',
-    'lam_sakinah': 'أحكام اللام الساكِنة',
-    'meem_sakinah': 'أحكام الميم الساكِنة',
-    'meem_maddah': 'أحكام الميم الممدودة',
-    'qalqalah': 'حكم القلبة',
-    'madd': 'أنواع المد',
-    'ghunnah': 'حكم الغنّة',
-    'idgham': 'أحكام الإدغام',
-    'ikhfa': 'أحكام الإخفاء',
-    'iqlab': 'حكم الإقلاب',
-    'izhar': 'حكم الإظهار',
-    'stopping': 'أحكام الوقف',
-  };
-  return map[englishName?.toLowerCase()] || englishName;
+function formatTime(date) {
+  const d = new Date(date);
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
 }
 
-// دالة للأقسام الفرعية
-function getArabicSubsectionName(englishName) {
-  const map = {
-    'idhar_halaqi': 'الإظهار الحلقي',
-    'idgham_bighunnah': 'إدغام بغنّة',
-    'idgham_bilaghunnah': 'إدغام بلا غنّة',
-    'ikhfa': 'إخفاء',
-    'iqlab': 'إقلاب',
-    'izhar': 'إظهار',
-    'madd_tabii': 'مد طبيعي',
-    'madd_arkam': 'مد عارض للسكون',
-    'madd_lin': 'مد لازم',
-    'ghunnah': 'غنّة',
-    'qalqalah_major': 'قلقلة كبرى',
-    'qalqalah_minor': 'قلقلة صغرى',
-    'idgham_shafawi': 'إدغام شفوي',
-    'ikhfa_shafawi': 'إخفاء شفوي',
-    'izhar_shafawi': 'إظهار شفوي',
-    'idgham_takrir': 'إدغام مع تكرير',
-    'stopping_rules': 'قواعد الوقف',
-    'noontanween': 'نون والتنوين',
-    'idharhalaqi': 'إظهار حلقي',
-    'idghambighunnah': 'إدغام بغنة',
-    'idghambilaghunnah': 'إدغام بلا غنة',
-    'maddtabii': 'مد طبيعي',
-  };
-  return map[englishName?.toLowerCase()] || englishName;
-}
-
-// دالة لنوع الاختبار
-function getExamTypeArabic(type) {
-  if (type === 'periodic') return 'اختبار دوري';
-  if (type === 'therapeutic') return 'تدريب علاجي';
-  return 'اختبار';
-}
-
-const COLORS = {
-  primary: '#1e7850',
-  primaryDark: '#155a3c',
-  correct: '#10b981',
-  wrong: '#ef4444'
-};
-
-/* ======================= Main Component ======================= */
-
-export default function QuizResultPage() {
+function ResultContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const params = useParams();
-  const attemptId = params?.id || searchParams.get('id'); // دعم لكلا المسارين: /result?id= أو /result/[id]
+  const attemptId = searchParams?.get('id');
 
   const [attempt, setAttempt] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [allAttempts, setAllAttempts] = useState([]);
   const [user, setUser] = useState({ name: 'اسم المتدرب' });
-
-  // حساب الإحصاءات
-  const aggregates = useState(() => {
-    if (!attempt?.responses || attempt.responses.length === 0) {
-      return { qArr: [], sArr: [] };
-    }
-
-    const qMap = {};
-    const sMap = {};
-
-    attempt.responses.forEach(r => {
-      const qKey = r.question || 'غير محدد';
-      const sKey = r.section || 'غير محدد';
-      const subKey = r.subsection || '';
-
-      if (!qMap[qKey]) {
-        qMap[qKey] = { 
-          question: qKey, 
-          section: getArabicSectionName(sKey),
-          subsection: getArabicSubsectionName(subKey),
-          right: 0, 
-          wrong: 0, 
-          total: 0 
-        };
-      }
-      qMap[qKey].total++;
-      if (r.correct) qMap[qKey].right++; else qMap[qKey].wrong++;
-
-      if (!sMap[sKey]) {
-        sMap[sKey] = { 
-          section: getArabicSectionName(sKey),
-          subs: {}, 
-          right: 0, 
-          wrong: 0, 
-          total: 0 
-        };
-      }
-      sMap[sKey].total++;
-      if (r.correct) sMap[sKey].right++; else sMap[sKey].wrong++;
-
-      if (subKey) {
-        if (!sMap[sKey].subs[subKey]) {
-          sMap[sKey].subs[subKey] = { 
-            subsection: getArabicSubsectionName(subKey),
-            right: 0, 
-            wrong: 0, 
-            total: 0 
-          };
-        }
-        sMap[sKey].subs[subKey].total++;
-        if (r.correct) sMap[sKey].subs[subKey].right++; else sMap[sKey].subs[subKey].wrong++;
-      }
-    });
-
-    const qArr = Object.values(qMap).map(q => ({
-      ...q,
-      pct: q.total ? Math.round((q.right / q.total) * 100) : 0
-    }));
-
-    const sArr = Object.values(sMap).map(s => ({
-      ...s,
-      subs: Object.values(s.subs || {}).map(sub => ({
-        ...sub,
-        pct: sub.total ? Math.round((sub.right / sub.total) * 100) : 0
-      })).filter(sub => sub.total > 0),
-      pct: s.total ? Math.round((s.right / s.total) * 100) : 0
-    })).filter(s => s.total > 0);
-
-    return { qArr, sArr };
-  }, [attempt])[0];
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
     setUser({ name: userData.name || 'اسم المتدرب' });
 
-    if (!attemptId) { 
-      setLoading(false); 
-      return; 
+    if (!attemptId) {
+      setLoading(false);
+      return;
     }
 
     const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
-    const found = attempts.find(
-      a => String(a?.id) === String(attemptId) || Number(a?.id) === Number(attemptId)
-    );
-    
-    if (found) {
-      setAttempt(found);
-      console.log('✅ Result loaded:', found);
-    } else {
-      console.warn('⚠️ No attempt found for ID:', attemptId);
-    }
+    const found = attempts.find(a => String(a?.id) === String(attemptId));
+    setAttempt(found);
+    setAllAttempts(attempts.sort((a, b) => new Date(b.date) - new Date(a.date)));
 
     setLoading(false);
   }, [attemptId]);
@@ -207,8 +68,9 @@ export default function QuizResultPage() {
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center p-4" dir="rtl">
         <div className="text-center">
           <p className="text-2xl font-bold text-gray-700 mb-4">❌ لا توجد بيانات</p>
-          <p className="text-gray-600 mb-6">لم يتم العثور على نتيجة الاختبار</p>
-          <Link href="/quiz" className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-xl">← اختبار جديد</Link>
+          <Link href="/quiz" className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-xl">
+            ← اختبار جديد
+          </Link>
         </div>
       </div>
     );
@@ -217,9 +79,9 @@ export default function QuizResultPage() {
   const score = attempt.score ?? 0;
   const total = attempt.total ?? 0;
   const percentage = total ? Math.round((score / total) * 100) : 0;
-  const examTypeArabic = getExamTypeArabic(attempt.type);
+  const examType = attempt.type || 'اختبار';
+  const examName = attempt.name || 'اختبار التجويد';
   const examCode = `TJ-${toEnglishDigits(attemptId)}`;
-  const examDate = formatDateArabic(attempt.date || Date.now());
 
   return (
     <>
@@ -228,6 +90,22 @@ export default function QuizResultPage() {
         
         * {
           font-family: 'Cairo', sans-serif !important;
+        }
+
+        /* Watermark background for screen */
+        .watermark-bg {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background-image: url('/logo.png');
+          background-size: 400px 400px;
+          background-repeat: repeat;
+          background-position: center;
+          opacity: 0.1;
+          z-index: 0;
+          pointer-events: none;
         }
 
         @media print {
@@ -245,18 +123,34 @@ export default function QuizResultPage() {
             visibility: hidden;
           }
 
-          #result-content,
-          #result-content * {
+          #result-print-area,
+          #result-print-area * {
             visibility: visible;
           }
 
-          #result-content {
+          #result-print-area {
             position: absolute;
             left: 0;
             top: 0;
             width: 100%;
             background: white;
             padding: 20px;
+          }
+
+          /* Watermark for print */
+          #result-print-area::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 210mm;
+            height: 297mm;
+            background-image: url('/logo.png');
+            background-size: 400px 400px;
+            background-repeat: repeat;
+            background-position: center;
+            opacity: 0.1;
+            z-index: -1;
           }
 
           .no-print {
@@ -273,157 +167,135 @@ export default function QuizResultPage() {
         }
       `}</style>
 
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8" dir="rtl">
-        <div id="result-content" className="max-w-4xl mx-auto">
+      {/* Watermark Background */}
+      <div className="watermark-bg"></div>
+
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8 relative z-10" dir="rtl">
+        <div id="result-print-area" className="max-w-4xl mx-auto">
           
-          {/* Header - مطابق للصور: شعار، بطاقة ترويسة أعلى يسار */}
-          <div className="relative mb-6">
-            {/* الشعار والنص في الوسط أعلى */}
-            <div className="text-center mb-4">
-              <img src="/logo.png" alt="Tajweedy Logo" className="w-16 h-16 mx-auto object-contain mb-2" />
-              <p className="text-sm font-bold text-primary">التجويد الذكي</p>
-            </div>
-
-            {/* بطاقة الترويسة - أعلى يسار، RTL داخلي */}
-            <div className="bg-white rounded-2xl shadow-md p-3 w-64 absolute top-0 left-0 text-right">
-              <p className="text-xs text-gray-600 mb-1"><strong>نوع الاختبار:</strong> {examTypeArabic}</p>
-              <p className="text-xs text-gray-600 mb-1"><strong>كود الاختبار:</strong> {examCode}</p>
-              <p className="text-xs text-gray-600"><strong>تاريخ الاختبار:</strong> {examDate}</p>
-            </div>
+          {/* Header with Real Logo */}
+          <div className="text-center mb-6">
+            <img 
+              src="/logo.png" 
+              alt="Tajweedy Logo" 
+              className="w-24 h-24 mx-auto mb-3 object-contain"
+            />
+            <h1 className="text-3xl font-bold text-primary mb-2">Tajweedy - التجويد الذكي</h1>
           </div>
 
-          {/* اسم المتدرب */}
-          <div className="bg-white rounded-2xl shadow-lg p-4 mb-6 text-center">
-            <h2 className="text-xl font-bold text-gray-800">{user.name}</h2>
+          {/* Trainee Name and Exam Info */}
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 text-center">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">{user.name}</h2>
+            <p className="text-lg text-gray-600">
+              <strong>النوع:</strong> {examType} | <strong>الاسم:</strong> {examName} | <strong>الكود:</strong> {examCode}
+            </p>
           </div>
 
-          {/* Navigation - رجوع إلى التقرير الكامل */}
-          <div className="flex justify-center mb-4 no-print">
-            <Link 
-              href={`/quiz/report/${attemptId}`} 
-              className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-6 rounded-2xl flex items-center gap-2"
-            >
-              📊 التقرير الكامل
-            </Link>
+          {/* Result Header */}
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 text-center">
+            <h1 className="text-2xl font-bold text-primary mb-3">
+              {percentage >= 80 ? '🎉 ممتاز!' : percentage >= 60 ? '👍 جيد جداً' : '📚 يحتاج مراجعة'}
+            </h1>
+            <p className="text-3xl font-bold text-gray-700 mb-2">{toEnglishDigits(percentage)}%</p>
+            <p className="text-lg text-gray-600">
+              حصلت على {toEnglishDigits(score)} من {toEnglishDigits(total)} نقطة
+            </p>
+            <p className="text-base text-primary mt-2">
+              {formatDate(attempt.date)} | {formatTime(attempt.date)}
+            </p>
           </div>
 
-          <h1 className="text-2xl font-bold text-primary text-center mb-6">🎯 نتيجة الاختبار</h1>
-
-          {/* دائرة التقدم - مطابقة للصور */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 text-center">
-            <h2 className="text-lg font-bold text-primary mb-4">النسبة المئوية</h2>
+          {/* Progress Circle */}
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-5">
             <div className="flex justify-center mb-4">
-              <svg width="150" height="150" viewBox="0 0 150 150">
-                <circle cx="75" cy="75" r="60" fill="none" stroke="#e5e7eb" strokeWidth="15"/>
+              <svg width="180" height="180" viewBox="0 0 180 180">
+                <circle cx="90" cy="90" r="70" fill="none" stroke="#e5e7eb" strokeWidth="18"/>
                 <circle
-                  cx="75" cy="75" r="60" fill="none"
-                  stroke={percentage >= 60 ? COLORS.correct : COLORS.wrong}
-                  strokeWidth="15"
-                  strokeDasharray={`${(percentage / 100) * 377} 377`}
-                  transform="rotate(-90 75 75)"
+                  cx="90" cy="90" r="70" fill="none"
+                  stroke={percentage >= 60 ? '#10b981' : '#ef4444'}
+                  strokeWidth="18"
+                  strokeDasharray={`${(percentage / 100) * 440} 440`}
+                  transform="rotate(-90 90 90)"
                   strokeLinecap="round"
                 />
-                <text x="75" y="75" fontSize="30" fontWeight="bold" textAnchor="middle" dy="10" fill={COLORS.primary}>
+                <text x="90" y="90" fontSize="36" fontWeight="bold" textAnchor="middle" dy="12" fill="#1e7850">
                   {toEnglishDigits(percentage)}%
                 </text>
               </svg>
             </div>
-            <p className="text-lg font-bold text-gray-700">
-              {percentage >= 80 ? '🎉 ممتاز!' : percentage >= 60 ? '👍 جيد' : '📚 يحتاج تحسين'}
-            </p>
-            <p className="text-gray-600 mt-2 text-sm">
-              {toEnglishDigits(score)} صحيح من {toEnglishDigits(total)} إجمالي
-            </p>
+            <div className="text-center">
+              <div className="flex justify-center gap-10">
+                <div>
+                  <p className="text-2xl font-bold text-green-600">{toEnglishDigits(score)}</p>
+                  <p className="text-gray-600">صحيح ✅</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-red-600">{toEnglishDigits(total - score)}</p>
+                  <p className="text-gray-600">خاطئ ❌</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* جدول الأسئلة - مطابق للصور: عمود صح/خطأ، أقسام عربية */}
-          {aggregates.qArr && aggregates.qArr.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-lg p-4 mb-6 overflow-x-auto">
-              <h2 className="text-lg font-bold text-primary mb-3 text-right">📝 إحصاءات الأسئلة</h2>
-              <table className="min-w-full table-auto">
+          {/* Attempts History */}
+          <div className="bg-white rounded-3xl shadow-lg p-5 mb-5">
+            <h2 className="text-xl font-bold text-primary mb-3">📈 سجل المحاولات</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="px-2 py-2 text-xs font-bold text-right">السؤال</th>
-                    <th className="px-2 py-2 text-xs font-bold text-right">القسم</th>
-                    <th className="px-2 py-2 text-xs font-bold text-right">القسم الفرعي</th>
-                    <th className="px-2 py-2 text-xs font-bold text-right">صحيح</th>
-                    <th className="px-2 py-2 text-xs font-bold text-right">خطأ</th>
-                    <th className="px-2 py-2 text-xs font-bold text-right">النسبة %</th>
+                    <th className="px-3 py-2 text-right font-bold">التاريخ</th>
+                    <th className="px-3 py-2 text-right font-bold">التوقيت</th>
+                    <th className="px-3 py-2 text-right font-bold">الدرجة</th>
+                    <th className="px-3 py-2 text-right font-bold">النسبة %</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {aggregates.qArr.map((q, idx) => (
-                    <tr key={idx} className="border-b">
-                      <td className="px-2 py-2 text-xs text-right">{q.question}</td>
-                      <td className="px-2 py-2 text-xs text-right">{q.section}</td>
-                      <td className="px-2 py-2 text-xs text-right">{q.subsection}</td>
-                      <td className={`px-2 py-2 text-xs font-bold text-right ${q.right > 0 ? 'text-green-600' : 'text-gray-400'}`}>
-                        {toEnglishDigits(q.right)}
-                      </td>
-                      <td className={`px-2 py-2 text-xs font-bold text-right ${q.wrong > 0 ? 'text-red-600' : 'text-gray-400'}`}>
-                        {toEnglishDigits(q.wrong)}
-                      </td>
-                      <td className="px-2 py-2 text-xs text-right">
-                        <span className={`font-bold ${q.pct >= 60 ? 'text-green-600' : 'text-red-600'}`}>
-                          {toEnglishDigits(q.pct)}%
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {allAttempts.map((att, index) => {
+                    const attScore = att.score ?? 0;
+                    const attTotal = att.total ?? 0;
+                    const attPercentage = attTotal ? Math.round((attScore / attTotal) * 100) : 0;
+                    return (
+                      <tr key={index} className="border-b">
+                        <td className="px-3 py-2 text-right">{formatDate(att.date)}</td>
+                        <td className="px-3 py-2 text-right">{formatTime(att.date)}</td>
+                        <td className="px-3 py-2 text-right font-bold text-green-600">{toEnglishDigits(attScore)}</td>
+                        <td className="px-3 py-2 text-right">
+                          <span className={`font-bold ${attPercentage >= 60 ? 'text-green-600' : 'text-red-600'}`}>
+                            {toEnglishDigits(attPercentage)}%
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
-          )}
+          </div>
 
-          {/* إحصاءات الأقسام المختصرة */}
-          {aggregates.sArr && aggregates.sArr.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-lg p-4 mb-6">
-              <h2 className="text-lg font-bold text-primary mb-3 text-right">📚 إحصاءات الأقسام</h2>
-              {aggregates.sArr.map((s, sIdx) => (
-                <div key={sIdx} className="mb-4">
-                  <h3 className="text-base font-bold text-primary mb-2">{s.section}</h3>
-                  <div className="flex flex-col gap-1 text-xs">
-                    {s.subs && s.subs.length > 0 ? (
-                      s.subs.map((sub, subIdx) => (
-                        <div key={subIdx} className="flex justify-between px-2">
-                          <span>{sub.subsection}</span>
-                          <span className={`font-bold ${sub.pct >= 60 ? 'text-green-600' : 'text-red-600'}`}>
-                            {toEnglishDigits(sub.right)} / {toEnglishDigits(sub.wrong)} ({toEnglishDigits(sub.pct)}%)
-                          </span>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="text-center text-gray-500">لا توجد بيانات فرعية</div>
-                    )}
-                    <div className="border-t pt-1 font-bold text-sm">
-                      <span>إجمالي القسم: </span>
-                      <span className={`text-right ml-auto ${s.pct >= 60 ? 'text-green-600' : 'text-red-600'}`}>
-                        {toEnglishDigits(s.right)} / {toEnglishDigits(s.wrong)} ({toEnglishDigits(s.pct)}%)
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* الأزرار - تصدير وطباعة واختبار جديد */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 no-print">
-            <Link
-              href={`/quiz/report/${attemptId}`}
-              className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-2xl text-center"
-            >
-              📊 تقرير مفصل
-            </Link>
+          {/* Buttons */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 no-print">
             <button
               onClick={() => window.print()}
-              className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-2xl"
+              className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2"
             >
               🖨️ طباعة
             </button>
             <Link
+              href={`/quiz/report/${attemptId}`}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-2xl text-center flex items-center justify-center"
+            >
+              📊 التقرير الكامل
+            </Link>
+            <Link
+              href="/"
+              className="bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-2xl text-center flex items-center justify-center"
+            >
+              🏠 الرئيسية
+            </Link>
+            <Link
               href="/quiz"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-2xl text-center"
+              className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-2xl text-center flex items-center justify-center"
             >
               🔄 اختبار جديد
             </Link>
@@ -431,5 +303,17 @@ export default function QuizResultPage() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function ResultPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent" />
+      </div>
+    }>
+      <ResultContent />
+    </Suspense>
   );
 }
