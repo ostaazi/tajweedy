@@ -90,12 +90,13 @@ function ResultContent() {
           }
 
           #result-print-area {
-            position: fixed;
+            position: absolute;
             left: 0;
             top: 0;
             width: 100%;
             background: white;
-            padding: 20px;
+            padding: 0;
+            margin: 0;
           }
 
           .no-print {
