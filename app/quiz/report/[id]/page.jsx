@@ -6,7 +6,7 @@ const handleExportPDF = async () => {
 
   try {
     const { jsPDF } = await import('jspdf');
-    await import('jspdf-autotable');
+    require('jspdf-autotable');
 
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -14,25 +14,7 @@ const handleExportPDF = async () => {
 
     let yPos = 60;
 
-    // ✅ تحميل الخط العربي
-    try {
-      const fontUrl = '/fonts/amiri-regular.ttf';
-      const fontResponse = await fetch(fontUrl);
-      if (!fontResponse.ok) throw new Error('Font not found');
-      
-      const fontBlob = await fontResponse.blob();
-      const fontArrayBuffer = await fontBlob.arrayBuffer();
-      const fontBase64 = btoa(String.fromCharCode(...new Uint8Array(fontArrayBuffer)));
-      
-      doc.addFileToVFS('amiri-regular.ttf', fontBase64);
-      doc.addFont('amiri-regular.ttf', 'amiri', 'normal');
-      doc.setFont('amiri');
-    } catch (fontError) {
-      console.warn('⚠️ Font not loaded, using default');
-      doc.setFont('helvetica');
-    }
-
-    // Header
+    // Header (بدون خطوط مخصصة)
     doc.setFontSize(22);
     doc.setTextColor(30, 120, 80);
     doc.text('Tajweedy - تقرير أحكام التجويد', pageWidth / 2, yPos, { align: 'center' });
@@ -75,7 +57,6 @@ const handleExportPDF = async () => {
         head: [['السؤال', 'القسم', 'صحيح', 'خاطئ', 'إجمالي', 'النسبة']],
         body: qTableData,
         styles: { 
-          font: 'amiri', 
           fontSize: 10, 
           halign: 'right',
           cellPadding: 5
@@ -138,7 +119,6 @@ const handleExportPDF = async () => {
           head: [['القسم الفرعي', 'صحيح', 'خاطئ', 'إجمالي', 'النسبة']],
           body: sTableData,
           styles: { 
-            font: 'amiri', 
             fontSize: 10, 
             halign: 'right',
             cellPadding: 5
@@ -159,7 +139,7 @@ const handleExportPDF = async () => {
       });
     }
 
-    // QR Code في صفحة جديدة
+    // QR Code
     doc.addPage();
     yPos = 100;
 
@@ -170,26 +150,26 @@ const handleExportPDF = async () => {
 
     if (qrSrc) {
       try {
-        const qrResponse = await fetch(qrSrc);
-        if (qrResponse.ok) {
-          const qrBlob = await qrResponse.blob();
-          const qrDataUrl = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.readAsDataURL(qrBlob);
-          });
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = qrSrc;
+        
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          setTimeout(reject, 3000);
+        });
 
-          doc.addImage(qrDataUrl, 'PNG', pageWidth / 2 - 75, yPos, 150, 150);
-        }
-      } catch (qrError) {
-        console.warn('⚠️ QR Code not added:', qrError);
+        doc.addImage(img, 'PNG', pageWidth / 2 - 75, yPos, 150, 150);
+      } catch (err) {
+        console.warn('⚠️ QR not added:', err);
       }
     }
 
     doc.save(`tajweedy-report-${attemptId}.pdf`);
-    console.log('✅ PDF exported successfully');
+    console.log('✅ PDF exported');
   } catch (error) {
-    console.error('❌ PDF export failed:', error);
+    console.error('❌ PDF error:', error);
     alert('❌ حدث خطأ أثناء التصدير');
   }
 };
