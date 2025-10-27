@@ -4,12 +4,13 @@ import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
+/* ============ أدوات مساعدة عامة ============ */
 function toEnglishDigits(input = '') {
   const map = {
     '٠':'0','١':'1','٢':'2','٣':'3','٤':'4',
     '٥':'5','٦':'6','٧':'7','٨':'8','٩':'9',
     '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4',
-    '۵':'5','۶':'6','۷':'7','۸':'8','۹':'9'
+    '۵':'5','۶':'6','۷':'۷','۸':'8','۹':'9'
   };
   return String(input).replace(/[٠-٩۰-۹]/g, d => map[d] ?? d);
 }
@@ -29,6 +30,74 @@ function formatTime(date) {
   return `${hours}:${minutes}`;
 }
 
+/* ============ مكون QR CODE ============ */
+function QrCode({ value, size = 250 }) {
+  const [src, setSrc] = useState('');
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (!value) return;
+
+    const logo = typeof window !== 'undefined' ? `${window.location.origin}/logo.png` : '';
+    const services = [
+      `https://quickchart.io/qr?text=${encodeURIComponent(value)}&size=${size}&centerImageUrl=${encodeURIComponent(
+        logo
+      )}&centerImageSizeRatio=0.25&margin=2`,
+      `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(value)}`,
+      `https://chart.googleapis.com/chart?cht=qr&chs=${size}x${size}&chl=${encodeURIComponent(value)}`
+    ];
+
+    let i = 0;
+    let stopped = false;
+    const tryNext = () => {
+      if (stopped) return;
+      if (i >= services.length) {
+        setError(true);
+        return;
+      }
+      const url = services[i++];
+      const img = new Image();
+      img.onload = () => { if (!stopped) setSrc(url); };
+      img.onerror = () => !stopped && tryNext();
+      img.referrerPolicy = 'no-referrer';
+      img.src = url;
+    };
+    tryNext();
+    return () => { stopped = true; };
+  }, [value, size]);
+
+  if (!value) return null;
+
+  return (
+    <div className="text-center my-4">
+      {error ? (
+        <p className="text-gray-500">تعذّر تحميل رمز الاستجابة</p>
+      ) : (
+        <>
+          <img
+            src={src}
+            alt="QR Code"
+            className="mx-auto rounded-xl border-4 border-green-300 shadow"
+            style={{ width: size, height: size }}
+          />
+          <button
+            onClick={() => {
+              const a = document.createElement('a');
+              a.href = src;
+              a.download = 'Tajweedy_QR.png';
+              a.click();
+            }}
+            className="mt-3 px-4 py-2 bg-blue-600 text-white font-bold rounded-xl no-print"
+          >
+            تحميل QR 📥
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ============ المحتوى الرئيسي ============ */
 function ResultContent() {
   const searchParams = useSearchParams();
   const attemptId = searchParams?.get('id');
@@ -42,16 +111,13 @@ function ResultContent() {
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
     setUser({ name: userData.name || 'اسم المتدرب' });
 
-    if (!attemptId) {
-      setLoading(false);
-      return;
-    }
-
     const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
-    const found = attempts.find(a => String(a?.id) === String(attemptId));
-    setAttempt(found);
     setAllAttempts(attempts.sort((a, b) => new Date(b.date) - new Date(a.date)));
 
+    if (attemptId) {
+      const found = attempts.find(a => String(a?.id) === String(attemptId));
+      setAttempt(found);
+    }
     setLoading(false);
   }, [attemptId]);
 
@@ -82,108 +148,25 @@ function ResultContent() {
   const examType = attempt.type || 'اختبار';
   const examName = attempt.name || 'اختبار التجويد';
   const examCode = `TJ-${toEnglishDigits(attemptId)}`;
+  const qrValue = typeof window !== 'undefined'
+    ? `${window.location.origin}/quiz/result?id=${attemptId}`
+    : '';
 
   return (
     <>
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
-        
-        * {
-          font-family: 'Cairo', sans-serif !important;
-        }
-
-        /* Watermark background for screen */
-        .watermark-bg {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background-image: url('/logo.png');
-          background-size: 400px 400px;
-          background-repeat: repeat;
-          background-position: center;
-          opacity: 0.1;
-          z-index: 0;
-          pointer-events: none;
-        }
-
-        @media print {
-          @page {
-            size: A4 portrait;
-            margin: 15mm;
-          }
-          
-          * {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-
-          body * {
-            visibility: hidden;
-          }
-
-          #result-print-area,
-          #result-print-area * {
-            visibility: visible;
-          }
-
-          #result-print-area {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            background: white;
-            padding: 20px;
-          }
-
-          /* Watermark for print */
-          #result-print-area::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 210mm;
-            height: 297mm;
-            background-image: url('/logo.png');
-            background-size: 400px 400px;
-            background-repeat: repeat;
-            background-position: center;
-            opacity: 0.1;
-            z-index: -1;
-          }
-
-          .no-print {
-            display: none !important;
-          }
-
-          .bg-gradient-to-br {
-            background: white !important;
-          }
-
-          .shadow-lg {
-            box-shadow: none !important;
-          }
-        }
+        * { font-family: 'Cairo', sans-serif !important; }
       `}</style>
 
-      {/* Watermark Background */}
-      <div className="watermark-bg"></div>
-
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8 relative z-10" dir="rtl">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8 relative" dir="rtl">
         <div id="result-print-area" className="max-w-4xl mx-auto">
-          
-          {/* Header with Real Logo */}
+          {/* شعار وبيانات المتدرب */}
           <div className="text-center mb-6">
-            <img 
-              src="/logo.png" 
-              alt="Tajweedy Logo" 
-              className="w-24 h-24 mx-auto mb-3 object-contain"
-            />
-            <h1 className="text-3xl font-bold text-primary mb-2">Tajweedy - التجويد الذكي</h1>
+            <img src="/logo.png" alt="Tajweedy Logo" className="w-20 h-20 mx-auto mb-2" />
+            <h1 className="text-2xl font-bold text-primary mb-2">Tajweedy - التجويد الذكي</h1>
           </div>
 
-          {/* Trainee Name and Exam Info */}
           <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 text-center">
             <h2 className="text-2xl font-bold text-gray-800 mb-2">{user.name}</h2>
             <p className="text-lg text-gray-600">
@@ -191,7 +174,7 @@ function ResultContent() {
             </p>
           </div>
 
-          {/* Result Header */}
+          {/* النسبة ونتيجة الاختبار */}
           <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 text-center">
             <h1 className="text-2xl font-bold text-primary mb-3">
               {percentage >= 80 ? '🎉 ممتاز!' : percentage >= 60 ? '👍 جيد جداً' : '📚 يحتاج مراجعة'}
@@ -205,39 +188,16 @@ function ResultContent() {
             </p>
           </div>
 
-          {/* Progress Circle */}
-          <div className="bg-white rounded-3xl shadow-lg p-6 mb-5">
-            <div className="flex justify-center mb-4">
-              <svg width="180" height="180" viewBox="0 0 180 180">
-                <circle cx="90" cy="90" r="70" fill="none" stroke="#e5e7eb" strokeWidth="18"/>
-                <circle
-                  cx="90" cy="90" r="70" fill="none"
-                  stroke={percentage >= 60 ? '#10b981' : '#ef4444'}
-                  strokeWidth="18"
-                  strokeDasharray={`${(percentage / 100) * 440} 440`}
-                  transform="rotate(-90 90 90)"
-                  strokeLinecap="round"
-                />
-                <text x="90" y="90" fontSize="36" fontWeight="bold" textAnchor="middle" dy="12" fill="#1e7850">
-                  {toEnglishDigits(percentage)}%
-                </text>
-              </svg>
+          {/* 🔳 QR CODE هنا */}
+          {qrValue && (
+            <div className="bg-white rounded-3xl shadow-lg p-6 mb-5">
+              <h2 className="text-xl font-bold text-primary mb-3">رمز الاستجابة السريع 📱</h2>
+              <QrCode value={qrValue} size={220} />
+              <p className="text-sm text-gray-600">امسح للوصول إلى تقريرك مباشرة</p>
             </div>
-            <div className="text-center">
-              <div className="flex justify-center gap-10">
-                <div>
-                  <p className="text-2xl font-bold text-green-600">{toEnglishDigits(score)}</p>
-                  <p className="text-gray-600">صحيح ✅</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-red-600">{toEnglishDigits(total - score)}</p>
-                  <p className="text-gray-600">خاطئ ❌</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          )}
 
-          {/* Attempts History */}
+          {/* سجل المحاولات */}
           <div className="bg-white rounded-3xl shadow-lg p-5 mb-5">
             <h2 className="text-xl font-bold text-primary mb-3">📈 سجل المحاولات</h2>
             <div className="overflow-x-auto">
@@ -245,7 +205,7 @@ function ResultContent() {
                 <thead>
                   <tr className="bg-gray-50">
                     <th className="px-3 py-2 text-right font-bold">التاريخ</th>
-                    <th className="px-3 py-2 text-right font-bold">التوقيت</th>
+                    <th className="px-3 py-2 text-right font-bold">الوقت</th>
                     <th className="px-3 py-2 text-right font-bold">الدرجة</th>
                     <th className="px-3 py-2 text-right font-bold">النسبة %</th>
                   </tr>
@@ -260,8 +220,8 @@ function ResultContent() {
                         <td className="px-3 py-2 text-right">{formatDate(att.date)}</td>
                         <td className="px-3 py-2 text-right">{formatTime(att.date)}</td>
                         <td className="px-3 py-2 text-right font-bold text-green-600">{toEnglishDigits(attScore)}</td>
-                        <td className="px-3 py-2 text-right">
-                          <span className={`font-bold ${attPercentage >= 60 ? 'text-green-600' : 'text-red-600'}`}>
+                        <td className="px-3 py-2 text-right font-bold">
+                          <span className={attPercentage >= 60 ? 'text-green-600' : 'text-red-600'}>
                             {toEnglishDigits(attPercentage)}%
                           </span>
                         </td>
@@ -273,30 +233,18 @@ function ResultContent() {
             </div>
           </div>
 
-          {/* Buttons */}
+          {/* الأزرار */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 no-print">
-            <button
-              onClick={() => window.print()}
-              className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2"
-            >
+            <button onClick={() => window.print()} className="bg-gray-600 text-white font-bold py-3 px-4 rounded-2xl">
               🖨️ طباعة
             </button>
-            <Link
-              href={`/quiz/report/${attemptId}`}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-2xl text-center flex items-center justify-center"
-            >
+            <Link href={`/quiz/report/${attemptId}`} className="bg-blue-600 text-white font-bold py-3 px-4 rounded-2xl text-center">
               📊 التقرير الكامل
             </Link>
-            <Link
-              href="/"
-              className="bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-2xl text-center flex items-center justify-center"
-            >
+            <Link href="/" className="bg-gray-800 text-white font-bold py-3 px-4 rounded-2xl text-center">
               🏠 الرئيسية
             </Link>
-            <Link
-              href="/quiz"
-              className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-2xl text-center flex items-center justify-center"
-            >
+            <Link href="/quiz" className="bg-primary text-white font-bold py-3 px-4 rounded-2xl text-center">
               🔄 اختبار جديد
             </Link>
           </div>
@@ -306,13 +254,16 @@ function ResultContent() {
   );
 }
 
+/* ============ الصفحة الكاملة مع Suspense ============ */
 export default function ResultPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent" />
+        </div>
+      }
+    >
       <ResultContent />
     </Suspense>
   );
