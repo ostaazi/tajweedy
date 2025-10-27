@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useParams } from 'next/navigation';
 
 /* ======================= Helpers ======================= */
 
@@ -90,8 +89,7 @@ const COLORS = {
 export default function QuizResultPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const params = useParams();
-  const attemptId = params?.id || searchParams.get('id');
+  const attemptId = searchParams.get('id');
 
   const [attempt, setAttempt] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -169,7 +167,7 @@ export default function QuizResultPage() {
 
   useEffect(() => {
     if (attemptId) {
-      const baseUrl = `${window.location.origin}/quiz/result/${attemptId}`;
+      const baseUrl = `${window.location.origin}/quiz/result?id=${attemptId}`;
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(baseUrl)}&size=200x200&color=1e7850&bgcolor=ffffff`;
       setQrDataUrl(qrUrl);
     }
@@ -276,7 +274,6 @@ export default function QuizResultPage() {
             box-shadow: none !important;
           }
 
-          /* فاصل صفحات - QR والإحصاءات في صفحة واحدة، باقي البيانات بعدها */
           .page-break-after {
             page-break-after: always;
           }
@@ -286,15 +283,13 @@ export default function QuizResultPage() {
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8" dir="rtl">
         <div id="result-content" className="max-w-4xl mx-auto">
           
-          {/* Header - مطابق للصور: شعار، بطاقة ترويسة أعلى يسار */}
+          {/* Header */}
           <div className="relative mb-6">
-            {/* الشعار والنص في الوسط أعلى */}
             <div className="text-center mb-4">
               <img src="/logo.png" alt="Tajweedy Logo" className="w-16 h-16 mx-auto object-contain mb-2" />
               <p className="text-sm font-bold text-primary">التجويد الذكي</p>
             </div>
 
-            {/* بطاقة الترويسة - أعلى يسار، RTL داخلي */}
             <div className="bg-white rounded-2xl shadow-md p-3 w-64 absolute top-0 left-0 text-right">
               <p className="text-xs text-gray-600 mb-1"><strong>نوع الاختبار:</strong> {examTypeArabic}</p>
               <p className="text-xs text-gray-600 mb-1"><strong>كود الاختبار:</strong> {examCode}</p>
@@ -307,10 +302,10 @@ export default function QuizResultPage() {
             <h2 className="text-xl font-bold text-gray-800">{user.name}</h2>
           </div>
 
-          {/* Navigation - رجوع إلى التقرير الكامل */}
+          {/* Navigation */}
           <div className="flex justify-center mb-4 no-print">
             <Link 
-              href={`/quiz/report/${attemptId}`} 
+              href={`/quiz/report?id=${attemptId}`} 
               className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-6 rounded-2xl flex items-center gap-2"
             >
               📊 التقرير الكامل
@@ -319,7 +314,7 @@ export default function QuizResultPage() {
 
           <h1 className="text-2xl font-bold text-primary text-center mb-6">🎯 نتيجة الاختبار</h1>
 
-          {/* دائرة التقدم - مطابقة للصور */}
+          {/* دائرة التقدم */}
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 text-center">
             <h2 className="text-lg font-bold text-primary mb-4">النسبة المئوية</h2>
             <div className="flex justify-center mb-4">
@@ -346,7 +341,7 @@ export default function QuizResultPage() {
             </p>
           </div>
 
-          {/* بطاقة QR Code - مطبوعة وفي الصفحة الأولى */}
+          {/* بطاقة QR Code */}
           {qrDataUrl && (
             <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 text-center page-break-after">
               <h2 className="text-lg font-bold text-primary mb-4">رمز الاستجابة السريع</h2>
@@ -355,7 +350,7 @@ export default function QuizResultPage() {
             </div>
           )}
 
-          {/* جدول الأسئلة - سجل المحاولات/إحصاءات الأسئلة */}
+          {/* جدول الأسئلة */}
           {aggregates.qArr && aggregates.qArr.length > 0 && (
             <div className="bg-white rounded-2xl shadow-lg p-4 mb-6 overflow-x-auto">
               <h2 className="text-lg font-bold text-primary mb-3 text-right">📝 إحصاءات الأسئلة</h2>
@@ -394,7 +389,7 @@ export default function QuizResultPage() {
             </div>
           )}
 
-          {/* إحصاءات الأقسام المختصرة */}
+          {/* إحصاءات الأقسام */}
           {aggregates.sArr && aggregates.sArr.length > 0 && (
             <div className="bg-white rounded-2xl shadow-lg p-4 mb-6">
               <h2 className="text-lg font-bold text-primary mb-3 text-right">📚 إحصاءات الأقسام</h2>
@@ -426,10 +421,10 @@ export default function QuizResultPage() {
             </div>
           )}
 
-          {/* الأزرار - تصدير وطباعة واختبار جديد */}
+          {/* الأزرار */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 no-print">
             <Link
-              href={`/quiz/report/${attemptId}`}
+              href={`/quiz/report?id=${attemptId}`}
               className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-2xl text-center"
             >
               📊 تقرير مفصل
