@@ -5,8 +5,9 @@ const handleExportPDF = async () => {
   }
 
   try {
+    // ✅ استخدم import بدلاً من require
     const { jsPDF } = await import('jspdf');
-    require('jspdf-autotable');
+    await import('jspdf-autotable');
 
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -14,7 +15,7 @@ const handleExportPDF = async () => {
 
     let yPos = 60;
 
-    // Header (بدون خطوط مخصصة)
+    // Header
     doc.setFontSize(22);
     doc.setTextColor(30, 120, 80);
     doc.text('Tajweedy - تقرير أحكام التجويد', pageWidth / 2, yPos, { align: 'center' });
@@ -36,7 +37,7 @@ const handleExportPDF = async () => {
     doc.text(`النتيجة: ${toEnglishDigits(score)} / ${toEnglishDigits(total)} (${toEnglishDigits(percentage)}%)`, pageWidth / 2, yPos, { align: 'center' });
     yPos += 60;
 
-    // ✅ إحصاءات الأسئلة
+    // إحصاءات الأسئلة
     if (aggregates.qArr && aggregates.qArr.length > 0) {
       doc.setFontSize(14);
       doc.setTextColor(30, 120, 80);
@@ -73,7 +74,7 @@ const handleExportPDF = async () => {
       yPos = doc.lastAutoTable.finalY + 30;
     }
 
-    // ✅ إحصاءات الأقسام
+    // إحصاءات الأقسام
     if (aggregates.sArr && aggregates.sArr.length > 0) {
       if (yPos > pageHeight - 100) {
         doc.addPage();
