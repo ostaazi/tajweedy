@@ -14,14 +14,34 @@ function toEnglishDigits(input = '') {
   return String(input).replace(/[٠-٩۰-۹]/g, d => map[d] ?? d);
 }
 
+function formatDate(date) {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+function formatTime(date) {
+  const d = new Date(date);
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
 function ResultContent() {
   const searchParams = useSearchParams();
   const attemptId = searchParams?.get('id');
 
   const [attempt, setAttempt] = useState(null);
+  const [allAttempts, setAllAttempts] = useState([]);
+  const [user, setUser] = useState({ name: 'اسم المتدرب' });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem('user') || '{}');
+    setUser({ name: userData.name || 'اسم المتدرب' });
+
     if (!attemptId) {
       setLoading(false);
       return;
@@ -29,10 +49,8 @@ function ResultContent() {
 
     const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
     const found = attempts.find(a => String(a?.id) === String(attemptId));
-
-    if (found) {
-      setAttempt(found);
-    }
+    setAttempt(found);
+    setAllAttempts(attempts.sort((a, b) => new Date(b.date) - new Date(a.date)));
 
     setLoading(false);
   }, [attemptId]);
@@ -61,38 +79,44 @@ function ResultContent() {
   const score = attempt.score ?? 0;
   const total = attempt.total ?? 0;
   const percentage = total ? Math.round((score / total) * 100) : 0;
+  const examType = attempt.type || 'اختبار';
+  const examName = attempt.name || 'اختبار التجويد';
+  const examCode = `TJ-${toEnglishDigits(attemptId)}`;
 
   return (
     <>
       <style jsx global>{`
-        @media screen {
-          .min-h-screen {
-            min-height: 100vh;
-          }
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+        
+        * {
+          font-family: 'Cairo', sans-serif !important;
+        }
+
+        /* Watermark background for screen */
+        .watermark-bg {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background-image: url('/logo.png');
+          background-size: 400px 400px;
+          background-repeat: repeat;
+          background-position: center;
+          opacity: 0.1;
+          z-index: 0;
+          pointer-events: none;
         }
 
         @media print {
           @page {
             size: A4 portrait;
-            margin: 0;
+            margin: 15mm;
           }
           
           * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
-          }
-
-          html {
-            height: 100%;
-            overflow: hidden;
-          }
-
-          body {
-            background: white !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            height: auto !important;
-            overflow: hidden !important;
           }
 
           body * {
@@ -111,8 +135,22 @@ function ResultContent() {
             width: 100%;
             background: white;
             padding: 20px;
-            margin: 0;
-            box-sizing: border-box;
+          }
+
+          /* Watermark for print */
+          #result-print-area::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 210mm;
+            height: 297mm;
+            background-image: url('/logo.png');
+            background-size: 400px 400px;
+            background-repeat: repeat;
+            background-position: center;
+            opacity: 0.1;
+            z-index: -1;
           }
 
           .no-print {
@@ -126,33 +164,50 @@ function ResultContent() {
           .shadow-lg {
             box-shadow: none !important;
           }
-
-          .min-h-screen {
-            min-height: auto !important;
-            height: auto !important;
-          }
         }
       `}</style>
 
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8" dir="rtl">
+      {/* Watermark Background */}
+      <div className="watermark-bg"></div>
+
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8 relative z-10" dir="rtl">
         <div id="result-print-area" className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="bg-white rounded-3xl shadow-lg p-6 mb-4 text-center">
-            <div className="w-20 h-20 rounded-full bg-primary text-white font-bold grid place-items-center text-3xl mx-auto mb-3">
-              TJ
-            </div>
-            <h1 className="text-3xl font-bold text-primary mb-2">
+          
+          {/* Header with Real Logo */}
+          <div className="text-center mb-6">
+            <img 
+              src="/logo.png" 
+              alt="Tajweedy Logo" 
+              className="w-24 h-24 mx-auto mb-3 object-contain"
+            />
+            <h1 className="text-3xl font-bold text-primary mb-2">Tajweedy - التجويد الذكي</h1>
+          </div>
+
+          {/* Trainee Name and Exam Info */}
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 text-center">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">{user.name}</h2>
+            <p className="text-lg text-gray-600">
+              <strong>النوع:</strong> {examType} | <strong>الاسم:</strong> {examName} | <strong>الكود:</strong> {examCode}
+            </p>
+          </div>
+
+          {/* Result Header */}
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 text-center">
+            <h1 className="text-2xl font-bold text-primary mb-3">
               {percentage >= 80 ? '🎉 ممتاز!' : percentage >= 60 ? '👍 جيد جداً' : '📚 يحتاج مراجعة'}
             </h1>
-            <p className="text-2xl font-bold text-gray-700 mb-1">{toEnglishDigits(percentage)}%</p>
-            <p className="text-base text-gray-600">
+            <p className="text-3xl font-bold text-gray-700 mb-2">{toEnglishDigits(percentage)}%</p>
+            <p className="text-lg text-gray-600">
               حصلت على {toEnglishDigits(score)} من {toEnglishDigits(total)} نقطة
+            </p>
+            <p className="text-base text-primary mt-2">
+              {formatDate(attempt.date)} | {formatTime(attempt.date)}
             </p>
           </div>
 
           {/* Progress Circle */}
-          <div className="bg-white rounded-3xl shadow-lg p-6 mb-4">
-            <div className="flex justify-center mb-3">
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-5">
+            <div className="flex justify-center mb-4">
               <svg width="180" height="180" viewBox="0 0 180 180">
                 <circle cx="90" cy="90" r="70" fill="none" stroke="#e5e7eb" strokeWidth="18"/>
                 <circle
@@ -169,45 +224,50 @@ function ResultContent() {
               </svg>
             </div>
             <div className="text-center">
-              <div className="flex justify-center gap-8 mt-4">
+              <div className="flex justify-center gap-10">
                 <div>
                   <p className="text-2xl font-bold text-green-600">{toEnglishDigits(score)}</p>
-                  <p className="text-gray-600 text-sm">صحيح ✅</p>
+                  <p className="text-gray-600">صحيح ✅</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-red-600">{toEnglishDigits(total - score)}</p>
-                  <p className="text-gray-600 text-sm">خاطئ ❌</p>
+                  <p className="text-gray-600">خاطئ ❌</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Attempt History */}
-          <div className="bg-white rounded-3xl shadow-lg p-5 mb-4">
-            <h2 className="text-xl font-bold text-primary mb-3">📈 تاريخ المحاولات</h2>
+          {/* Attempts History */}
+          <div className="bg-white rounded-3xl shadow-lg p-5 mb-5">
+            <h2 className="text-xl font-bold text-primary mb-3">📈 سجل المحاولات</h2>
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm">
                 <thead>
                   <tr className="bg-gray-50">
                     <th className="px-3 py-2 text-right font-bold">التاريخ</th>
+                    <th className="px-3 py-2 text-right font-bold">التوقيت</th>
                     <th className="px-3 py-2 text-right font-bold">الدرجة</th>
-                    <th className="px-3 py-2 text-right font-bold">الإجمالي</th>
                     <th className="px-3 py-2 text-right font-bold">النسبة %</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b">
-                    <td className="px-3 py-2 text-right">
-                      {new Date(attempt.date).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' })}
-                    </td>
-                    <td className="px-3 py-2 text-right font-bold text-green-600">{toEnglishDigits(score)}</td>
-                    <td className="px-3 py-2 text-right font-bold">{toEnglishDigits(total)}</td>
-                    <td className="px-3 py-2 text-right">
-                      <span className={`font-bold ${percentage >= 60 ? 'text-green-600' : 'text-red-600'}`}>
-                        {toEnglishDigits(percentage)}%
-                      </span>
-                    </td>
-                  </tr>
+                  {allAttempts.map((att, index) => {
+                    const attScore = att.score ?? 0;
+                    const attTotal = att.total ?? 0;
+                    const attPercentage = attTotal ? Math.round((attScore / attTotal) * 100) : 0;
+                    return (
+                      <tr key={index} className="border-b">
+                        <td className="px-3 py-2 text-right">{formatDate(att.date)}</td>
+                        <td className="px-3 py-2 text-right">{formatTime(att.date)}</td>
+                        <td className="px-3 py-2 text-right font-bold text-green-600">{toEnglishDigits(attScore)}</td>
+                        <td className="px-3 py-2 text-right">
+                          <span className={`font-bold ${attPercentage >= 60 ? 'text-green-600' : 'text-red-600'}`}>
+                            {toEnglishDigits(attPercentage)}%
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
