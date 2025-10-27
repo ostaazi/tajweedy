@@ -41,6 +41,7 @@ export default function QuizReportPage() {
   const [qrSrc, setQrSrc] = useState('');
   const [qrDataUrl, setQrDataUrl] = useState(''); // ✅ للطباعة وPDF
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState({ name: 'اسم المتدرب' });
 
   const aggregates = useMemo(() => {
     if (!attempt?.responses || attempt.responses.length === 0) {
@@ -115,6 +116,9 @@ export default function QuizReportPage() {
   }, [attempt]);
 
   useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem('user') || '{}');
+    setUser({ name: userData.name || 'اسم المتدرب' });
+
     if (!attemptId) { 
       setLoading(false); 
       return; 
@@ -186,7 +190,7 @@ export default function QuizReportPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent" />
       </div>
     );
@@ -210,49 +214,134 @@ export default function QuizReportPage() {
   const score = attempt.score ?? 0;
   const total = attempt.total ?? 0;
   const percentage = total ? Math.round((score / total) * 100) : 0;
+  const examType = attempt.type || 'اختبار';
+  const examName = attempt.name || 'اختبار التجويد';
+  const examCode = `TJ-${toEnglishDigits(attemptId)}`;
 
   return (
     <>
-      {/* ✅ CSS للطباعة */}
       <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+        
+        * {
+          font-family: 'Cairo', sans-serif !important;
+        }
+
+        /* Watermark background for screen */
+        .watermark-bg {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background-image: url('/logo.png');
+          background-size: 400px 400px;
+          background-repeat: repeat;
+          background-position: center;
+          opacity: 0.1;
+          z-index: 0;
+          pointer-events: none;
+        }
+
         @media print {
+          @page {
+            size: A4 portrait;
+            margin: 15mm;
+          }
+          
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
           body * {
             visibility: hidden;
           }
+
           #report-content,
           #report-content * {
             visibility: visible;
           }
+
           #report-content {
             position: absolute;
             left: 0;
             top: 0;
             width: 100%;
+            background: white;
+            padding: 20px;
           }
+
+          /* Watermark for print */
+          #report-content::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 210mm;
+            height: 297mm;
+            background-image: url('/logo.png');
+            background-size: 400px 400px;
+            background-repeat: repeat;
+            background-position: center;
+            opacity: 0.1;
+            z-index: -1;
+          }
+
           .no-print {
             display: none !important;
+          }
+
+          .bg-gradient-to-br {
+            background: white !important;
+          }
+
+          .shadow-lg {
+            box-shadow: none !important;
           }
         }
       `}</style>
 
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8" dir="rtl">
+      {/* Watermark Background */}
+      <div className="watermark-bg"></div>
+
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8 relative z-10" dir="rtl">
         <div id="report-content" className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3 no-print">
-                <Link href={`/quiz/result?id=${attemptId}`} className="px-4 py-2 rounded-xl bg-gray-600 text-white font-bold hover:bg-gray-700">
-                  ← رجوع
-                </Link>
-                <Link href="/" className="px-4 py-2 rounded-xl bg-gray-700 text-white font-bold hover:bg-gray-800">
-                  🏠 الرئيسية
-                </Link>
-              </div>
-              <div className="w-16 h-16 rounded-2xl bg-primary text-white font-bold grid place-items-center text-2xl">TJ</div>
-            </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-primary text-center mb-2">📊 التقرير الكامل</h1>
-            <p className="text-center text-gray-600 text-lg">{formatDateEnRtl(attempt.date || Date.now())}</p>
+          
+          {/* Header with Logo and Project Name */}
+          <div className="text-center mb-6">
+            <img 
+              src="/logo.png" 
+              alt="Tajweedy Logo" 
+              className="w-24 h-24 mx-auto mb-3 object-contain"
+            />
+            <h1 className="text-3xl font-bold text-primary mb-2">Tajweedy - التجويد الذكي</h1>
           </div>
+
+          {/* Trainee Name and Exam Info */}
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-6 text-center">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">{user.name}</h2>
+            <p className="text-lg text-gray-600">
+              <strong>النوع:</strong> {examType} | <strong>الاسم:</strong> {examName} | <strong>الكود:</strong> {examCode}
+            </p>
+            <p className="text-base text-primary mt-2">
+              {formatDateEnRtl(attempt.date || Date.now())}
+            </p>
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex items-center justify-between mb-4 no-print">
+            <div className="flex items-center gap-3">
+              <Link href={`/quiz/result?id=${attemptId}`} className="px-4 py-2 rounded-xl bg-gray-600 text-white font-bold hover:bg-gray-700">
+                ← رجوع
+              </Link>
+              <Link href="/" className="px-4 py-2 rounded-xl bg-gray-700 text-white font-bold hover:bg-gray-800">
+                🏠 الرئيسية
+              </Link>
+            </div>
+          </div>
+
+          <h1 className="text-3xl md:text-4xl font-bold text-primary text-center mb-6">📊 التقرير الكامل</h1>
 
           {/* النسبة المئوية */}
           <div className="bg-white rounded-3xl shadow-lg p-8 mb-6 text-center">
