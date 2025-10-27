@@ -16,12 +16,34 @@ function toEnglishDigits(input = '') {
   return String(input).replace(/[٠-٩۰-۹]/g, d => map[d] ?? d);
 }
 
-function formatDateEnRtl(dateLike) {
+function formatDateArabic(dateLike) {
   const d = (dateLike instanceof Date) ? dateLike : new Date(dateLike || Date.now());
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = d.toLocaleString('en-GB', { month: 'short' });
-  const year = String(d.getFullYear());
-  return `${day} ${month} ${year}`;
+  return d.toLocaleDateString('ar-EG', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+}
+
+// دالة لترجمة أسماء الأقسام الفرعية إلى العربية
+function getArabicSubsectionName(englishName) {
+  const map = {
+    'noontanween': 'نون والتنوين',
+    'idharhalaqi': 'إظهار حلقي',
+    'idghambighunnah': 'إدغام بغنة',
+    'idghambilaghunnah': 'إدغام بلا غنة',
+    'iqlab': 'إقلاب',
+    'maddtabii': 'مد طبيعي',
+    // أضف المزيد إذا لزم الأمر بناءً على بنك الأسئلة
+  };
+  return map[englishName] || englishName; // إذا لم يوجد، يبقى كما هو
+}
+
+// دالة لنوع الاختبار
+function getExamTypeArabic(type) {
+  if (type === 'periodic') return 'اختبار دوري';
+  if (type === 'therapeutic') return 'تدريب علاجي';
+  return 'اختبار';
 }
 
 const COLORS = {
@@ -45,7 +67,7 @@ export default function QuizReportPage() {
 
   const aggregates = useMemo(() => {
     if (!attempt?.responses || attempt.responses.length === 0) {
-      return { qArr: [], sArr: [], tl: [] };
+      return { qArr: [], sArr: [] };
     }
 
     const qMap = {};
@@ -108,11 +130,12 @@ export default function QuizReportPage() {
       pct: s.total ? Math.round((s.right / s.total) * 100) : 0,
       subs: Object.values(s.subs || {}).map(sub => ({
         ...sub,
+        subsection: getArabicSubsectionName(sub.subsection), // ✅ ترجمة إلى العربية
         pct: sub.total ? Math.round((sub.right / sub.total) * 100) : 0
       })).filter(sub => sub.total > 0)
     })).filter(s => s.total > 0);
 
-    return { qArr, sArr, tl: [] };
+    return { qArr, sArr };
   }, [attempt]);
 
   useEffect(() => {
@@ -188,6 +211,85 @@ export default function QuizReportPage() {
     }
   };
 
+  // ✅ دالة لرسم الشريط البياني (SVG بسيط)
+  const BarChart = ({ subs }) => {
+    if (!subs || subs.length === 0) return null;
+
+    const maxTotal = Math.max(...subs.map(sub => sub.total));
+    const barWidth = 60;
+    const barSpacing = 80;
+    const chartHeight = 200;
+    const chartWidth = subs.length * barSpacing;
+
+    return (
+      <div className="mt-6">
+        <svg width={chartWidth + 100} height={chartHeight + 50} className="bg-gray-50 rounded-lg p-4">
+          {/* المحاور */}
+          <line x1="0" y1={chartHeight} x2={chartWidth + 100} y2={chartHeight} stroke="#d1d5db" strokeWidth="2" />
+          <line x1="50" y1={chartHeight} x2="50" y2="20" stroke="#d1d5db" strokeWidth="2" />
+
+          {/* التسميات على X */}
+          {subs.map((sub, idx) => (
+            <g key={idx}>
+              <text x={50 + idx * barSpacing + barWidth / 2} y={chartHeight + 20} textAnchor="middle" fontSize="12" fill="#374151">
+                {sub.subsection}
+              </text>
+            </g>
+          ))}
+
+          {/* الشرائط */}
+          {subs.map((sub, idx) => {
+            const x = 50 + idx * barSpacing;
+            const wrongHeight = (sub.wrong / maxTotal) * chartHeight;
+            const rightHeight = (sub.right / maxTotal) * chartHeight;
+            const totalHeight = wrongHeight + rightHeight;
+
+            return (
+              <g key={idx}>
+                {/* شريط الخاطئ (أسفل) */}
+                <rect
+                  x={x}
+                  y={chartHeight - wrongHeight}
+                  width={barWidth}
+                  height={wrongHeight}
+                  fill={COLORS.wrong}
+                  rx="3"
+                />
+                {/* شريط الصحيح (أعلى) */}
+                <rect
+                  x={x}
+                  y={chartHeight - totalHeight}
+                  width={barWidth}
+                  height={rightHeight}
+                  fill={COLORS.correct}
+                  rx="3"
+                />
+                {/* النسبة المئوية */}
+                <text
+                  x={x + barWidth / 2}
+                  y={chartHeight - totalHeight - 5}
+                  textAnchor="middle"
+                  fontSize="12"
+                  fontWeight="bold"
+                  fill="white"
+                >
+                  {toEnglishDigits(sub.pct)}%
+                </text>
+                {/* القيم */}
+                <text x={x + barWidth / 2} y={chartHeight - totalHeight + 15} textAnchor="middle" fontSize="10" fill="#374151">
+                  {toEnglishDigits(sub.right + sub.wrong)}
+                </text>
+              </g>
+            );
+          })}
+
+          {/* تسمية Y */}
+          <text x="20" y="10" fontSize="12" fill="#374151">عدد الأسئلة</text>
+        </svg>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center">
@@ -214,8 +316,7 @@ export default function QuizReportPage() {
   const score = attempt.score ?? 0;
   const total = attempt.total ?? 0;
   const percentage = total ? Math.round((score / total) * 100) : 0;
-  const examType = attempt.type || 'اختبار';
-  const examName = attempt.name || 'اختبار التجويد';
+  const examTypeArabic = getExamTypeArabic(attempt.type);
   const examCode = `TJ-${toEnglishDigits(attemptId)}`;
 
   return (
@@ -227,7 +328,7 @@ export default function QuizReportPage() {
           font-family: 'Cairo', sans-serif !important;
         }
 
-        /* Watermark background for screen */
+        /* Watermark background for screen - صورة واحدة كبيرة تغطي الصفحة */
         .watermark-bg {
           position: fixed;
           top: 0;
@@ -235,8 +336,8 @@ export default function QuizReportPage() {
           width: 100vw;
           height: 100vh;
           background-image: url('/logo.png');
-          background-size: 400px 400px;
-          background-repeat: repeat;
+          background-size: cover; /* حجم كبير بدون stretch */
+          background-repeat: no-repeat;
           background-position: center;
           opacity: 0.1;
           z-index: 0;
@@ -272,7 +373,7 @@ export default function QuizReportPage() {
             padding: 20px;
           }
 
-          /* Watermark for print */
+          /* Watermark for print - صورة واحدة في كل صفحة */
           #report-content::before {
             content: '';
             position: fixed;
@@ -281,8 +382,8 @@ export default function QuizReportPage() {
             width: 210mm;
             height: 297mm;
             background-image: url('/logo.png');
-            background-size: 400px 400px;
-            background-repeat: repeat;
+            background-size: cover;
+            background-repeat: no-repeat;
             background-position: center;
             opacity: 0.1;
             z-index: -1;
@@ -308,24 +409,35 @@ export default function QuizReportPage() {
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8 relative z-10" dir="rtl">
         <div id="report-content" className="max-w-6xl mx-auto">
           
-          {/* Header with Logo and Project Name */}
-          <div className="text-center mb-6">
+          {/* Header with Logo - محاذاة يمين */}
+          <div className="text-right mb-6">
             <img 
               src="/logo.png" 
               alt="Tajweedy Logo" 
-              className="w-24 h-24 mx-auto mb-3 object-contain"
+              className="w-24 h-24 mx-auto md:ml-auto mb-3 object-contain inline-block"
             />
-            <h1 className="text-3xl font-bold text-primary mb-2">Tajweedy - التجويد الذكي</h1>
+            <p className="text-xl font-bold text-primary">التجويد الذكي</p>
           </div>
 
-          {/* Trainee Name and Exam Info */}
+          {/* Trainee Name */}
           <div className="bg-white rounded-3xl shadow-lg p-6 mb-6 text-center">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">{user.name}</h2>
-            <p className="text-lg text-gray-600">
-              <strong>النوع:</strong> {examType} | <strong>الاسم:</strong> {examName} | <strong>الكود:</strong> {examCode}
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">{user.name}</h2>
+          </div>
+
+          {/* منطقة 2: نوع الاختبار وكود */}
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-6 text-center">
+            <p className="text-lg text-gray-600 mb-2">
+              <strong>نوع الاختبار:</strong> {examTypeArabic}
             </p>
-            <p className="text-base text-primary mt-2">
-              {formatDateEnRtl(attempt.date || Date.now())}
+            <p className="text-lg text-gray-600">
+              <strong>كود الاختبار:</strong> {examCode}
+            </p>
+          </div>
+
+          {/* منطقة 3: التاريخ */}
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-6 text-center">
+            <p className="text-base text-primary">
+              {formatDateArabic(attempt.date || Date.now())}
             </p>
           </div>
 
@@ -370,7 +482,7 @@ export default function QuizReportPage() {
             </p>
           </div>
 
-          {/* QR Code - ✅ استخدام Base64 */}
+          {/* QR Code */}
           {qrDataUrl && (
             <div className="bg-white rounded-3xl shadow-lg p-6 mb-6 text-center">
               <h2 className="text-xl font-bold text-primary mb-4">رمز الاستجابة السريع</h2>
@@ -416,14 +528,14 @@ export default function QuizReportPage() {
             </div>
           )}
 
-          {/* إحصاءات الأقسام */}
+          {/* إحصاءات الأقسام مع الرسم البياني */}
           {aggregates.sArr && aggregates.sArr.length > 0 && (
             <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
               <h2 className="text-2xl font-bold text-primary mb-4">📚 إحصاءات الأقسام</h2>
               {aggregates.sArr.map((s, sIdx) => (
                 <div key={sIdx} className="mb-8">
                   <h3 className="text-xl font-bold text-primary mb-3">{s.section}</h3>
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto mb-4">
                     <table className="min-w-full table-auto">
                       <thead>
                         <tr className="bg-gray-50">
@@ -468,6 +580,8 @@ export default function QuizReportPage() {
                       </tbody>
                     </table>
                   </div>
+                  {/* الرسم البياني */}
+                  <BarChart subs={s.subs} />
                 </div>
               ))}
             </div>
