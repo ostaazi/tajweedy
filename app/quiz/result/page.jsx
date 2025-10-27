@@ -67,8 +67,8 @@ function ResultContent() {
       <style jsx global>{`
         @media print {
           @page {
-            size: A4;
-            margin: 10mm;
+            size: 210mm 297mm;
+            margin: 15mm;
           }
           
           * {
@@ -78,8 +78,10 @@ function ResultContent() {
 
           html, body {
             background: white !important;
-            height: 100% !important;
-            max-height: 100% !important;
+            width: 210mm;
+            height: 297mm;
+            margin: 0;
+            padding: 0;
           }
 
           body * {
@@ -96,10 +98,11 @@ function ResultContent() {
             left: 0;
             top: 0;
             width: 100%;
-            max-height: 100vh;
+            max-width: 180mm;
+            max-height: 267mm;
             background: white;
             padding: 0;
-            margin: 0;
+            margin: 0 auto;
             overflow: hidden;
           }
 
@@ -113,10 +116,6 @@ function ResultContent() {
 
           .shadow-lg {
             box-shadow: none !important;
-          }
-
-          .min-h-screen {
-            min-height: 0 !important;
           }
         }
       `}</style>
@@ -140,17 +139,17 @@ function ResultContent() {
           {/* Progress Circle */}
           <div className="bg-white rounded-3xl shadow-lg p-6 mb-4">
             <div className="flex justify-center mb-3">
-              <svg width="180" height="180" viewBox="0 0 180 180">
-                <circle cx="90" cy="90" r="70" fill="none" stroke="#e5e7eb" strokeWidth="18"/>
+              <svg width="160" height="160" viewBox="0 0 160 160">
+                <circle cx="80" cy="80" r="65" fill="none" stroke="#e5e7eb" strokeWidth="16"/>
                 <circle
-                  cx="90" cy="90" r="70" fill="none"
+                  cx="80" cy="80" r="65" fill="none"
                   stroke={percentage >= 60 ? '#10b981' : '#ef4444'}
-                  strokeWidth="18"
-                  strokeDasharray={`${(percentage / 100) * 440} 440`}
-                  transform="rotate(-90 90 90)"
+                  strokeWidth="16"
+                  strokeDasharray={`${(percentage / 100) * 408} 408`}
+                  transform="rotate(-90 80 80)"
                   strokeLinecap="round"
                 />
-                <text x="90" y="90" fontSize="36" fontWeight="bold" textAnchor="middle" dy="12" fill="#1e7850">
+                <text x="80" y="80" fontSize="32" fontWeight="bold" textAnchor="middle" dy="10" fill="#1e7850">
                   {toEnglishDigits(percentage)}%
                 </text>
               </svg>
