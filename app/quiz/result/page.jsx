@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
+/* تحويل الأرقام العربية/الفارسية إلى إنجليزية للطباعة الصحيحة */
 function toEnglishDigits(input = '') {
   const map = {
     '٠':'0','١':'1','٢':'2','٣':'3','٤':'4',
@@ -21,20 +22,21 @@ function ResultContent() {
   const [attempt, setAttempt] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // تحميل محاولة واحدة من localStorage
   useEffect(() => {
-    if (!attemptId) {
+    try {
+      if (!attemptId) {
+        setLoading(false);
+        return;
+      }
+      const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
+      const found = attempts.find(a => String(a?.id) === String(attemptId));
+      if (found) setAttempt(found);
+    } catch (e) {
+      console.error(e);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
-    const found = attempts.find(a => String(a?.id) === String(attemptId));
-
-    if (found) {
-      setAttempt(found);
-    }
-
-    setLoading(false);
   }, [attemptId]);
 
   if (loading) {
@@ -48,7 +50,7 @@ function ResultContent() {
   if (!attempt) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center p-4" dir="rtl">
-        <div className="text-center">
+        <div className="text-center bg-white rounded-3xl shadow-lg p-8">
           <p className="text-2xl font-bold text-gray-700 mb-4">❌ لا توجد بيانات</p>
           <Link href="/quiz" className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-xl">
             ← اختبار جديد
@@ -58,86 +60,57 @@ function ResultContent() {
     );
   }
 
-  const score = attempt.score ?? 0;
-  const total = attempt.total ?? 0;
+  const score = Number(attempt.score ?? 0);
+  const total = Number(attempt.total ?? 0);
   const percentage = total ? Math.round((score / total) * 100) : 0;
 
   return (
     <>
+      {/* قواعد الطباعة — تمنع الصفحة البيضاء الثانية */}
       <style jsx global>{`
-        @media screen {
-          .min-h-screen {
-            min-height: 100vh;
-          }
-        }
+        @media screen { .min-h-screen { min-height: 100vh; } }
 
         @media print {
-          @page {
-            size: A4 portrait;
-            margin: 0;
-          }
-          
-          * {
+          @page { size: A4 portrait; margin: 10mm; }
+
+          html, body {
+            background: #fff !important;
+            height: auto !important;
+            overflow: visible !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
 
-          html {
-            height: 100%;
-            overflow: hidden;
-          }
-
-          body {
-            background: white !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            height: auto !important;
-            overflow: hidden !important;
-          }
-
-          body * {
-            visibility: hidden;
-          }
-
-          #result-print-area,
-          #result-print-area * {
-            visibility: visible;
-          }
+          /* إخفاء كل العناصر خارج منطقة الطباعة بدل استعمال visibility */
+          body > * { display: none !important; }
+          #result-print-area { display: block !important; }
 
           #result-print-area {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            background: white;
-            padding: 20px;
-            margin: 0;
-            box-sizing: border-box;
-          }
-
-          .no-print {
-            display: none !important;
-          }
-
-          .bg-gradient-to-br {
-            background: white !important;
-          }
-
-          .shadow-lg {
+            position: static !important;
+            max-width: 190mm !important;      /* داخل حدود الصفحة */
+            margin: 0 auto !important;
+            padding: 0 !important;
             box-shadow: none !important;
+            background: #fff !important;
           }
 
-          .min-h-screen {
-            min-height: auto !important;
-            height: auto !important;
-          }
+          /* مسافات متوازنة ومنع تقطيع البطاقات */
+          #result-print-area > * { margin: 0 0 8mm 0 !important; }
+          #result-print-area > *:last-child { margin-bottom: 0 !important; }
+
+          .card, .avoid-break { break-inside: avoid; page-break-inside: avoid; }
+          .no-print { display: none !important; }
+          .bg-gradient-to-br { background: #fff !important; }
+          .shadow-lg { box-shadow: none !important; }
+          .min-h-screen { min-height: auto !important; height: auto !important; }
         }
       `}</style>
 
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8" dir="rtl">
         <div id="result-print-area" className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="bg-white rounded-3xl shadow-lg p-6 mb-4 text-center">
+
+          {/* رأس الصفحة */}
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-4 text-center card">
             <div className="w-20 h-20 rounded-full bg-primary text-white font-bold grid place-items-center text-3xl mx-auto mb-3">
               TJ
             </div>
@@ -150,11 +123,11 @@ function ResultContent() {
             </p>
           </div>
 
-          {/* Progress Circle */}
-          <div className="bg-white rounded-3xl shadow-lg p-6 mb-4">
+          {/* دائرة النسبة */}
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-4 card">
             <div className="flex justify-center mb-3">
-              <svg width="180" height="180" viewBox="0 0 180 180">
-                <circle cx="90" cy="90" r="70" fill="none" stroke="#e5e7eb" strokeWidth="18"/>
+              <svg width="180" height="180" viewBox="0 0 180 180" aria-label="final percentage">
+                <circle cx="90" cy="90" r="70" fill="none" stroke="#e5e7eb" strokeWidth="18" />
                 <circle
                   cx="90" cy="90" r="70" fill="none"
                   stroke={percentage >= 60 ? '#10b981' : '#ef4444'}
@@ -168,22 +141,25 @@ function ResultContent() {
                 </text>
               </svg>
             </div>
-            <div className="text-center">
-              <div className="flex justify-center gap-8 mt-4">
-                <div>
-                  <p className="text-2xl font-bold text-green-600">{toEnglishDigits(score)}</p>
-                  <p className="text-gray-600 text-sm">صحيح ✅</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-red-600">{toEnglishDigits(total - score)}</p>
-                  <p className="text-gray-600 text-sm">خاطئ ❌</p>
-                </div>
+
+            <div className="grid grid-cols-2 gap-4 max-w-xs mx-auto mt-4 text-center">
+              <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-3">
+                <p className="text-green-800 font-semibold">صحيح ✅</p>
+                <p className="text-3xl font-bold text-green-600">{toEnglishDigits(score)}</p>
+              </div>
+              <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-3">
+                <p className="text-red-800 font-semibold">خاطئ ❌</p>
+                <p className="text-3xl font-bold text-red-600">{toEnglishDigits(Math.max(0, total - score))}</p>
+              </div>
+              <div className="col-span-2 bg-blue-50 border-2 border-blue-200 rounded-2xl p-3">
+                <p className="text-blue-800 font-semibold">إجمالي الأسئلة 📝</p>
+                <p className="text-3xl font-bold text-blue-600">{toEnglishDigits(total)}</p>
               </div>
             </div>
           </div>
 
-          {/* Attempt History */}
-          <div className="bg-white rounded-3xl shadow-lg p-5 mb-4">
+          {/* سجل المحاولة */}
+          <div className="bg-white rounded-3xl shadow-lg p-5 mb-4 card">
             <h2 className="text-xl font-bold text-primary mb-3">📈 تاريخ المحاولات</h2>
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm">
@@ -198,7 +174,11 @@ function ResultContent() {
                 <tbody>
                   <tr className="border-b">
                     <td className="px-3 py-2 text-right">
-                      {new Date(attempt.date).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' })}
+                      {attempt.date
+                        ? new Date(attempt.date).toLocaleDateString('ar-EG', {
+                            year: 'numeric', month: 'short', day: 'numeric'
+                          })
+                        : '-'}
                     </td>
                     <td className="px-3 py-2 text-right font-bold text-green-600">{toEnglishDigits(score)}</td>
                     <td className="px-3 py-2 text-right font-bold">{toEnglishDigits(total)}</td>
@@ -213,7 +193,7 @@ function ResultContent() {
             </div>
           </div>
 
-          {/* Buttons */}
+          {/* أزرار التحكم — لا تُطبع */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 no-print">
             <button
               onClick={() => window.print()}
@@ -221,18 +201,21 @@ function ResultContent() {
             >
               🖨️ طباعة
             </button>
+
             <Link
               href={`/quiz/report/${attemptId}`}
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-2xl text-center flex items-center justify-center"
             >
               📊 التقرير الكامل
             </Link>
+
             <Link
               href="/"
               className="bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-2xl text-center flex items-center justify-center"
             >
               🏠 الرئيسية
             </Link>
+
             <Link
               href="/quiz"
               className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-2xl text-center flex items-center justify-center"
@@ -248,11 +231,13 @@ function ResultContent() {
 
 export default function ResultPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent" />
+        </div>
+      }
+    >
       <ResultContent />
     </Suspense>
   );
