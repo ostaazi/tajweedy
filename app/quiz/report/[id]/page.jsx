@@ -41,7 +41,6 @@ export default function QuizReportPage() {
   const [qrSrc, setQrSrc] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // حساب aggregates مباشرة من attempt.responses
   const aggregates = useMemo(() => {
     if (!attempt?.responses || attempt.responses.length === 0) {
       return { qArr: [], sArr: [], tl: [] };
@@ -55,7 +54,6 @@ export default function QuizReportPage() {
       const sKey = r.section || 'غير محدد';
       const subKey = r.subsection || '';
 
-      // By Question
       if (!qMap[qKey]) {
         qMap[qKey] = { 
           question: qKey, 
@@ -69,7 +67,6 @@ export default function QuizReportPage() {
       qMap[qKey].total++;
       if (r.correct) qMap[qKey].right++; else qMap[qKey].wrong++;
 
-      // By Section
       if (!sMap[sKey]) {
         sMap[sKey] = { 
           section: sKey, 
@@ -82,7 +79,6 @@ export default function QuizReportPage() {
       sMap[sKey].total++;
       if (r.correct) sMap[sKey].right++; else sMap[sKey].wrong++;
 
-      // By Subsection
       if (subKey) {
         if (!sMap[sKey].subs[subKey]) {
           sMap[sKey].subs[subKey] = { 
@@ -117,7 +113,6 @@ export default function QuizReportPage() {
     return { qArr, sArr, tl: [] };
   }, [attempt]);
 
-  // جلب المحاولة
   useEffect(() => {
     if (!attemptId) { 
       setLoading(false); 
@@ -139,7 +134,6 @@ export default function QuizReportPage() {
     setLoading(false);
   }, [attemptId]);
 
-  // توليد QR Code
   useEffect(() => {
     if (!attemptId) return;
     const reportUrl = `${window.location.origin}/quiz/report/${attemptId}`;
@@ -147,12 +141,32 @@ export default function QuizReportPage() {
     setQrSrc(qrUrl);
   }, [attemptId]);
 
-  // دالة تصدير PDF
-  const handleExportPDF = () => {
-    window.print();
+  // ✅ دالة تصدير PDF مع html2pdf
+  const handleExportPDF = async () => {
+    try {
+      const html2pdf = (await import('html2pdf.js')).default;
+      
+      const element = document.getElementById('report-content');
+      if (!element) {
+        alert('⚠️ لم يتم العثور على المحتوى');
+        return;
+      }
+
+      const opt = {
+        margin: 10,
+        filename: `tajweedy-report-${attemptId}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+    } catch (error) {
+      console.error('❌ PDF Error:', error);
+      alert('❌ حدث خطأ أثناء التصدير');
+    }
   };
 
-  // Loading
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center p-4">
@@ -161,7 +175,6 @@ export default function QuizReportPage() {
     );
   }
 
-  // No attempt
   if (!attempt) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center p-4" dir="rtl">
@@ -183,7 +196,7 @@ export default function QuizReportPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8" dir="rtl">
-      <div className="max-w-6xl mx-auto">
+      <div id="report-content" className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
