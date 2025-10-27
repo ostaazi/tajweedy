@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-/* تحويل الأرقام العربية/الفارسية إلى إنجليزية للطباعة الصحيحة */
+/* تحويل الأرقام العربية/الفارسية إلى إنجليزية */
 function toEnglishDigits(input = '') {
   const map = {
     '٠':'0','١':'1','٢':'2','٣':'3','٤':'4',
@@ -22,6 +22,10 @@ function ResultContent() {
   const [attempt, setAttempt] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // --- QR ---
+  const [qrSrc, setQrSrc] = useState('');
+  const [qrError, setQrError] = useState(false);
+
   // تحميل محاولة واحدة من localStorage
   useEffect(() => {
     try {
@@ -38,6 +42,73 @@ function ResultContent() {
       setLoading(false);
     }
   }, [attemptId]);
+
+  // توليد رابط صورة QR (مع شعـار وفولبـاك)
+  useEffect(() => {
+    if (!attemptId || typeof window === 'undefined') return;
+
+    const targetUrl = `${window.location.origin}/quiz/result?id=${encodeURIComponent(
+      attemptId
+    )}`;
+    const logo = `${window.location.origin}/logo.png`;
+
+    const services = [
+      // QuickChart مع وضع الشعار في الوسط
+      `https://quickchart.io/qr?text=${encodeURIComponent(
+        targetUrl
+      )}&size=300&centerImageUrl=${encodeURIComponent(
+        logo
+      )}&centerImageSizeRatio=0.25&margin=2`,
+      // QuickChart بدون شعار
+      `https://quickchart.io/qr?text=${encodeURIComponent(targetUrl)}&size=300&margin=2`,
+      // qrserver
+      `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
+        targetUrl
+      )}`,
+      // Google Charts (احتياطي)
+      `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(
+        targetUrl
+      )}`,
+    ];
+
+    let i = 0;
+    let stopped = false;
+
+    const tryNext = () => {
+      if (stopped) return;
+      if (i >= services.length) {
+        setQrSrc('');
+        setQrError(true);
+        return;
+      }
+      const url = services[i++];
+      const img = new Image();
+      img.onload = () => {
+        if (!stopped) {
+          setQrSrc(url);
+          setQrError(false);
+        }
+      };
+      img.onerror = () => {
+        if (!stopped) tryNext();
+      };
+      img.referrerPolicy = 'no-referrer';
+      img.src = url;
+    };
+
+    tryNext();
+    return () => {
+      stopped = true;
+    };
+  }, [attemptId]);
+
+  const handleDownloadQR = () => {
+    if (!qrSrc) return alert('⚠️ لم يتم توليد الكود بعد.');
+    const a = document.createElement('a');
+    a.href = qrSrc;
+    a.download = `tajweedy-qr-${attemptId}.png`;
+    a.click();
+  };
 
   if (loading) {
     return (
@@ -81,20 +152,18 @@ function ResultContent() {
             print-color-adjust: exact !important;
           }
 
-          /* إخفاء كل العناصر خارج منطقة الطباعة بدل استعمال visibility */
           body > * { display: none !important; }
           #result-print-area { display: block !important; }
 
           #result-print-area {
             position: static !important;
-            max-width: 190mm !important;      /* داخل حدود الصفحة */
+            max-width: 190mm !important;
             margin: 0 auto !important;
             padding: 0 !important;
             box-shadow: none !important;
             background: #fff !important;
           }
 
-          /* مسافات متوازنة ومنع تقطيع البطاقات */
           #result-print-area > * { margin: 0 0 8mm 0 !important; }
           #result-print-area > *:last-child { margin-bottom: 0 !important; }
 
@@ -191,6 +260,30 @@ function ResultContent() {
                 </tbody>
               </table>
             </div>
+          </div>
+
+          {/* QR Code */}
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-4 text-center card">
+            <h2 className="text-lg font-bold text-primary mb-4">رمز الاستجابة السريع</h2>
+            {qrSrc && !qrError ? (
+              <>
+                <img
+                  src={qrSrc}
+                  alt="QR Code للنتيجة"
+                  referrerPolicy="no-referrer"
+                  className="mx-auto w-48 h-48 border-4 border-green-300 rounded-2xl"
+                />
+                <button
+                  onClick={handleDownloadQR}
+                  className="mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl no-print"
+                >
+                  تحميل QR 📥
+                </button>
+              </>
+            ) : (
+              <p className="text-gray-500">تعذّر توليد رمز QR — حاول تحديث الصفحة</p>
+            )}
+            <p className="text-gray-500 mt-2 text-sm">امسح للوصول السريع إلى نتيجة الاختبار</p>
           </div>
 
           {/* أزرار التحكم — لا تُطبع */}
