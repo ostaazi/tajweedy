@@ -1,444 +1,300 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 
-function Modal({ open, title, onClose, children }) {
-  if (!open) return null;
+function ResultContent() {
+  const searchParams = useSearchParams();
+  const attemptId = searchParams.get('id');
+  
+  const [attempt, setAttempt] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showDetails, setShowDetails] = useState(false);
+  const [studentName, setStudentName] = useState('');
+  const [teacherName, setTeacherName] = useState('');
+
+  useEffect(() => {
+    try {
+      const data = localStorage.getItem('quizAttempts');
+      
+      if (!data) {
+        setLoading(false);
+        return;
+      }
+
+      const attempts = JSON.parse(data);
+      
+      if (!Array.isArray(attempts) || attempts.length === 0) {
+        setLoading(false);
+        return;
+      }
+
+      // إذا كان هناك id في الرابط، نبحث عنه
+      let found = null;
+      if (attemptId) {
+        found = attempts.find(a => String(a.id) === String(attemptId) || Number(a.id) === Number(attemptId));
+      }
+
+      // إذا لم نجد، نأخذ آخر محاولة
+      if (!found) {
+        found = attempts[attempts.length - 1];
+      }
+
+      setAttempt(found);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading attempts:', error);
+      setLoading(false);
+    }
+  }, [attemptId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen p-8 flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#1e7850] border-t-transparent mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">جاري التحميل...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!attempt) {
+    return (
+      <div className="min-h-screen p-8 flex items-center justify-center bg-gray-50">
+        <div className="text-center bg-white p-8 rounded-3xl shadow-lg max-w-md">
+          <div className="text-6xl mb-4">📊</div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">لا توجد نتائج</h2>
+          <p className="text-gray-600 mb-6">يرجى إكمال الاختبار أولاً</p>
+          <Link href="/quiz" className="inline-block bg-[#1e7850] text-white px-6 py-3 rounded-full font-bold hover:bg-[#155c3e]">
+            بدء اختبار جديد
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const percentage = attempt.score || 0;
+  const wrongCount = (attempt.questionsCount || 0) - (attempt.correctCount || 0);
+  const circumference = 2 * Math.PI * 80;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white w-full max-w-3xl rounded-2xl shadow-xl p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold">{title}</h3>
+    <div className="min-h-screen p-4 md:p-8 bg-gradient-to-br from-gray-50 to-gray-100 relative">
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] z-0">
+        <div className="w-[800px] h-[800px] relative">
+          <Image src="/logo.png" alt="Watermark" fill className="object-contain" />
+        </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto relative z-10">
+        <div className="flex items-center justify-between mb-6 bg-white rounded-2xl p-4 shadow-md">
+          <Link href="/quiz" className="text-[#1e7850] hover:text-[#155c3e] font-semibold flex items-center gap-2 text-lg">
+            <span>←</span> اختبار جديد
+          </Link>
+          <div className="w-16 h-16 relative">
+            <Image src="/logo.png" alt="Logo" fill className="object-contain" />
+          </div>
+        </div>
+
+        <div className="text-center mb-6">
+          <h1 className="text-3xl md:text-4xl font-bold text-[#1e7850] mb-2">🎓 تقرير أداء الاختبار</h1>
+          <p className="text-gray-600 text-lg">
+            {new Date(attempt.date || Date.now()).toLocaleDateString('ar-SA')}
+          </p>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-lg">👤 اسم المتدرب</label>
+              <input
+                type="text"
+                value={studentName}
+                onChange={(e) => setStudentName(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-[#1e7850] focus:outline-none text-lg"
+                placeholder="أدخل اسمك..."
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-lg">👨‍🏫 اسم المدرب (اختياري)</label>
+              <input
+                type="text"
+                value={teacherName}
+                onChange={(e) => setTeacherName(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-[#1e7850] focus:outline-none text-lg"
+                placeholder="أدخل اسم المدرب..."
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-lg p-8 mb-6">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div className="relative w-64 h-64 mx-auto">
+              <svg className="transform -rotate-90" width="256" height="256">
+                <circle cx="128" cy="128" r="80" stroke="#e5e7eb" strokeWidth="20" fill="none" />
+                <circle
+                  cx="128" cy="128" r="80" stroke="#10b981" strokeWidth="20" fill="none"
+                  strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
+                  strokeLinecap="round" className="transition-all duration-1000"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <p className="text-6xl font-bold text-[#1e7850]">{percentage}%</p>
+                  <p className="text-gray-600 mt-2 text-lg">النسبة النهائية</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-green-50 p-5 rounded-2xl border-2 border-green-200">
+                <p className="text-green-800 font-semibold text-xl mb-2">✅ إجابات صحيحة</p>
+                <p className="text-5xl font-bold text-green-600">{attempt.correctCount || 0}</p>
+              </div>
+              <div className="bg-red-50 p-5 rounded-2xl border-2 border-red-200">
+                <p className="text-red-800 font-semibold text-xl mb-2">❌ إجابات خاطئة</p>
+                <p className="text-5xl font-bold text-red-600">{wrongCount}</p>
+              </div>
+              <div className="bg-blue-50 p-5 rounded-2xl border-2 border-blue-200">
+                <p className="text-blue-800 font-semibold text-xl mb-2">📝 إجمالي الأسئلة</p>
+                <p className="text-5xl font-bold text-blue-600">{attempt.questionsCount || 0}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <button
-            onClick={onClose}
-            className="px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200"
+            onClick={() => setShowDetails(!showDetails)}
+            className="bg-blue-500 text-white px-4 py-4 rounded-full font-bold text-base hover:bg-blue-600 transition-all shadow-md"
           >
-            إغلاق ✖
+            {showDetails ? '📤 إخفاء' : '📥 التفاصيل'}
+          </button>
+
+          <button
+            onClick={() => window.print()}
+            className="bg-gray-500 text-white px-4 py-4 rounded-full font-bold text-base hover:bg-gray-600 transition-all shadow-md"
+          >
+            🖨️ طباعة
+          </button>
+
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.href);
+              alert('✅ تم نسخ الرابط!');
+            }}
+            className="bg-[#1e7850] text-white px-4 py-4 rounded-full font-bold text-base hover:bg-[#155c3e] transition-all shadow-md"
+          >
+            🔗 نسخ
+          </button>
+
+          <button
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: 'Tajweedy',
+                  url: window.location.href
+                });
+              }
+            }}
+            className="bg-purple-500 text-white px-4 py-4 rounded-full font-bold text-base hover:bg-purple-600 transition-all shadow-md"
+          >
+            📤 مشاركة
           </button>
         </div>
-        <div className="max-h-[70vh] overflow-auto">{children}</div>
+
+        <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-32 h-32 bg-gradient-to-br from-[#1e7850] to-[#155c3e] rounded-2xl flex items-center justify-center text-white font-bold">
+                <div className="text-center">
+                  <p className="text-3xl">QR</p>
+                  <p className="text-xs">امسح</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-gray-700 font-semibold text-lg">📱 رمز الاستجابة</p>
+                <p className="text-gray-500 text-sm">للوصول السريع</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-gray-700 font-bold text-xl">Tajweedy</p>
+                <p className="text-gray-500 text-sm">التجويد التفاعلي</p>
+              </div>
+              <div className="w-20 h-20 relative">
+                <Image src="/logo.png" alt="Logo" fill className="object-contain" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {showDetails && attempt.questions && Array.isArray(attempt.questions) && (
+          <div className="bg-white rounded-3xl shadow-lg p-6 md:p-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 font-amiri">📊 تفاصيل الإجابات</h2>
+            <div className="space-y-6">
+              {attempt.questions.map((question, index) => {
+                const userAnswer = attempt.answers?.[index];
+                const isCorrect = userAnswer === question.answer;
+                return (
+                  <div key={index} className={`p-6 rounded-2xl border-2 ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                    <div className="flex items-start gap-4 mb-4">
+                      <span className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-xl ${isCorrect ? 'bg-green-500' : 'bg-red-500'}`}>
+                        {index + 1}
+                      </span>
+                      <div className="flex-1">
+                        <p className="text-xl md:text-2xl font-semibold text-gray-800 mb-2 font-amiri leading-relaxed">
+                          {question.question}
+                        </p>
+                        <p className="text-base text-gray-500">{question.section}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-3 mb-4">
+                      {question.options?.map((option, optIndex) => {
+                        const isUserAnswer = userAnswer === optIndex + 1;
+                        const isCorrectAnswer = question.answer === optIndex + 1;
+                        return (
+                          <div key={optIndex} className={`p-4 rounded-lg text-lg ${
+                            isCorrectAnswer ? 'bg-green-100 border-2 border-green-500' :
+                            isUserAnswer ? 'bg-red-100 border-2 border-red-500' :
+                            'bg-white border border-gray-200'
+                          }`}>
+                            <span className="font-semibold">{['أ','ب','ج','د'][optIndex]}.</span> {option}
+                            {isCorrectAnswer && <span className="float-left text-green-600 font-bold text-xl">✓</span>}
+                            {isUserAnswer && !isCorrectAnswer && <span className="float-left text-red-600 font-bold text-xl">✗</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {question.explain && (
+                      <div className="bg-white p-5 rounded-lg border-2 border-gray-200">
+                        <p className="text-lg font-semibold text-gray-700 mb-2">💡 التفسير:</p>
+                        <p className="text-base md:text-lg text-gray-600 leading-relaxed">{question.explain}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 export default function ResultPage() {
-  const [score, setScore] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [qrSrc, setQrSrc] = useState('');
-  const [attemptId, setAttemptId] = useState('');
-  const [attempt, setAttempt] = useState(null);
-  const [allAttempts, setAllAttempts] = useState([]);
-
-  // Modals
-  const [openQStats, setOpenQStats] = useState(false);
-  const [openSectionStats, setOpenSectionStats] = useState(false);
-  const [openProgress, setOpenProgress] = useState(false);
-
-  // اجلب آخر محاولة + كل المحاولات
-  useEffect(() => {
-    const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
-    setAllAttempts(attempts);
-    const latest = attempts[attempts.length - 1];
-    if (latest) {
-      setScore(Number(latest.score || 0));
-      setTotal(Number(latest.total || 0));
-      setAttemptId(latest.id || '');
-      setAttempt(latest);
-    }
-  }, []);
-
-  const percentage = total ? Math.round((score / total) * 100) : 0;
-
-  // رابط التقرير
-  const reportUrl = useMemo(() => {
-    if (typeof window === 'undefined' || !attemptId) return '';
-    return `${window.location.origin}/quiz/report/${attemptId}`;
-  }, [attemptId]);
-
-  // توليد QR مع شعار Tajweedy في الوسط + fallback
-  useEffect(() => {
-    if (!reportUrl || typeof window === 'undefined') return;
-
-    const logo = `${window.location.origin}/logo.png`;
-    const services = [
-      // QuickChart مع شعار
-      `https://quickchart.io/qr?text=${encodeURIComponent(
-        reportUrl
-      )}&size=300&centerImageUrl=${encodeURIComponent(logo)}&centerImageSizeRatio=0.25&margin=2`,
-      // QuickChart بدون شعار (fallback)
-      `https://quickchart.io/qr?text=${encodeURIComponent(reportUrl)}&size=300&margin=2`,
-      // QRServer
-      `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
-        reportUrl
-      )}`,
-      // Google Chart
-      `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(
-        reportUrl
-      )}`,
-    ];
-
-    let i = 0;
-    let cancelled = false;
-    const tryNext = () => {
-      if (cancelled) return;
-      if (i >= services.length) {
-        setQrSrc('');
-        return;
-      }
-      const candidate = services[i++];
-      const img = new Image();
-      img.onload = () => !cancelled && setQrSrc(candidate);
-      img.onerror = () => !cancelled && tryNext();
-      img.referrerPolicy = 'no-referrer';
-      img.src = candidate;
-    };
-
-    tryNext();
-    return () => {
-      cancelled = true;
-    };
-  }, [reportUrl]);
-
-  const handleDownloadQR = () => {
-    if (!qrSrc) return alert('⚠️ لم يتم توليد الكود بعد.');
-    const link = document.createElement('a');
-    link.href = qrSrc;
-    link.download = `tajweedy-qr-${attemptId || 'report'}.png`;
-    link.click();
-  };
-
-  // === حساب الإحصاءات من جميع المحاولات ===
-  const aggregates = useMemo(() => {
-    // هيكل إحصاءات عام
-    const byQuestion = new Map(); // key: نص السؤال -> { right, wrong }
-    const bySection = new Map();  // key: section -> { right, wrong, subs: Map(subsection -> {right, wrong}) }
-    const timeline = []; // [{id, date, score, total, pct}]
-
-    for (const att of allAttempts) {
-      const qs = Array.isArray(att?.questions) ? att.questions : [];
-      const ans = Array.isArray(att?.answers) ? att.answers : [];
-      const n = Math.min(qs.length, ans.length);
-
-      timeline.push({
-        id: att.id,
-        date: att.date,
-        score: Number(att.score || 0),
-        total: Number(att.total || n || 0),
-        pct:
-          Number(att.total || n || 0) > 0
-            ? Math.round((Number(att.score || 0) / Number(att.total || n || 0)) * 100)
-            : 0,
-      });
-
-      for (let i = 0; i < n; i++) {
-        const q = qs[i] || {};
-        const user = Number(ans[i]);
-        const correct = Number(q?.answer);
-        const isRight = user === correct;
-
-        // الأسئلة
-        const qKey = (q?.question || `سؤال ${i + 1}`).trim();
-        if (!byQuestion.has(qKey)) byQuestion.set(qKey, { right: 0, wrong: 0, section: q?.section, subsection: q?.subsection });
-        byQuestion.get(qKey)[isRight ? 'right' : 'wrong']++;
-
-        // الأقسام
-        const sKey = (q?.section || 'غير محدد').trim();
-        if (!bySection.has(sKey)) bySection.set(sKey, { right: 0, wrong: 0, subs: new Map() });
-        const sObj = bySection.get(sKey);
-        sObj[isRight ? 'right' : 'wrong']++;
-
-        const subKey = (q?.subsection || 'غير محدد').trim();
-        if (!sObj.subs.has(subKey)) sObj.subs.set(subKey, { right: 0, wrong: 0 });
-        sObj.subs.get(subKey)[isRight ? 'right' : 'wrong']++;
-      }
-    }
-
-    // تحويل الخرائط لمصفوفات مرتبة
-    const questionArr = Array.from(byQuestion.entries()).map(([k, v]) => ({
-      question: k,
-      section: v.section || '—',
-      subsection: v.subsection || '—',
-      right: v.right,
-      wrong: v.wrong,
-      total: v.right + v.wrong,
-      pct: v.right + v.wrong ? Math.round((v.right / (v.right + v.wrong)) * 100) : 0,
-    }));
-    questionArr.sort((a, b) => a.pct === b.pct ? b.total - a.total : b.pct - a.pct);
-
-    const sectionArr = Array.from(bySection.entries()).map(([sec, val]) => {
-      const subs = Array.from(val.subs.entries()).map(([sub, r]) => ({
-        subsection: sub,
-        right: r.right,
-        wrong: r.wrong,
-        total: r.right + r.wrong,
-        pct: r.right + r.wrong ? Math.round((r.right / (r.right + r.wrong)) * 100) : 0,
-      })).sort((a, b) => b.pct - a.pct);
-      return {
-        section: sec,
-        right: val.right,
-        wrong: val.wrong,
-        total: val.right + val.wrong,
-        pct: val.right + val.wrong ? Math.round((val.right / (val.right + val.wrong)) * 100) : 0,
-        subs,
-      };
-    });
-    sectionArr.sort((a, b) => b.pct - a.pct);
-
-    timeline.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
-
-    return { questionArr, sectionArr, timeline };
-  }, [allAttempts]);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-green-50 p-6" dir="rtl">
-      <div className="max-w-4xl mx-auto">
-
-        {/* شريط أعلى: الصفحة الرئيسية / العودة للاختبار */}
-        <div className="flex items-center justify-between mb-4">
-          <Link
-            href="/"
-            className="px-4 py-2 rounded-xl bg-white border text-green-700 font-bold hover:bg-green-50"
-          >
-            🏠 الصفحة الرئيسية
-          </Link>
-          <Link
-            href="/quiz"
-            className="px-4 py-2 rounded-xl bg-white border text-blue-700 font-bold hover:bg-blue-50"
-          >
-            ↩️ العودة للاختبار
-          </Link>
-        </div>
-
-        {/* النتيجة */}
-        <h1 className="text-3xl font-bold text-green-700 mb-6 text-center">نتيجة الاختبار 🎓</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-green-100 border-2 border-green-300 rounded-2xl p-6 text-center">
-            <p className="text-green-800 font-bold mb-2">إجابات صحيحة ✅</p>
-            <p className="text-5xl font-bold">{score}</p>
-          </div>
-          <div className="bg-red-100 border-2 border-red-300 rounded-2xl p-6 text-center">
-            <p className="text-red-800 font-bold mb-2">إجابات خاطئة ❌</p>
-            <p className="text-5xl font-bold">{Math.max(0, total - score)}</p>
-          </div>
-          <div className="bg-blue-100 border-2 border-blue-300 rounded-2xl p-6 text-center">
-            <p className="text-blue-800 font-bold mb-2">إجمالي الأسئلة 📝</p>
-            <p className="text-5xl font-bold">{total}</p>
-          </div>
-        </div>
-
-        {/* النسبة */}
-        <div className="bg-green-700 text-white rounded-3xl p-8 mb-6 text-center shadow">
-          <p className="text-8xl font-bold mb-3">{percentage}%</p>
-          <p className="text-lg">
-            {percentage >= 80 ? '🎉 ممتاز جداً!' : percentage >= 60 ? '👏 أداء جيد' : '📖 يحتاج مراجعة'}
-          </p>
-        </div>
-
-        {/* أزرار الإجراءات */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <button onClick={() => window.print()} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-2xl">
-            طباعة 🖨️
-          </button>
-
-          {reportUrl ? (
-            <Link href={reportUrl} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-2xl text-center">
-              التفاصيل 📄
-            </Link>
-          ) : (
-            <button disabled className="bg-blue-400 text-white font-bold py-3 rounded-2xl opacity-60">
-              التفاصيل 📄
-            </button>
-          )}
-
-          <button
-            onClick={() => {
-              if (navigator.share && reportUrl) {
-                navigator.share({
-                  title: 'تقرير التجويد',
-                  text: `حصلت على ${percentage}% في اختبار التجويد.`,
-                  url: reportUrl,
-                });
-              } else if (reportUrl) {
-                navigator.clipboard.writeText(reportUrl);
-                alert('تم نسخ الرابط!');
-              }
-            }}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-2xl"
-          >
-            مشاركة 📤
-          </button>
-
-          <button
-            onClick={() => {
-              if (!reportUrl) return;
-              navigator.clipboard.writeText(reportUrl);
-              alert('تم نسخ الرابط!');
-            }}
-            className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-2xl"
-          >
-            نسخ 🔗
-          </button>
-        </div>
-
-        {/* QR */}
-        <div className="bg-white border-2 border-green-200 rounded-3xl shadow-md p-8 text-center mb-6">
-          <h2 className="text-xl font-bold text-gray-700 mb-4 flex justify-center items-center gap-2">
-            <span>📱</span> رمز الاستجابة السريع للوصول السريع
-          </h2>
-
-          {qrSrc ? (
-            <div className="flex flex-col items-center justify-center gap-3">
-              <img
-                src={qrSrc}
-                alt="QR Code"
-                className="w-56 h-56 border-4 border-green-400 rounded-2xl shadow-lg"
-                referrerPolicy="no-referrer"
-              />
-              <button
-                onClick={handleDownloadQR}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl mt-3"
-              >
-                تحميل QR 📥
-              </button>
-            </div>
-          ) : (
-            <p className="text-gray-500 mt-4">جارٍ توليد الكود...</p>
-          )}
-
-          <p className="mt-4 text-gray-600 text-sm">
-            امسح الكود باستخدام كاميرا الهاتف أو تطبيق قارئ QR 📸
-          </p>
-
-          <div className="mt-6 flex flex-col items-center">
-            <img src="/logo.png" alt="Tajweedy Logo" className="w-20 opacity-80" />
-            <p className="text-gray-700 font-bold mt-2">Tajweedy — التجويد التفاعلي</p>
-          </div>
-        </div>
-
-        {/* أزرار الإحصاءات */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-          <button
-            onClick={() => setOpenQStats(true)}
-            className="w-full bg-white border-2 border-blue-200 hover:bg-blue-50 rounded-2xl p-4 font-bold"
-          >
-            إحصاءات الأسئلة 📊
-          </button>
-          <button
-            onClick={() => setOpenSectionStats(true)}
-            className="w-full bg-white border-2 border-emerald-200 hover:bg-emerald-50 rounded-2xl p-4 font-bold"
-          >
-            الأقسام والأجزاء الفرعية 🧭
-          </button>
-          <button
-            onClick={() => setOpenProgress(true)}
-            className="w-full bg-white border-2 border-purple-200 hover:bg-purple-50 rounded-2xl p-4 font-bold"
-          >
-            متابعة تقدّم المتدرب 📈
-          </button>
-        </div>
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#1e7850] border-t-transparent"></div>
       </div>
-
-      {/* نافذة: إحصاءات الأسئلة */}
-      <Modal open={openQStats} title="إحصاءات الأسئلة" onClose={() => setOpenQStats(false)}>
-        {aggregates.questionArr.length ? (
-          <div className="space-y-3">
-            {aggregates.questionArr.map((q, idx) => (
-              <div
-                key={idx}
-                className="p-4 rounded-xl border flex items-start justify-between gap-3"
-              >
-                <div>
-                  <p className="font-bold mb-1">{q.question}</p>
-                  <p className="text-sm text-gray-500">
-                    القسم: {q.section} — الجزء الفرعي: {q.subsection}
-                  </p>
-                </div>
-                <div className="text-end">
-                  <p className="text-green-700 font-bold">صحيح: {q.right}</p>
-                  <p className="text-red-600 font-bold">خطأ: {q.wrong}</p>
-                  <p className="text-blue-700 font-bold">النسبة: {q.pct}%</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-600">لا توجد بيانات مفصلة للأسئلة حتى الآن.</p>
-        )}
-      </Modal>
-
-      {/* نافذة: الأقسام والأجزاء الفرعية */}
-      <Modal
-        open={openSectionStats}
-        title="إحصاءات الأقسام والأجزاء الفرعية"
-        onClose={() => setOpenSectionStats(false)}
-      >
-        {aggregates.sectionArr.length ? (
-          <div className="space-y-5">
-            {aggregates.sectionArr.map((s, idx) => (
-              <div key={idx} className="p-4 border rounded-2xl">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-bold text-lg">القسم: {s.section}</h4>
-                  <div className="text-end">
-                    <span className="text-green-700 font-bold ms-3">صحيح: {s.right}</span>
-                    <span className="text-red-600 font-bold ms-3">خطأ: {s.wrong}</span>
-                    <span className="text-blue-700 font-bold">النسبة: {s.pct}%</span>
-                  </div>
-                </div>
-                {s.subs.length ? (
-                  <div className="space-y-2">
-                    {s.subs.map((sub, i2) => (
-                      <div
-                        key={i2}
-                        className="p-3 rounded-xl bg-gray-50 flex items-center justify-between"
-                      >
-                        <span className="font-semibold">الجزء الفرعي: {sub.subsection}</span>
-                        <span className="text-sm text-gray-600">
-                          صحيح: {sub.right} — خطأ: {sub.wrong} — نسبة: {sub.pct}%
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500 text-sm">لا توجد أجزاء فرعية مسجّلة.</p>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-600">لا توجد بيانات للأقسام حتى الآن.</p>
-        )}
-      </Modal>
-
-      {/* نافذة: تقدّم المتدرب */}
-      <Modal open={openProgress} title="متابعة تقدّم المتدرب" onClose={() => setOpenProgress(false)}>
-        {aggregates.timeline.length ? (
-          <div className="space-y-3">
-            {aggregates.timeline.map((t, i) => (
-              <div
-                key={i}
-                className="p-4 border rounded-xl flex items-center justify-between"
-              >
-                <div>
-                  <p className="font-bold">المحاولة: {t.id || i + 1}</p>
-                  <p className="text-sm text-gray-500">
-                    {t.date ? new Date(t.date).toLocaleString('ar-EG') : '—'}
-                  </p>
-                </div>
-                <div className="text-end">
-                  <p className="text-green-700 font-bold">درجة: {t.score}/{t.total}</p>
-                  <p className="text-blue-700 font-bold">النسبة: {t.pct}%</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-600">لا توجد محاولات مسجّلة بعد.</p>
-        )}
-      </Modal>
-    </div>
+    }>
+      <ResultContent />
+    </Suspense>
   );
 }
