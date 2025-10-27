@@ -4,9 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
-/* ======================= Helpers: Digits / Dates / jsPDF / Fonts / Watermark / Save ======================= */
+/* ======================= Helpers ======================= */
 
-// تحويل الأرقام العربية إلى إنجليزية
 function toEnglishDigits(input = '') {
   const map = {
     '٠':'0','١':'1','٢':'2','٣':'3','٤':'4',
@@ -17,7 +16,6 @@ function toEnglishDigits(input = '') {
   return String(input).replace(/[٠-٩۰-۹]/g, d => map[d] ?? d);
 }
 
-// تنسيق التاريخ
 function formatDateEnRtl(dateLike) {
   const d = (dateLike instanceof Date) ? dateLike : new Date(dateLike || Date.now());
   const day = String(d.getDate()).padStart(2, '0');
@@ -40,38 +38,102 @@ export default function QuizReportPage() {
   const attemptId = params?.id;
 
   const [attempt, setAttempt] = useState(null);
-  const [aggregates, setAggregates] = useState({ qArr: [], sArr: [], tl: [] }); // ✅ جديد
   const [qrSrc, setQrSrc] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // ✅ جلب المحاولة + aggregates من localStorage
+  // ✅ حساب aggregates مباشرة من attempt.responses
+  const aggregates = useMemo(() => {
+    if (!attempt?.responses || attempt.responses.length === 0) {
+      return { qArr: [], sArr: [], tl: [] };
+    }
+
+    const qMap = {};
+    const sMap = {};
+
+    attempt.responses.forEach(r => {
+      const qKey = r.question || 'غير محدد';
+      const sKey = r.section || 'غير محدد';
+      const subKey = r.subsection || '';
+
+      // By Question
+      if (!qMap[qKey]) {
+        qMap[qKey] = { 
+          question: qKey, 
+          section: r.section, 
+          subsection: subKey, 
+          right: 0, 
+          wrong: 0, 
+          total: 0 
+        };
+      }
+      qMap[qKey].total++;
+      if (r.correct) qMap[qKey].right++; else qMap[qKey].wrong++;
+
+      // By Section
+      if (!sMap[sKey]) {
+        sMap[sKey] = { 
+          section: sKey, 
+          subs: {}, 
+          right: 0, 
+          wrong: 0, 
+          total: 0 
+        };
+      }
+      sMap[sKey].total++;
+      if (r.correct) sMap[sKey].right++; else sMap[sKey].wrong++;
+
+      // By Subsection
+      if (subKey) {
+        if (!sMap[sKey].subs[subKey]) {
+          sMap[sKey].subs[subKey] = { 
+            subsection: subKey, 
+            right: 0, 
+            wrong: 0, 
+            total: 0 
+          };
+        }
+        sMap[sKey].subs[subKey].total++;
+        if (r.correct) sMap[sKey].subs[subKey].right++; else sMap[sKey].subs[subKey].wrong++;
+      }
+    });
+
+    const qArr = Object.values(qMap).map(q => ({
+      ...q,
+      pct: q.total ? Math.round((q.right / q.total) * 100) : 0
+    }));
+
+    const sArr = Object.values(sMap).map(s => ({
+      section: s.section,
+      right: s.right,
+      wrong: s.wrong,
+      total: s.total,
+      pct: s.total ? Math.round((s.right / s.total) * 100) : 0,
+      subs: Object.values(s.subs || {}).map(sub => ({
+        ...sub,
+        pct: sub.total ? Math.round((sub.right / sub.total) * 100) : 0
+      })).filter(sub => sub.total > 0)
+    })).filter(s => s.total > 0);
+
+    return { qArr, sArr, tl: [] };
+  }, [attempt]);
+
+  // ✅ جلب المحاولة
   useEffect(() => {
     if (!attemptId) { 
       setLoading(false); 
       return; 
     }
 
-    // 1️⃣ جلب المحاولة
     const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
     const found = attempts.find(
       a => String(a?.id) === String(attemptId) || Number(a?.id) === Number(attemptId)
     );
+    
     if (found) {
       setAttempt(found);
-    }
-
-    // 2️⃣ جلب aggregates من localStorage
-    try {
-      const stored = localStorage.getItem('tajweedyAggregates');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setAggregates(parsed);
-        console.log('✅ Aggregates loaded successfully:', parsed);
-      } else {
-        console.warn('⚠️ No aggregates found in localStorage');
-      }
-    } catch (error) {
-      console.error('❌ Failed to load aggregates:', error);
+      console.log('✅ Attempt loaded:', found);
+    } else {
+      console.warn('⚠️ No attempt found for ID:', attemptId);
     }
 
     setLoading(false);
@@ -83,7 +145,6 @@ export default function QuizReportPage() {
     const reportUrl = `${window.location.origin}/quiz/report/${attemptId}`;
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(reportUrl)}`;
     setQrSrc(qrUrl);
-    console.log('✅ QR Code URL generated:', qrUrl);
   }, [attemptId]);
 
   // ✅ دالة تصدير PDF
@@ -94,7 +155,6 @@ export default function QuizReportPage() {
     }
 
     try {
-      // استيراد jsPDF و autoTable
       const { jsPDF } = await import('jspdf');
       await import('jspdf-autotable');
 
@@ -104,7 +164,7 @@ export default function QuizReportPage() {
 
       let yPos = 60;
 
-      // ✅ إضافة الخط العربي (Cairo أو Amiri)
+      // ✅ إضافة الخط العربي
       try {
         const fontUrl = '/fonts/Amiri-Regular.ttf';
         const fontResponse = await fetch(fontUrl);
@@ -117,7 +177,6 @@ export default function QuizReportPage() {
         doc.addFileToVFS('Amiri-Regular.ttf', fontBase64);
         doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
         doc.setFont('Amiri');
-        console.log('✅ Arabic font loaded successfully');
       } catch (fontError) {
         console.error('❌ Font loading failed:', fontError);
         doc.setFont('helvetica');
@@ -185,7 +244,6 @@ export default function QuizReportPage() {
 
       // ✅ إحصاءات الأقسام
       if (aggregates.sArr && aggregates.sArr.length > 0) {
-        // تحقق من المساحة المتبقية
         if (yPos > pageHeight - 100) {
           doc.addPage();
           yPos = 60;
@@ -196,7 +254,7 @@ export default function QuizReportPage() {
         doc.text('إحصاءات الأقسام', pageWidth / 2, yPos, { align: 'center' });
         yPos += 20;
 
-        aggregates.sArr.forEach((s, idx) => {
+        aggregates.sArr.forEach((s) => {
           if (yPos > pageHeight - 100) {
             doc.addPage();
             yPos = 60;
@@ -217,7 +275,6 @@ export default function QuizReportPage() {
               ])
             : [['لا توجد بيانات', '-', '-', '-', '-']];
 
-          // إضافة صف إجمالي القسم
           sTableData.push([
             'إجمالي القسم',
             toEnglishDigits(s.right),
@@ -241,7 +298,7 @@ export default function QuizReportPage() {
               textColor: [255, 255, 255] 
             },
             bodyStyles: {
-              fillColor: (rowIndex, node) => rowIndex === sTableData.length - 1 ? [240, 240, 240] : null,
+              fillColor: (rowIndex) => rowIndex === sTableData.length - 1 ? [240, 240, 240] : null,
               fontStyle: (rowIndex) => rowIndex === sTableData.length - 1 ? 'bold' : 'normal'
             },
             theme: 'grid',
@@ -270,19 +327,17 @@ export default function QuizReportPage() {
             });
 
             doc.addImage(qrDataUrl, 'PNG', pageWidth / 2 - 50, yPos, 100, 100);
-            yPos += 110;
           }
         } catch (qrError) {
-          console.warn('⚠️ QR Code not added to PDF:', qrError);
+          console.warn('⚠️ QR Code not added:', qrError);
         }
       }
 
-      // حفظ الملف
       doc.save(`tajweedy-stats-${attemptId}.pdf`);
       console.log('✅ PDF exported successfully');
     } catch (error) {
       console.error('❌ PDF export failed:', error);
-      alert('❌ حدث خطأ أثناء التصدير. حاول مرة أخرى.');
+      alert('❌ حدث خطأ أثناء التصدير');
     }
   };
 
@@ -301,9 +356,9 @@ export default function QuizReportPage() {
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center p-4" dir="rtl">
         <div className="text-center">
           <p className="text-2xl font-bold text-gray-700 mb-4">❌ لا توجد بيانات</p>
-          <p className="text-gray-600 mb-6">لم يتم العثور على محاولة مطابقة</p>
+          <p className="text-gray-600 mb-6">لم يتم العثور على محاولة</p>
           <div className="flex items-center justify-center gap-3">
-            <Link href="/" className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-xl">🏠 الصفحة الرئيسية</Link>
+            <Link href="/" className="bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-xl">🏠 الرئيسية</Link>
             <Link href="/quiz" className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-xl">← اختبار جديد</Link>
           </div>
         </div>
@@ -469,36 +524,35 @@ export default function QuizReportPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           <button
             onClick={handleExportPDF}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-2xl"
           >
             📥 تصدير PDF
           </button>
           <button
             onClick={() => window.print()}
-            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2"
+            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-2xl"
           >
             🖨️ طباعة
           </button>
           <button
             onClick={() => {
-              if (navigator.share && qrSrc) {
+              if (navigator.share) {
                 navigator.share({
-                  title: 'Tajweedy - تقرير التجويد',
-                  text: `نتيجتي: ${percentage}%`,
+                  title: 'Tajweedy',
                   url: window.location.href
-                }).catch(err => console.log('Share failed:', err));
+                }).catch(() => {});
               } else {
                 navigator.clipboard.writeText(window.location.href);
-                alert('✅ تم نسخ الرابط!');
+                alert('✅ تم نسخ الرابط');
               }
             }}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2"
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-2xl"
           >
             📤 مشاركة
           </button>
           <Link
             href="/"
-            className="bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-2xl text-center flex items-center justify-center gap-2"
+            className="bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-2xl text-center flex items-center justify-center"
           >
             🏠 الرئيسية
           </Link>
@@ -506,4 +560,4 @@ export default function QuizReportPage() {
       </div>
     </div>
   );
-}
+            }
