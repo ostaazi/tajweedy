@@ -113,29 +113,40 @@ export default function QuizPage() {
     }
   };
 
+  // ✅ الدالة المُصلحة
   const finishQuiz = () => {
     let correctCount = 0;
-    selectedQuestions.forEach((q, index) => {
-      if (userAnswers[index] === q.answer) {
-        correctCount++;
-      }
+    
+    // ✅ بناء responses بالتنسيق الصحيح
+    const responses = selectedQuestions.map((q, index) => {
+      const userAnswer = userAnswers[index];
+      const isCorrect = userAnswer === q.answer;
+      if (isCorrect) correctCount++;
+      
+      return {
+        question: q.question,
+        section: q.section,
+        subsection: q.part || '',
+        userAnswer: userAnswer,
+        correctAnswer: q.answer,
+        correct: isCorrect,
+        explanation: q.explain
+      };
     });
-
-    const score = Math.round((correctCount / selectedQuestions.length) * 100);
 
     const attempt = {
       id: Date.now(),
       date: new Date().toISOString(),
-      questionsCount: selectedQuestions.length,
-      correctCount,
-      score,
-      questions: selectedQuestions,
-      answers: userAnswers
+      score: correctCount,
+      total: selectedQuestions.length,
+      responses: responses  // ✅ الاسم الصحيح
     };
 
     const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
     attempts.push(attempt);
     localStorage.setItem('quizAttempts', JSON.stringify(attempts));
+
+    console.log('✅ Attempt saved:', attempt); // للتأكد
 
     router.push(`/quiz/result?id=${attempt.id}`);
   };
