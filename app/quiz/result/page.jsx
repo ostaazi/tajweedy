@@ -65,10 +65,16 @@ function ResultContent() {
   return (
     <>
       <style jsx global>{`
+        @media screen {
+          .min-h-screen {
+            min-height: 100vh;
+          }
+        }
+
         @media print {
           @page {
-            size: 210mm 297mm;
-            margin: 15mm;
+            size: A4 portrait;
+            margin: 0;
           }
           
           * {
@@ -76,12 +82,17 @@ function ResultContent() {
             print-color-adjust: exact !important;
           }
 
-          html, body {
+          html {
+            height: 100%;
+            overflow: hidden;
+          }
+
+          body {
             background: white !important;
-            width: 210mm;
-            height: 297mm;
-            margin: 0;
-            padding: 0;
+            margin: 0 !important;
+            padding: 0 !important;
+            height: auto !important;
+            overflow: hidden !important;
           }
 
           body * {
@@ -98,12 +109,10 @@ function ResultContent() {
             left: 0;
             top: 0;
             width: 100%;
-            max-width: 180mm;
-            max-height: 267mm;
             background: white;
-            padding: 0;
-            margin: 0 auto;
-            overflow: hidden;
+            padding: 20px;
+            margin: 0;
+            box-sizing: border-box;
           }
 
           .no-print {
@@ -116,6 +125,11 @@ function ResultContent() {
 
           .shadow-lg {
             box-shadow: none !important;
+          }
+
+          .min-h-screen {
+            min-height: auto !important;
+            height: auto !important;
           }
         }
       `}</style>
@@ -139,17 +153,17 @@ function ResultContent() {
           {/* Progress Circle */}
           <div className="bg-white rounded-3xl shadow-lg p-6 mb-4">
             <div className="flex justify-center mb-3">
-              <svg width="160" height="160" viewBox="0 0 160 160">
-                <circle cx="80" cy="80" r="65" fill="none" stroke="#e5e7eb" strokeWidth="16"/>
+              <svg width="180" height="180" viewBox="0 0 180 180">
+                <circle cx="90" cy="90" r="70" fill="none" stroke="#e5e7eb" strokeWidth="18"/>
                 <circle
-                  cx="80" cy="80" r="65" fill="none"
+                  cx="90" cy="90" r="70" fill="none"
                   stroke={percentage >= 60 ? '#10b981' : '#ef4444'}
-                  strokeWidth="16"
-                  strokeDasharray={`${(percentage / 100) * 408} 408`}
-                  transform="rotate(-90 80 80)"
+                  strokeWidth="18"
+                  strokeDasharray={`${(percentage / 100) * 440} 440`}
+                  transform="rotate(-90 90 90)"
                   strokeLinecap="round"
                 />
-                <text x="80" y="80" fontSize="32" fontWeight="bold" textAnchor="middle" dy="10" fill="#1e7850">
+                <text x="90" y="90" fontSize="36" fontWeight="bold" textAnchor="middle" dy="12" fill="#1e7850">
                   {toEnglishDigits(percentage)}%
                 </text>
               </svg>
