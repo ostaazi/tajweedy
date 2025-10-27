@@ -68,7 +68,7 @@ function ResultContent() {
         @media print {
           @page {
             size: A4;
-            margin: 15mm;
+            margin: 10mm;
           }
           
           * {
@@ -78,8 +78,8 @@ function ResultContent() {
 
           html, body {
             background: white !important;
-            height: auto !important;
-            overflow: hidden !important;
+            height: 100% !important;
+            max-height: 100% !important;
           }
 
           body * {
@@ -96,10 +96,10 @@ function ResultContent() {
             left: 0;
             top: 0;
             width: 100%;
+            max-height: 100vh;
             background: white;
             padding: 0;
             margin: 0;
-            page-break-after: avoid !important;
             overflow: hidden;
           }
 
@@ -114,78 +114,82 @@ function ResultContent() {
           .shadow-lg {
             box-shadow: none !important;
           }
+
+          .min-h-screen {
+            min-height: 0 !important;
+          }
         }
       `}</style>
 
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8" dir="rtl">
         <div id="result-print-area" className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="bg-white rounded-3xl shadow-lg p-8 mb-6 text-center">
-            <div className="w-24 h-24 rounded-full bg-primary text-white font-bold grid place-items-center text-4xl mx-auto mb-4">
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-4 text-center">
+            <div className="w-20 h-20 rounded-full bg-primary text-white font-bold grid place-items-center text-3xl mx-auto mb-3">
               TJ
             </div>
-            <h1 className="text-4xl font-bold text-primary mb-2">
+            <h1 className="text-3xl font-bold text-primary mb-2">
               {percentage >= 80 ? '🎉 ممتاز!' : percentage >= 60 ? '👍 جيد جداً' : '📚 يحتاج مراجعة'}
             </h1>
-            <p className="text-2xl font-bold text-gray-700 mb-2">{toEnglishDigits(percentage)}%</p>
-            <p className="text-lg text-gray-600">
+            <p className="text-2xl font-bold text-gray-700 mb-1">{toEnglishDigits(percentage)}%</p>
+            <p className="text-base text-gray-600">
               حصلت على {toEnglishDigits(score)} من {toEnglishDigits(total)} نقطة
             </p>
           </div>
 
           {/* Progress Circle */}
-          <div className="bg-white rounded-3xl shadow-lg p-8 mb-6">
-            <div className="flex justify-center mb-4">
-              <svg width="200" height="200" viewBox="0 0 200 200">
-                <circle cx="100" cy="100" r="80" fill="none" stroke="#e5e7eb" strokeWidth="20"/>
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-4">
+            <div className="flex justify-center mb-3">
+              <svg width="180" height="180" viewBox="0 0 180 180">
+                <circle cx="90" cy="90" r="70" fill="none" stroke="#e5e7eb" strokeWidth="18"/>
                 <circle
-                  cx="100" cy="100" r="80" fill="none"
+                  cx="90" cy="90" r="70" fill="none"
                   stroke={percentage >= 60 ? '#10b981' : '#ef4444'}
-                  strokeWidth="20"
-                  strokeDasharray={`${(percentage / 100) * 502} 502`}
-                  transform="rotate(-90 100 100)"
+                  strokeWidth="18"
+                  strokeDasharray={`${(percentage / 100) * 440} 440`}
+                  transform="rotate(-90 90 90)"
                   strokeLinecap="round"
                 />
-                <text x="100" y="100" fontSize="40" fontWeight="bold" textAnchor="middle" dy="15" fill="#1e7850">
+                <text x="90" y="90" fontSize="36" fontWeight="bold" textAnchor="middle" dy="12" fill="#1e7850">
                   {toEnglishDigits(percentage)}%
                 </text>
               </svg>
             </div>
             <div className="text-center">
-              <div className="flex justify-center gap-8 mt-6">
+              <div className="flex justify-center gap-8 mt-4">
                 <div>
-                  <p className="text-3xl font-bold text-green-600">{toEnglishDigits(score)}</p>
-                  <p className="text-gray-600">صحيح ✅</p>
+                  <p className="text-2xl font-bold text-green-600">{toEnglishDigits(score)}</p>
+                  <p className="text-gray-600 text-sm">صحيح ✅</p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-red-600">{toEnglishDigits(total - score)}</p>
-                  <p className="text-gray-600">خاطئ ❌</p>
+                  <p className="text-2xl font-bold text-red-600">{toEnglishDigits(total - score)}</p>
+                  <p className="text-gray-600 text-sm">خاطئ ❌</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Attempt History */}
-          <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
-            <h2 className="text-2xl font-bold text-primary mb-4">📈 تاريخ المحاولات</h2>
+          <div className="bg-white rounded-3xl shadow-lg p-5 mb-4">
+            <h2 className="text-xl font-bold text-primary mb-3">📈 تاريخ المحاولات</h2>
             <div className="overflow-x-auto">
-              <table className="min-w-full">
+              <table className="min-w-full text-sm">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="px-4 py-2 text-right font-bold">التاريخ</th>
-                    <th className="px-4 py-2 text-right font-bold">الدرجة</th>
-                    <th className="px-4 py-2 text-right font-bold">الإجمالي</th>
-                    <th className="px-4 py-2 text-right font-bold">النسبة %</th>
+                    <th className="px-3 py-2 text-right font-bold">التاريخ</th>
+                    <th className="px-3 py-2 text-right font-bold">الدرجة</th>
+                    <th className="px-3 py-2 text-right font-bold">الإجمالي</th>
+                    <th className="px-3 py-2 text-right font-bold">النسبة %</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-2 text-right">
+                  <tr className="border-b">
+                    <td className="px-3 py-2 text-right">
                       {new Date(attempt.date).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' })}
                     </td>
-                    <td className="px-4 py-2 text-right font-bold text-green-600">{toEnglishDigits(score)}</td>
-                    <td className="px-4 py-2 text-right font-bold">{toEnglishDigits(total)}</td>
-                    <td className="px-4 py-2 text-right">
+                    <td className="px-3 py-2 text-right font-bold text-green-600">{toEnglishDigits(score)}</td>
+                    <td className="px-3 py-2 text-right font-bold">{toEnglishDigits(total)}</td>
+                    <td className="px-3 py-2 text-right">
                       <span className={`font-bold ${percentage >= 60 ? 'text-green-600' : 'text-red-600'}`}>
                         {toEnglishDigits(percentage)}%
                       </span>
@@ -197,7 +201,7 @@ function ResultContent() {
           </div>
 
           {/* Buttons */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 no-print">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 no-print">
             <button
               onClick={() => window.print()}
               className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2"
