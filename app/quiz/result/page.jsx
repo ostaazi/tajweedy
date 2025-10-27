@@ -3,103 +3,27 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 
-/* ====================== أدوات عامة ====================== */
-function Modal({ open, title, actions, onClose, children }) {
+function Modal({ open, title, onClose, children }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 print:static print:p-0">
-      <div className="absolute inset-0 bg-black/40 print:hidden" onClick={onClose} />
-      <div className="relative bg-white w-full max-w-5xl rounded-2xl shadow-xl p-6 print:shadow-none print:rounded-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative bg-white w-full max-w-3xl rounded-2xl shadow-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-[#1e7850]">{title}</h3>
-          <div className="flex items-center gap-2">
-            {actions}
-            <button
-              onClick={onClose}
-              className="px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 print:hidden"
-            >
-              ✖ إغلاق
-            </button>
-          </div>
+          <h3 className="text-xl font-bold">{title}</h3>
+          <button
+            onClick={onClose}
+            className="px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200"
+          >
+            إغلاق ✖
+          </button>
         </div>
-        <div className="max-h-[70vh] overflow-auto print:max-h-none">{children}</div>
+        <div className="max-h-[70vh] overflow-auto">{children}</div>
       </div>
     </div>
   );
 }
 
-// QuickChart helper (بدون مكتبات)
-function chartURL(config) {
-  const base = 'https://quickchart.io/chart';
-  const c = encodeURIComponent(JSON.stringify(config));
-  return `${base}?c=${c}&backgroundColor=transparent&devicePixelRatio=2`;
-}
-
-// تحميل jsPDF من CDN فقط عند الحاجة
-async function loadJsPDF() {
-  if (typeof window === 'undefined') return null;
-  if (window.jspdf?.jsPDF) return window.jspdf.jsPDF;
-  await new Promise((res, rej) => {
-    const s = document.createElement('script');
-    s.src =
-      'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
-    s.onload = res;
-    s.onerror = rej;
-    document.body.appendChild(s);
-  });
-  return window.jspdf?.jsPDF || null;
-}
-
-// جلب صورة كـ DataURL لإدراجها في PDF
-async function urlToDataURL(url) {
-  try {
-    const resp = await fetch(url, { cache: 'no-cache' });
-    const blob = await resp.blob();
-    return await new Promise((res) => {
-      const r = new FileReader();
-      r.onload = () => res(r.result);
-      r.readAsDataURL(blob);
-    });
-  } catch {
-    return null;
-  }
-}
-
-// مشاركة/تنزيل ملف Blob
-async function saveOrShareBlob(blob, filename, title = 'Tajweedy') {
-  const file = new File([blob], filename, { type: blob.type });
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try {
-      await navigator.share({ title, files: [file] });
-      return;
-    } catch {
-      /* تجاهل وإلى التنزيل */
-    }
-  }
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-// CSV بسيط
-function toCSV(rows) {
-  const esc = (v) =>
-    `"${String(v ?? '').replace(/"/g, '""')}"`;
-  return rows.map((r) => r.map(esc).join(',')).join('\n');
-}
-
-/* ====================== الهوية اللونية ====================== */
-const COLORS = {
-  primary: '#1e7850',
-  primaryDark: '#155c3e',
-  blue: '#2563eb',
-  red: '#ef4444',
-  gray: '#64748b',
-};
-
-/* ====================== الصفحة ====================== */
 export default function ResultPage() {
   const [score, setScore] = useState(0);
   const [total, setTotal] = useState(0);
@@ -109,26 +33,20 @@ export default function ResultPage() {
   const [allAttempts, setAllAttempts] = useState([]);
 
   // Modals
-  const [openQ, setOpenQ] = useState(false);
-  const [openSec, setOpenSec] = useState(false);
-  const [openProg, setOpenProg] = useState(false);
+  const [openQStats, setOpenQStats] = useState(false);
+  const [openSectionStats, setOpenSectionStats] = useState(false);
+  const [openProgress, setOpenProgress] = useState(false);
 
-  // Chart URLs
-  const [chartBest, setChartBest] = useState('');
-  const [chartWorst, setChartWorst] = useState('');
-  const [chartSections, setChartSections] = useState('');
-  const [chartTimeline, setChartTimeline] = useState('');
-
-  // حمل آخر محاولة + الكل من localStorage
+  // اجلب آخر محاولة + كل المحاولات
   useEffect(() => {
     const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
     setAllAttempts(attempts);
-    const last = attempts[attempts.length - 1];
-    if (last) {
-      setAttempt(last);
-      setAttemptId(last.id || '');
-      setScore(Number(last.score || 0));
-      setTotal(Number(last.total || 0));
+    const latest = attempts[attempts.length - 1];
+    if (latest) {
+      setScore(Number(latest.score || 0));
+      setTotal(Number(latest.total || 0));
+      setAttemptId(latest.id || '');
+      setAttempt(latest);
     }
   }, []);
 
@@ -140,39 +58,64 @@ export default function ResultPage() {
     return `${window.location.origin}/quiz/report/${attemptId}`;
   }, [attemptId]);
 
-  // QR مع شعار
+  // توليد QR مع شعار Tajweedy في الوسط + fallback
   useEffect(() => {
     if (!reportUrl || typeof window === 'undefined') return;
+
     const logo = `${window.location.origin}/logo.png`;
     const services = [
+      // QuickChart مع شعار
       `https://quickchart.io/qr?text=${encodeURIComponent(
         reportUrl
-      )}&size=300&centerImageUrl=${encodeURIComponent(
-        logo
-      )}&centerImageSizeRatio=0.25&margin=2`,
+      )}&size=300&centerImageUrl=${encodeURIComponent(logo)}&centerImageSizeRatio=0.25&margin=2`,
+      // QuickChart بدون شعار (fallback)
       `https://quickchart.io/qr?text=${encodeURIComponent(reportUrl)}&size=300&margin=2`,
+      // QRServer
       `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
         reportUrl
       )}`,
+      // Google Chart
+      `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(
+        reportUrl
+      )}`,
     ];
+
     let i = 0;
+    let cancelled = false;
     const tryNext = () => {
-      if (i >= services.length) return setQrSrc('');
-      const url = services[i++];
+      if (cancelled) return;
+      if (i >= services.length) {
+        setQrSrc('');
+        return;
+      }
+      const candidate = services[i++];
       const img = new Image();
-      img.onload = () => setQrSrc(url);
-      img.onerror = tryNext;
+      img.onload = () => !cancelled && setQrSrc(candidate);
+      img.onerror = () => !cancelled && tryNext();
       img.referrerPolicy = 'no-referrer';
-      img.src = url;
+      img.src = candidate;
     };
+
     tryNext();
+    return () => {
+      cancelled = true;
+    };
   }, [reportUrl]);
 
-  /* ------------------ تجميع الإحصاءات ------------------ */
+  const handleDownloadQR = () => {
+    if (!qrSrc) return alert('⚠️ لم يتم توليد الكود بعد.');
+    const link = document.createElement('a');
+    link.href = qrSrc;
+    link.download = `tajweedy-qr-${attemptId || 'report'}.png`;
+    link.click();
+  };
+
+  // === حساب الإحصاءات من جميع المحاولات ===
   const aggregates = useMemo(() => {
-    const byQ = new Map();
-    const bySec = new Map();
-    const timeline = [];
+    // هيكل إحصاءات عام
+    const byQuestion = new Map(); // key: نص السؤال -> { right, wrong }
+    const bySection = new Map();  // key: section -> { right, wrong, subs: Map(subsection -> {right, wrong}) }
+    const timeline = []; // [{id, date, score, total, pct}]
 
     for (const att of allAttempts) {
       const qs = Array.isArray(att?.questions) ? att.questions : [];
@@ -184,6 +127,10 @@ export default function ResultPage() {
         date: att.date,
         score: Number(att.score || 0),
         total: Number(att.total || n || 0),
+        pct:
+          Number(att.total || n || 0) > 0
+            ? Math.round((Number(att.score || 0) / Number(att.total || n || 0)) * 100)
+            : 0,
       });
 
       for (let i = 0; i < n; i++) {
@@ -192,276 +139,82 @@ export default function ResultPage() {
         const correct = Number(q?.answer);
         const isRight = user === correct;
 
-        const keyQ = (q?.question || `سؤال ${i + 1}`).trim();
-        if (!byQ.has(keyQ))
-          byQ.set(keyQ, {
-            section: q?.section || 'غير محدد',
-            subsection: q?.subsection || 'غير محدد',
-            right: 0,
-            wrong: 0,
-          });
-        byQ.get(keyQ)[isRight ? 'right' : 'wrong']++;
+        // الأسئلة
+        const qKey = (q?.question || `سؤال ${i + 1}`).trim();
+        if (!byQuestion.has(qKey)) byQuestion.set(qKey, { right: 0, wrong: 0, section: q?.section, subsection: q?.subsection });
+        byQuestion.get(qKey)[isRight ? 'right' : 'wrong']++;
 
-        const keyS = (q?.section || 'غير محدد').trim();
-        if (!bySec.has(keyS))
-          bySec.set(keyS, { right: 0, wrong: 0, subs: new Map() });
-        const s = bySec.get(keyS);
-        s[isRight ? 'right' : 'wrong']++;
-        const sub = (q?.subsection || 'غير محدد').trim();
-        if (!s.subs.has(sub)) s.subs.set(sub, { right: 0, wrong: 0 });
-        s.subs.get(sub)[isRight ? 'right' : 'wrong']++;
+        // الأقسام
+        const sKey = (q?.section || 'غير محدد').trim();
+        if (!bySection.has(sKey)) bySection.set(sKey, { right: 0, wrong: 0, subs: new Map() });
+        const sObj = bySection.get(sKey);
+        sObj[isRight ? 'right' : 'wrong']++;
+
+        const subKey = (q?.subsection || 'غير محدد').trim();
+        if (!sObj.subs.has(subKey)) sObj.subs.set(subKey, { right: 0, wrong: 0 });
+        sObj.subs.get(subKey)[isRight ? 'right' : 'wrong']++;
       }
     }
 
-    const qArr = Array.from(byQ.entries()).map(([question, v]) => {
-      const total = v.right + v.wrong;
-      return {
-        question,
-        section: v.section,
-        subsection: v.subsection,
-        right: v.right,
-        wrong: v.wrong,
-        total,
-        pct: total ? Math.round((v.right / total) * 100) : 0,
-      };
-    });
+    // تحويل الخرائط لمصفوفات مرتبة
+    const questionArr = Array.from(byQuestion.entries()).map(([k, v]) => ({
+      question: k,
+      section: v.section || '—',
+      subsection: v.subsection || '—',
+      right: v.right,
+      wrong: v.wrong,
+      total: v.right + v.wrong,
+      pct: v.right + v.wrong ? Math.round((v.right / (v.right + v.wrong)) * 100) : 0,
+    }));
+    questionArr.sort((a, b) => a.pct === b.pct ? b.total - a.total : b.pct - a.pct);
 
-    qArr.sort((a, b) => (a.pct === b.pct ? b.total - a.total : b.pct - a.pct));
-
-    const sArr = Array.from(bySec.entries()).map(([section, v]) => {
-      const total = v.right + v.wrong;
-      const subs = Array.from(v.subs.entries()).map(([subsection, r]) => {
-        const t = r.right + r.wrong;
-        return {
-          subsection,
-          right: r.right,
-          wrong: r.wrong,
-          total: t,
-          pct: t ? Math.round((r.right / t) * 100) : 0,
-        };
-      });
-      subs.sort((a, b) => b.pct - a.pct);
+    const sectionArr = Array.from(bySection.entries()).map(([sec, val]) => {
+      const subs = Array.from(val.subs.entries()).map(([sub, r]) => ({
+        subsection: sub,
+        right: r.right,
+        wrong: r.wrong,
+        total: r.right + r.wrong,
+        pct: r.right + r.wrong ? Math.round((r.right / (r.right + r.wrong)) * 100) : 0,
+      })).sort((a, b) => b.pct - a.pct);
       return {
-        section,
-        right: v.right,
-        wrong: v.wrong,
-        total,
-        pct: total ? Math.round((v.right / total) * 100) : 0,
+        section: sec,
+        right: val.right,
+        wrong: val.wrong,
+        total: val.right + val.wrong,
+        pct: val.right + val.wrong ? Math.round((val.right / (val.right + val.wrong)) * 100) : 0,
         subs,
       };
     });
-    sArr.sort((a, b) => b.pct - a.pct);
+    sectionArr.sort((a, b) => b.pct - a.pct);
 
-    const tl = timeline
-      .map((t) => ({
-        ...t,
-        pct: t.total ? Math.round((t.score / t.total) * 100) : 0,
-      }))
-      .sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+    timeline.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
 
-    return { qArr, sArr, tl };
+    return { questionArr, sectionArr, timeline };
   }, [allAttempts]);
 
-  /* ------------------ توليد الروابط البيانية ------------------ */
-  useEffect(() => {
-    if (aggregates.qArr.length) {
-      const best = aggregates.qArr.slice(0, 10).reverse();
-      setChartBest(
-        chartURL({
-          type: 'bar',
-          data: {
-            labels: best.map((q) => (q.question.length > 22 ? q.question.slice(0, 22) + '…' : q.question)),
-            datasets: [{ data: best.map((q) => q.pct), backgroundColor: COLORS.primary, borderRadius: 8 }],
-          },
-          options: {
-            indexAxis: 'y',
-            plugins: { legend: { display: false }, title: { display: true, text: 'أفضل 10 أسئلة', color: COLORS.primaryDark } },
-            scales: { x: { min: 0, max: 100 }, y: {} },
-          },
-        })
-      );
-
-      const worst = [...aggregates.qArr]
-        .sort((a, b) => a.pct - b.pct || b.total - a.total)
-        .slice(0, 10)
-        .reverse();
-      setChartWorst(
-        chartURL({
-          type: 'bar',
-          data: {
-            labels: worst.map((q) => (q.question.length > 22 ? q.question.slice(0, 22) + '…' : q.question)),
-            datasets: [{ data: worst.map((q) => q.pct), backgroundColor: COLORS.red, borderRadius: 8 }],
-          },
-          options: {
-            indexAxis: 'y',
-            plugins: { legend: { display: false }, title: { display: true, text: 'أضعف 10 أسئلة', color: COLORS.primaryDark } },
-            scales: { x: { min: 0, max: 100 }, y: {} },
-          },
-        })
-      );
-    } else {
-      setChartBest('');
-      setChartWorst('');
-    }
-
-    if (aggregates.sArr.length) {
-      const top = aggregates.sArr.slice(0, 8);
-      setChartSections(
-        chartURL({
-          type: 'bar',
-          data: {
-            labels: top.map((s) => (s.section.length > 18 ? s.section.slice(0, 18) + '…' : s.section)),
-            datasets: [
-              { label: 'صحيح', data: top.map((s) => s.right), backgroundColor: COLORS.primary, stack: 'tot', borderRadius: 6 },
-              { label: 'خطأ', data: top.map((s) => s.wrong), backgroundColor: COLORS.red, stack: 'tot', borderRadius: 6 },
-            ],
-          },
-          options: {
-            plugins: { title: { display: true, text: 'الأقسام (صحيح/خطأ)', color: COLORS.primaryDark } },
-            scales: { x: {}, y: {} },
-          },
-        })
-      );
-    } else {
-      setChartSections('');
-    }
-
-    if (aggregates.tl.length) {
-      setChartTimeline(
-        chartURL({
-          type: 'line',
-          data: {
-            labels: aggregates.tl.map((t, i) =>
-              t.date ? new Date(t.date).toLocaleDateString('ar-EG') : `محاولة ${i + 1}`
-            ),
-            datasets: [
-              { label: 'النسبة %', data: aggregates.tl.map((t) => t.pct), fill: false, borderColor: COLORS.blue, tension: 0.3 },
-            ],
-          },
-          options: {
-            plugins: { title: { display: true, text: 'تقدّم المتدرّب', color: COLORS.primaryDark } },
-            scales: { y: { min: 0, max: 100 }, x: {} },
-          },
-        })
-      );
-    } else {
-      setChartTimeline('');
-    }
-  }, [aggregates]);
-
-  /* ------------------ تصدير CSV ------------------ */
-  const exportQuestionsCSV = async () => {
-    const rows = [
-      ['السؤال', 'القسم', 'الجزء الفرعي', 'صحيح', 'خطأ', 'المجموع', 'النسبة %'],
-      ...aggregates.qArr.map((q) => [
-        q.question,
-        q.section,
-        q.subsection,
-        q.right,
-        q.wrong,
-        q.total,
-        q.pct,
-      ]),
-    ];
-    const csv = toCSV(rows);
-    await saveOrShareBlob(new Blob([csv], { type: 'text/csv;charset=utf-8' }), 'tajweedy-questions.csv', 'إحصاءات الأسئلة');
-  };
-
-  const exportSectionsCSV = async () => {
-    const rows = [['القسم', 'الجزء الفرعي', 'صحيح', 'خطأ', 'المجموع', 'النسبة %']];
-    for (const s of aggregates.sArr) {
-      if (!s.subs.length) rows.push([s.section, '-', s.right, s.wrong, s.total, s.pct]);
-      for (const sub of s.subs) {
-        rows.push([s.section, sub.subsection, sub.right, sub.wrong, sub.total, sub.pct]);
-      }
-    }
-    const csv = toCSV(rows);
-    await saveOrShareBlob(new Blob([csv], { type: 'text/csv;charset=utf-8' }), 'tajweedy-sections.csv', 'إحصاءات الأقسام');
-  };
-
-  const exportTimelineCSV = async () => {
-    const rows = [['التاريخ', 'الدرجة', 'الإجمالي', 'النسبة %']];
-    aggregates.tl.forEach((t) => {
-      rows.push([
-        t.date ? new Date(t.date).toLocaleString('ar-EG') : '',
-        t.score,
-        t.total,
-        t.pct,
-      ]);
-    });
-    const csv = toCSV(rows);
-    await saveOrShareBlob(new Blob([csv], { type: 'text/csv;charset=utf-8' }), 'tajweedy-progress.csv', 'تقدّم المتدرّب');
-  };
-
-  /* ------------------ تصدير PDF ------------------ */
-  const exportChartsPDF = async () => {
-    const jsPDF = await loadJsPDF();
-    if (!jsPDF) return alert('تعذر تحميل مُصدّر PDF. أعد المحاولة.');
-
-    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-    const pageW = doc.internal.pageSize.getWidth();
-    const margin = 36;
-
-    const addTitle = (t) => {
-      doc.setTextColor(30, 120, 80);
-      doc.setFontSize(14);
-      doc.text(t, pageW / 2, margin, { align: 'center' });
-      doc.setTextColor(0, 0, 0);
-    };
-
-    const addChart = async (title, url) => {
-      doc.addPage();
-      addTitle(title);
-      const data = await urlToDataURL(url);
-      if (data) {
-        const w = pageW - margin * 2;
-        const h = (w * 9) / 16;
-        doc.addImage(data, 'PNG', margin, margin + 12, w, h, undefined, 'FAST');
-      } else {
-        doc.text('تعذّر تحميل الرسم.', margin, margin + 30);
-      }
-    };
-
-    // صفحة أولى: غلاف
-    addTitle('إحصاءات Tajweedy');
-    doc.setFontSize(12);
-    doc.text(`التقرير: ${reportUrl || '-'}`, margin, margin + 28);
-    doc.text(`النتيجة: ${score}/${total} — ${percentage}%`, margin, margin + 46);
-
-    if (chartBest) await addChart('أفضل الأسئلة', chartBest);
-    if (chartWorst) await addChart('أضعف الأسئلة', chartWorst);
-    if (chartSections) await addChart('الأقسام (صحيح/خطأ)', chartSections);
-    if (chartTimeline) await addChart('تقدّم المتدرّب', chartTimeline);
-
-    const blob = doc.output('blob');
-    await saveOrShareBlob(blob, 'tajweedy-stats.pdf', 'إحصاءات Tajweedy');
-  };
-
-  const handleDownloadQR = () => {
-    if (!qrSrc) return alert('⚠️ لم يتم توليد الكود بعد.');
-    const a = document.createElement('a');
-    a.href = qrSrc;
-    a.download = `tajweedy-qr-${attemptId || 'report'}.png`;
-    a.click();
-  };
-
-  /* ====================== واجهة المستخدم ====================== */
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-green-50 p-6" dir="rtl">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-4xl mx-auto">
 
-        {/* شريط علوي */}
+        {/* شريط أعلى: الصفحة الرئيسية / العودة للاختبار */}
         <div className="flex items-center justify-between mb-4">
-          <Link href="/" className="px-4 py-2 rounded-xl bg-white border text-[#1e7850] font-bold hover:bg-green-50">
+          <Link
+            href="/"
+            className="px-4 py-2 rounded-xl bg-white border text-green-700 font-bold hover:bg-green-50"
+          >
             🏠 الصفحة الرئيسية
           </Link>
-          <Link href="/quiz" className="px-4 py-2 rounded-xl bg-white border text-[#2563eb] font-bold hover:bg-blue-50">
+          <Link
+            href="/quiz"
+            className="px-4 py-2 rounded-xl bg-white border text-blue-700 font-bold hover:bg-blue-50"
+          >
             ↩️ العودة للاختبار
           </Link>
         </div>
 
-        {/* نتائج */}
-        <h1 className="text-3xl font-bold text-[#1e7850] mb-6 text-center">نتيجة الاختبار 🎓</h1>
+        {/* النتيجة */}
+        <h1 className="text-3xl font-bold text-green-700 mb-6 text-center">نتيجة الاختبار 🎓</h1>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-green-100 border-2 border-green-300 rounded-2xl p-6 text-center">
             <p className="text-green-800 font-bold mb-2">إجابات صحيحة ✅</p>
@@ -478,122 +231,213 @@ export default function ResultPage() {
         </div>
 
         {/* النسبة */}
-        <div className="bg-[#1e7850] text-white rounded-3xl p-8 mb-6 text-center shadow">
+        <div className="bg-green-700 text-white rounded-3xl p-8 mb-6 text-center shadow">
           <p className="text-8xl font-bold mb-3">{percentage}%</p>
           <p className="text-lg">
             {percentage >= 80 ? '🎉 ممتاز جداً!' : percentage >= 60 ? '👏 أداء جيد' : '📖 يحتاج مراجعة'}
           </p>
         </div>
 
-        {/* أزرار عامة */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-          <button onClick={() => window.print()} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-2xl">طباعة 🖨️</button>
+        {/* أزرار الإجراءات */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <button onClick={() => window.print()} className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 rounded-2xl">
+            طباعة 🖨️
+          </button>
+
           {reportUrl ? (
-            <Link href={reportUrl} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-2xl text-center">التفاصيل 📄</Link>
+            <Link href={reportUrl} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-2xl text-center">
+              التفاصيل 📄
+            </Link>
           ) : (
-            <button disabled className="bg-blue-400 text-white font-bold py-3 rounded-2xl opacity-60">التفاصيل 📄</button>
+            <button disabled className="bg-blue-400 text-white font-bold py-3 rounded-2xl opacity-60">
+              التفاصيل 📄
+            </button>
           )}
-          <button onClick={() => setOpenQ(true)} className="bg-white border-2 border-blue-200 hover:bg-blue-50 rounded-2xl font-bold">إحصاءات الأسئلة 📊</button>
-          <button onClick={() => setOpenSec(true)} className="bg-white border-2 border-emerald-200 hover:bg-emerald-50 rounded-2xl font-bold">الأقسام 🧭</button>
-          <button onClick={() => setOpenProg(true)} className="bg-white border-2 border-purple-200 hover:bg-purple-50 rounded-2xl font-bold">التقدّم 📈</button>
+
+          <button
+            onClick={() => {
+              if (navigator.share && reportUrl) {
+                navigator.share({
+                  title: 'تقرير التجويد',
+                  text: `حصلت على ${percentage}% في اختبار التجويد.`,
+                  url: reportUrl,
+                });
+              } else if (reportUrl) {
+                navigator.clipboard.writeText(reportUrl);
+                alert('تم نسخ الرابط!');
+              }
+            }}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-2xl"
+          >
+            مشاركة 📤
+          </button>
+
+          <button
+            onClick={() => {
+              if (!reportUrl) return;
+              navigator.clipboard.writeText(reportUrl);
+              alert('تم نسخ الرابط!');
+            }}
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-2xl"
+          >
+            نسخ 🔗
+          </button>
         </div>
 
         {/* QR */}
-        <div className="bg-white border-2 border-green-200 rounded-3xl shadow-md p-8 text-center mb-10">
+        <div className="bg-white border-2 border-green-200 rounded-3xl shadow-md p-8 text-center mb-6">
           <h2 className="text-xl font-bold text-gray-700 mb-4 flex justify-center items-center gap-2">
             <span>📱</span> رمز الاستجابة السريع للوصول السريع
           </h2>
+
           {qrSrc ? (
             <div className="flex flex-col items-center justify-center gap-3">
-              <img src={qrSrc} alt="QR Code" className="w-56 h-56 border-4 border-green-400 rounded-2xl shadow-lg" referrerPolicy="no-referrer" />
-              <button onClick={handleDownloadQR} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl mt-3">
+              <img
+                src={qrSrc}
+                alt="QR Code"
+                className="w-56 h-56 border-4 border-green-400 rounded-2xl shadow-lg"
+                referrerPolicy="no-referrer"
+              />
+              <button
+                onClick={handleDownloadQR}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl mt-3"
+              >
                 تحميل QR 📥
               </button>
             </div>
           ) : (
-            <p className="text-gray-500 mt-4">جارٍ توليد الكود…</p>
+            <p className="text-gray-500 mt-4">جارٍ توليد الكود...</p>
           )}
-          <p className="mt-4 text-gray-600 text-sm">امسح الكود باستخدام كاميرا الهاتف أو تطبيق قارئ QR 📸</p>
+
+          <p className="mt-4 text-gray-600 text-sm">
+            امسح الكود باستخدام كاميرا الهاتف أو تطبيق قارئ QR 📸
+          </p>
+
+          <div className="mt-6 flex flex-col items-center">
+            <img src="/logo.png" alt="Tajweedy Logo" className="w-20 opacity-80" />
+            <p className="text-gray-700 font-bold mt-2">Tajweedy — التجويد التفاعلي</p>
+          </div>
+        </div>
+
+        {/* أزرار الإحصاءات */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+          <button
+            onClick={() => setOpenQStats(true)}
+            className="w-full bg-white border-2 border-blue-200 hover:bg-blue-50 rounded-2xl p-4 font-bold"
+          >
+            إحصاءات الأسئلة 📊
+          </button>
+          <button
+            onClick={() => setOpenSectionStats(true)}
+            className="w-full bg-white border-2 border-emerald-200 hover:bg-emerald-50 rounded-2xl p-4 font-bold"
+          >
+            الأقسام والأجزاء الفرعية 🧭
+          </button>
+          <button
+            onClick={() => setOpenProgress(true)}
+            className="w-full bg-white border-2 border-purple-200 hover:bg-purple-50 rounded-2xl p-4 font-bold"
+          >
+            متابعة تقدّم المتدرب 📈
+          </button>
         </div>
       </div>
 
-      {/* نافذة: الأسئلة */}
-      <Modal
-        open={openQ}
-        title="إحصاءات الأسئلة"
-        onClose={() => setOpenQ(false)}
-        actions={
-          <>
-            <button onClick={() => window.print()} className="px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 print:hidden">🖨️ طباعة</button>
-            <button onClick={exportQuestionsCSV} className="px-3 py-1 rounded-lg bg-[#1e7850] text-white print:hidden">CSV ⬇</button>
-            <button onClick={exportChartsPDF} className="px-3 py-1 rounded-lg bg-blue-600 text-white print:hidden">PDF ⬇</button>
-          </>
-        }
-      >
-        {chartBest && <img src={chartBest} alt="أفضل الأسئلة" className="w-full mb-6" />}
-        {chartWorst && <img src={chartWorst} alt="أضعف الأسئلة" className="w-full" />}
-      </Modal>
-
-      {/* نافذة: الأقسام */}
-      <Modal
-        open={openSec}
-        title="الأقسام والأجزاء الفرعية"
-        onClose={() => setOpenSec(false)}
-        actions={
-          <>
-            <button onClick={() => window.print()} className="px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 print:hidden">🖨️ طباعة</button>
-            <button onClick={exportSectionsCSV} className="px-3 py-1 rounded-lg bg-[#1e7850] text-white print:hidden">CSV ⬇</button>
-            <button onClick={exportChartsPDF} className="px-3 py-1 rounded-lg bg-blue-600 text-white print:hidden">PDF ⬇</button>
-          </>
-        }
-      >
-        {chartSections && <img src={chartSections} alt="الأقسام" className="w-full mb-6" />}
-        <div className="grid md:grid-cols-2 gap-3">
-          {aggregates.sArr.slice(0, 8).map((s, idx) => (
-            <div key={idx} className="border rounded-xl p-3">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-bold">{s.section}</span>
-                <span className="text-sm text-gray-600">النسبة: {s.pct}%</span>
-              </div>
-              {s.subs.slice(0, 6).map((sub, i2) => (
-                <div key={i2} className="flex items-center justify-between text-sm border-b last:border-0 py-1">
-                  <span>{sub.subsection}</span>
-                  <span className="text-gray-600">
-                    صحيح {sub.right} / خطأ {sub.wrong} — {sub.pct}%
-                  </span>
+      {/* نافذة: إحصاءات الأسئلة */}
+      <Modal open={openQStats} title="إحصاءات الأسئلة" onClose={() => setOpenQStats(false)}>
+        {aggregates.questionArr.length ? (
+          <div className="space-y-3">
+            {aggregates.questionArr.map((q, idx) => (
+              <div
+                key={idx}
+                className="p-4 rounded-xl border flex items-start justify-between gap-3"
+              >
+                <div>
+                  <p className="font-bold mb-1">{q.question}</p>
+                  <p className="text-sm text-gray-500">
+                    القسم: {q.section} — الجزء الفرعي: {q.subsection}
+                  </p>
                 </div>
-              ))}
-            </div>
-          ))}
-        </div>
+                <div className="text-end">
+                  <p className="text-green-700 font-bold">صحيح: {q.right}</p>
+                  <p className="text-red-600 font-bold">خطأ: {q.wrong}</p>
+                  <p className="text-blue-700 font-bold">النسبة: {q.pct}%</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-600">لا توجد بيانات مفصلة للأسئلة حتى الآن.</p>
+        )}
       </Modal>
 
-      {/* نافذة: التقدّم */}
+      {/* نافذة: الأقسام والأجزاء الفرعية */}
       <Modal
-        open={openProg}
-        title="متابعة تقدّم المتدرّب"
-        onClose={() => setOpenProg(false)}
-        actions={
-          <>
-            <button onClick={() => window.print()} className="px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 print:hidden">🖨️ طباعة</button>
-            <button onClick={exportTimelineCSV} className="px-3 py-1 rounded-lg bg-[#1e7850] text-white print:hidden">CSV ⬇</button>
-            <button onClick={exportChartsPDF} className="px-3 py-1 rounded-lg bg-blue-600 text-white print:hidden">PDF ⬇</button>
-          </>
-        }
+        open={openSectionStats}
+        title="إحصاءات الأقسام والأجزاء الفرعية"
+        onClose={() => setOpenSectionStats(false)}
       >
-        {chartTimeline && <img src={chartTimeline} alt="الزمن" className="w-full mb-6" />}
-        <div className="space-y-2">
-          {aggregates.tl.map((t, i) => (
-            <div key={i} className="flex items-center justify-between text-sm border-b py-1">
-              <span className="font-semibold">
-                {t.date ? new Date(t.date).toLocaleString('ar-EG') : `محاولة ${i + 1}`}
-              </span>
-              <span className="text-gray-600">
-                درجة: {t.score}/{t.total} — {t.pct}%
-              </span>
-            </div>
-          ))}
-        </div>
+        {aggregates.sectionArr.length ? (
+          <div className="space-y-5">
+            {aggregates.sectionArr.map((s, idx) => (
+              <div key={idx} className="p-4 border rounded-2xl">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-bold text-lg">القسم: {s.section}</h4>
+                  <div className="text-end">
+                    <span className="text-green-700 font-bold ms-3">صحيح: {s.right}</span>
+                    <span className="text-red-600 font-bold ms-3">خطأ: {s.wrong}</span>
+                    <span className="text-blue-700 font-bold">النسبة: {s.pct}%</span>
+                  </div>
+                </div>
+                {s.subs.length ? (
+                  <div className="space-y-2">
+                    {s.subs.map((sub, i2) => (
+                      <div
+                        key={i2}
+                        className="p-3 rounded-xl bg-gray-50 flex items-center justify-between"
+                      >
+                        <span className="font-semibold">الجزء الفرعي: {sub.subsection}</span>
+                        <span className="text-sm text-gray-600">
+                          صحيح: {sub.right} — خطأ: {sub.wrong} — نسبة: {sub.pct}%
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-sm">لا توجد أجزاء فرعية مسجّلة.</p>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-600">لا توجد بيانات للأقسام حتى الآن.</p>
+        )}
+      </Modal>
+
+      {/* نافذة: تقدّم المتدرب */}
+      <Modal open={openProgress} title="متابعة تقدّم المتدرب" onClose={() => setOpenProgress(false)}>
+        {aggregates.timeline.length ? (
+          <div className="space-y-3">
+            {aggregates.timeline.map((t, i) => (
+              <div
+                key={i}
+                className="p-4 border rounded-xl flex items-center justify-between"
+              >
+                <div>
+                  <p className="font-bold">المحاولة: {t.id || i + 1}</p>
+                  <p className="text-sm text-gray-500">
+                    {t.date ? new Date(t.date).toLocaleString('ar-EG') : '—'}
+                  </p>
+                </div>
+                <div className="text-end">
+                  <p className="text-green-700 font-bold">درجة: {t.score}/{t.total}</p>
+                  <p className="text-blue-700 font-bold">النسبة: {t.pct}%</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-600">لا توجد محاولات مسجّلة بعد.</p>
+        )}
       </Modal>
     </div>
   );
