@@ -1,14 +1,11 @@
-// app/quiz/result/page.js - الكود الكامل في ملف واحد (مع إصلاح خطأ البناء الثابت)
 'use client';
+export const dynamic = 'force-dynamic';
 
 import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-// جعل الصفحة ديناميكية لتجنب static generation (حل الخطأ في Vercel)
-export const dynamic = 'force-dynamic';
-
-/* ============ أدوات مساعدة عامة ============ */
+/* ============ أدوات مساعدة ============ */
 function toEnglishDigits(input = '') {
   const map = {
     '٠':'0','١':'1','٢':'2','٣':'3','٤':'4',
@@ -18,7 +15,6 @@ function toEnglishDigits(input = '') {
   };
   return String(input).replace(/[٠-٩۰-۹]/g, d => map[d] ?? d);
 }
-
 function formatDate(date) {
   const d = new Date(date);
   const day = String(d.getDate()).padStart(2, '0');
@@ -26,7 +22,6 @@ function formatDate(date) {
   const year = d.getFullYear();
   return `${day}/${month}/${year}`;
 }
-
 function formatTime(date) {
   const d = new Date(date);
   const hours = String(d.getHours()).padStart(2, '0');
@@ -41,7 +36,6 @@ function QrCode({ value, size = 250 }) {
 
   useEffect(() => {
     if (!value) return;
-
     const logo = typeof window !== 'undefined' ? `${window.location.origin}/logo.png` : '';
     const services = [
       `https://quickchart.io/qr?text=${encodeURIComponent(value)}&size=${size}&centerImageUrl=${encodeURIComponent(
@@ -51,14 +45,10 @@ function QrCode({ value, size = 250 }) {
       `https://chart.googleapis.com/chart?cht=qr&chs=${size}x${size}&chl=${encodeURIComponent(value)}`
     ];
 
-    let i = 0;
-    let stopped = false;
+    let i = 0, stopped = false;
     const tryNext = () => {
       if (stopped) return;
-      if (i >= services.length) {
-        setError(true);
-        return;
-      }
+      if (i >= services.length) { setError(true); return; }
       const url = services[i++];
       const img = new Image();
       img.onload = () => { if (!stopped) setSrc(url); };
@@ -107,7 +97,7 @@ function QrCode({ value, size = 250 }) {
   );
 }
 
-/* ============ المحتوى الرئيسي ============ */
+/* ============ الصفحة ============ */
 function ResultContent() {
   const searchParams = useSearchParams();
   const attemptId = searchParams?.get('id');
@@ -116,6 +106,7 @@ function ResultContent() {
   const [allAttempts, setAllAttempts] = useState([]);
   const [user, setUser] = useState({ name: 'اسم المتدرب' });
   const [loading, setLoading] = useState(true);
+  const [qrValue, setQrValue] = useState('');
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
@@ -126,15 +117,27 @@ function ResultContent() {
 
     if (attemptId) {
       const found = attempts.find(a => String(a?.id) === String(attemptId));
-      if (found) {
-        setAttempt(found);
-        console.log('✅ محاولة محملة:', found);
-      } else {
-        console.warn('⚠️ لم يتم العثور على محاولة لـ ID:', attemptId);
-      }
+      if (found) setAttempt(found);
     }
     setLoading(false);
   }, [attemptId]);
+
+  useEffect(() => {
+    if (attempt && attemptId && typeof window !== 'undefined') {
+      const reportHref = `/quiz/report/${attemptId}`;
+      const fullLink = `${window.location.origin}${reportHref}`;
+      const score = attempt.score ?? 0;
+      const total = attempt.total ?? 0;
+      const percentage = total ? Math.round((score / total) * 100) : 0;
+
+      const text = `Tajweedy Report
+Name: ${user.name}
+Score: ${toEnglishDigits(score)}/${toEnglishDigits(total)} (${toEnglishDigits(percentage)}%)
+Date: ${formatDate(attempt.date)} ${formatTime(attempt.date)}
+Link: ${fullLink}`;
+      setQrValue(text);
+    }
+  }, [attempt, attemptId, user.name]);
 
   if (loading) {
     return (
@@ -149,7 +152,6 @@ function ResultContent() {
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center p-4" dir="rtl">
         <div className="text-center">
           <p className="text-2xl font-bold text-gray-700 mb-4">❌ لا توجد بيانات</p>
-          <p className="text-gray-600 mb-6">لم يتم العثور على نتيجة الاختبار</p>
           <Link href="/quiz" className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl inline-block">
             ← اختبار جديد
           </Link>
@@ -161,19 +163,16 @@ function ResultContent() {
   const score = attempt.score ?? 0;
   const total = attempt.total ?? 0;
   const percentage = total ? Math.round((score / total) * 100) : 0;
-  const examType = attempt.type === 'periodic' ? 'اختبار دوري' : attempt.type === 'therapeutic' ? 'تدريب علاجي' : 'اختبار';
+  const examType = attempt.type || 'اختبار';
   const examName = attempt.name || 'اختبار التجويد';
   const examCode = `TJ-${toEnglishDigits(attemptId)}`;
-  const qrValue = typeof window !== 'undefined'
-    ? `${window.location.origin}/quiz/result?id=${attemptId}`
-    : '';
+  const reportHref = attemptId ? `/quiz/report/${attemptId}` : '/quiz/report';
 
   return (
     <>
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
         * { font-family: 'Cairo', sans-serif !important; }
-        
         @media print {
           @page { size: A4 portrait; margin: 15mm; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -188,12 +187,14 @@ function ResultContent() {
 
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8 relative" dir="rtl">
         <div id="result-print-area" className="max-w-4xl mx-auto">
-          {/* شعار وبيانات المتدرب */}
+          
+          {/* شعار */}
           <div className="text-center mb-6">
             <img src="/logo.png" alt="Tajweedy Logo" className="w-20 h-20 mx-auto mb-2 object-contain" />
             <h1 className="text-2xl font-bold text-green-600 mb-2">Tajweedy - التجويد الذكي</h1>
           </div>
 
+          {/* بيانات المتدرب */}
           <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 text-center">
             <h2 className="text-2xl font-bold text-gray-800 mb-2">{user.name}</h2>
             <p className="text-lg text-gray-600">
@@ -204,7 +205,7 @@ function ResultContent() {
             </p>
           </div>
 
-          {/* النسبة ونتيجة الاختبار */}
+          {/* النتيجة */}
           <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 text-center">
             <h1 className="text-2xl font-bold text-green-600 mb-3">
               {percentage >= 80 ? '🎉 ممتاز!' : percentage >= 60 ? '👍 جيد جداً' : '📚 يحتاج مراجعة'}
@@ -215,12 +216,12 @@ function ResultContent() {
             </p>
           </div>
 
-          {/* 🔳 QR CODE هنا */}
+          {/* QR */}
           {qrValue && (
-            <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 page-break-after">
+            <div className="bg-white rounded-3xl shadow-lg p-6 mb-5">
               <h2 className="text-xl font-bold text-green-600 mb-3">رمز الاستجابة السريع 📱</h2>
               <QrCode value={qrValue} size={220} />
-              <p className="text-sm text-gray-600">امسح للوصول إلى تقريرك مباشرة</p>
+              <p className="text-sm text-gray-600 mt-2">يحتوي على بيانات النتيجة ورابط التقرير الكامل</p>
             </div>
           )}
 
@@ -271,7 +272,8 @@ function ResultContent() {
               🖨️ طباعة
             </button>
             <Link 
-              href={`/quiz/report/${attemptId}`} 
+              href={reportHref}
+              prefetch={false}
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-2xl text-center transition-colors"
             >
               📊 التقرير الكامل
