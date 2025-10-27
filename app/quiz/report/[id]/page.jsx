@@ -11,16 +11,16 @@ export default function ReportPage() {
   const [attempt, setAttempt] = useState(null);
   const [userName, setUserName] = useState('');
   const [trainerName, setTrainerName] = useState('');
-  const [qrSrc, setQrSrc] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [qrSrc, setQrSrc] = useState('');         // رابط صورة الـ QR المختبرة والصالحة
+  const [loading, setLoading] = useState(true);   // حالة تحميل البيانات
 
-  // اجلب بيانات المحاولة من localStorage
+  // ——————————————————————————————————————————
+  // 1) جلب بيانات المحاولة من localStorage (عميل فقط)
+  // ——————————————————————————————————————————
   useEffect(() => {
     const run = () => {
-      if (!attemptId) {
-        setLoading(false);
-        return;
-      }
+      if (!attemptId) { setLoading(false); return; }
+
       const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
       const found = attempts.find(
         (a) => String(a?.id) === String(attemptId) || Number(a?.id) === Number(attemptId)
@@ -34,23 +34,24 @@ export default function ReportPage() {
     run();
   }, [attemptId]);
 
-  // رابط التقرير (يُبنى على جانب العميل فقط)
+  // ——————————————————————————————————————————
+  // 2) بناء رابط التقرير بأمان (لا يشتغل على السيرفر)
+  // ——————————————————————————————————————————
   const reportUrl = useMemo(() => {
     if (typeof window === 'undefined' || !attemptId) return '';
     return `${window.location.origin}/quiz/report/${attemptId}`;
   }, [attemptId]);
 
-  // توليد رابط صورة QR باستخدام خدمات خارجية بدون أي مكتبات
+  // ——————————————————————————————————————————
+  // 3) توليد رابط صورة QR بالاعتماد على خدمات عامة (بدون مكتبات)
+  //    مع التجربة التسلسلية (fallback) حتى تنجح إحداها
+  // ——————————————————————————————————————————
   useEffect(() => {
     if (!reportUrl) return;
 
     const services = [
-      `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
-        reportUrl
-      )}`,
-      `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(
-        reportUrl
-      )}`,
+      `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(reportUrl)}`,
+      `https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=${encodeURIComponent(reportUrl)}`,
       `https://quickchart.io/qr?text=${encodeURIComponent(reportUrl)}&size=300`,
     ];
 
@@ -59,33 +60,31 @@ export default function ReportPage() {
 
     const tryNext = () => {
       if (cancelled) return;
-      if (i >= services.length) {
-        setQrSrc('');
-        return;
-      }
+      if (i >= services.length) { setQrSrc(''); return; }
+
       const candidate = services[i++];
       const img = new Image();
-      img.onload = () => {
-        if (!cancelled) setQrSrc(candidate);
-      };
-      img.onerror = () => {
-        if (!cancelled) tryNext();
-      };
+      img.onload = () => { if (!cancelled) setQrSrc(candidate); };
+      img.onerror = () => { if (!cancelled) tryNext(); };
       img.referrerPolicy = 'no-referrer';
       img.src = candidate;
     };
 
     tryNext();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [reportUrl]);
 
+  // ——————————————————————————————————————————
+  // 4) حفظ الأسماء
+  // ——————————————————————————————————————————
   const saveNames = () => {
     if (userName) localStorage.setItem('userName', userName);
     if (trainerName) localStorage.setItem('trainerName', trainerName);
   };
 
+  // ——————————————————————————————————————————
+  // 5) شاشات الحالات
+  // ——————————————————————————————————————————
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-green-50 flex items-center justify-center p-4">
@@ -111,13 +110,20 @@ export default function ReportPage() {
     );
   }
 
+  // ——————————————————————————————————————————
+  // 6) حساب الإحصاءات
+  // ——————————————————————————————————————————
   const score = attempt.score ?? 0;
   const total = attempt.total ?? 0;
   const percentage = total ? Math.round((score / total) * 100) : 0;
 
+  // ——————————————————————————————————————————
+  // 7) واجهة التقرير
+  // ——————————————————————————————————————————
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-green-50 p-4 md:p-8" dir="rtl">
       <div className="max-w-4xl mx-auto">
+
         {/* Header */}
         <div className="bg-white rounded-3xl shadow-card p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
@@ -219,7 +225,7 @@ export default function ReportPage() {
               if (qrSrc) {
                 const a = document.createElement('a');
                 a.href = qrSrc;
-                a.download = 'qr-code.png';
+                a.download = `qr-code-${attemptId}.png`;
                 a.click();
               }
             }}
@@ -279,9 +285,8 @@ export default function ReportPage() {
                   }}
                 />
               ) : null}
-              <div
-                className={`${qrSrc ? 'hidden' : 'flex'} w-72 h-72 items-center justify-center flex-col gap-4 text-gray-500`}
-              >
+
+              <div className={`${qrSrc ? 'hidden' : 'flex'} w-72 h-72 items-center justify-center flex-col gap-4 text-gray-500`}>
                 <span className="text-5xl">⚠️</span>
                 <p className="text-center">تعذّر توليد رمز QR</p>
                 <p className="text-xs text-gray-400 break-all">{reportUrl}</p>
