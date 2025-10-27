@@ -76,8 +76,10 @@ function ResultContent() {
             print-color-adjust: exact !important;
           }
 
-          body {
+          html, body {
             background: white !important;
+            height: auto !important;
+            overflow: hidden !important;
           }
 
           body * {
@@ -97,6 +99,8 @@ function ResultContent() {
             background: white;
             padding: 0;
             margin: 0;
+            page-break-after: avoid !important;
+            overflow: hidden;
           }
 
           .no-print {
@@ -105,6 +109,10 @@ function ResultContent() {
 
           .bg-gradient-to-br {
             background: white !important;
+          }
+
+          .shadow-lg {
+            box-shadow: none !important;
           }
         }
       `}</style>
