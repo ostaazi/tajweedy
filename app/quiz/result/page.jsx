@@ -92,6 +92,22 @@ function ResultContent() {
           font-family: 'Cairo', sans-serif !important;
         }
 
+        /* Watermark background for screen */
+        .watermark-bg {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background-image: url('/logo.png');
+          background-size: 400px 400px;
+          background-repeat: repeat;
+          background-position: center;
+          opacity: 0.1;
+          z-index: 0;
+          pointer-events: none;
+        }
+
         @media print {
           @page {
             size: A4 portrait;
@@ -121,6 +137,22 @@ function ResultContent() {
             padding: 20px;
           }
 
+          /* Watermark for print */
+          #result-print-area::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 210mm;
+            height: 297mm;
+            background-image: url('/logo.png');
+            background-size: 400px 400px;
+            background-repeat: repeat;
+            background-position: center;
+            opacity: 0.1;
+            z-index: -1;
+          }
+
           .no-print {
             display: none !important;
           }
@@ -135,14 +167,19 @@ function ResultContent() {
         }
       `}</style>
 
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8" dir="rtl">
+      {/* Watermark Background */}
+      <div className="watermark-bg"></div>
+
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 p-4 md:p-8 relative z-10" dir="rtl">
         <div id="result-print-area" className="max-w-4xl mx-auto">
           
-          {/* Header with Logo */}
+          {/* Header with Real Logo */}
           <div className="text-center mb-6">
-            <div className="w-24 h-24 rounded-full bg-primary text-white font-bold flex items-center justify-center text-4xl mx-auto mb-3">
-              TJ
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="Tajweedy Logo" 
+              className="w-24 h-24 mx-auto mb-3 object-contain"
+            />
             <h1 className="text-3xl font-bold text-primary mb-2">Tajweedy - التجويد الذكي</h1>
           </div>
 
