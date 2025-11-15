@@ -4,6 +4,15 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Amiri:wght@400;700&display=swap');
 
+/* Uthmanic Hafs Quran Font */
+@font-face {
+  font-family: 'UthmanicHafs_V22';
+  src: url('/fonts/UthmanicHafs_V22.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --color-primary: #1e7850;
   --color-primary-dark: #155c3e;
@@ -41,7 +50,7 @@ body::before {
   z-index: 0;
 }
 
-/* Quranic text styling */
+/* Quranic text styling (عام) */
 .quran-text {
   font-family: var(--font-amiri);
   font-size: 1.875rem;
@@ -50,6 +59,27 @@ body::before {
   text-align: center;
   color: #1e293b;
 }
+
+/* Uthmanic Hafs font for ayat (يُستخدم في الأسئلة) */
+.quran-uthmani {
+  font-family: 'UthmanicHafs_V22', var(--font-amiri), serif !important;
+  direction: rtl;
+  text-align: center;
+   /* تكبير الخط وجعله عريضًا */
+  font-size: 2.5rem;        /* تقريبًا مثل text-4xl */
+  line-height: 2.9;
+  font-weight: 500;          /* Bold */
+}
+
+
+@media (max-width: 768px) {
+  .quran-uthmani {
+    font-size: 1.9rem;
+    line-height: 2.6;
+  }
+}
+
+
 
 /* Arabic text with diacritics */
 .arabic-text {

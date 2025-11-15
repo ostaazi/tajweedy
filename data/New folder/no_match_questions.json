@@ -1,0 +1,2560 @@
+{
+  "no_match_count": 365,
+  "questions": [
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 8,
+      "snippet": "قَوْلٌ هُوَ",
+      "question_text": "قال تعالى: ﴿قَوْلٌ هُوَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 12,
+      "snippet": "حَلِيمٌ خَبِيرٌ",
+      "question_text": "قال تعالى: ﴿حَلِيمٌ خَبِيرٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 16,
+      "snippet": "أَلِيمٌ حَكِيمٌ",
+      "question_text": "قال تعالى: ﴿أَلِيمٌ حَكِيمٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 17,
+      "snippet": "عَذَابًا غَيْرَ",
+      "question_text": "قال تعالى: ﴿عَذَابًا غَيْرَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 21,
+      "snippet": "أَشَدُّ عَلَيْهِمْ عَذَابًا",
+      "question_text": "قال تعالى: ﴿أَشَدُّ عَلَيْهِمْ عَذَابًا﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 22,
+      "snippet": "فَسَلَامٌ هِيَ",
+      "question_text": "قال تعالى: ﴿فَسَلَامٌ هِيَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 27,
+      "snippet": "وَيُنْحِتُونَ",
+      "question_text": "قال تعالى: ﴿وَيُنْحِتُونَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 30,
+      "snippet": "مُسْتَقِيمٍ عَالِمٌ",
+      "question_text": "قال تعالى: ﴿مُسْتَقِيمٍ عَالِمٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 36,
+      "snippet": "مَنْ غَلَبَ",
+      "question_text": "قال تعالى: ﴿مَنْ غَلَبَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 41,
+      "snippet": "مُسْتَقِيمٌ عَلَى",
+      "question_text": "قال تعالى: ﴿مُسْتَقِيمٌ عَلَى﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 42,
+      "snippet": "غَفُورٌ غَفَّارٌ",
+      "question_text": "قال تعالى: ﴿غَفُورٌ غَفَّارٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 43,
+      "snippet": "قَوْمٍ خَبِيرٌ",
+      "question_text": "قال تعالى: ﴿قَوْمٍ خَبِيرٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 45,
+      "snippet": "كَرِيمٌ حَمِيدٌ",
+      "question_text": "قال تعالى: ﴿كَرِيمٌ حَمِيدٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 46,
+      "snippet": "أَهْلًا خَيْرًا",
+      "question_text": "قال تعالى: ﴿أَهْلًا خَيْرًا﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 53,
+      "snippet": "فَسَلامٌ هِيَ",
+      "question_text": "قال تعالى: ﴿فَسَلامٌ هِيَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 55,
+      "snippet": "حُكْمٌ عَزِيزٌ",
+      "question_text": "قال تعالى: ﴿حُكْمٌ عَزِيزٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 56,
+      "snippet": "قَوْمٌ غَافِلُونَ",
+      "question_text": "قال تعالى: ﴿قَوْمٌ غَافِلُونَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 57,
+      "snippet": "جَنَّاتٍ غَيْرَ",
+      "question_text": "قال تعالى: ﴿جَنَّاتٍ غَيْرَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 59,
+      "snippet": "أَنْحَلْنَا",
+      "question_text": "قال تعالى: ﴿أَنْحَلْنَا﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 62,
+      "snippet": "فَمَا لَهُمْ مِنْ عَذَابٍ",
+      "question_text": "قال تعالى: ﴿فَمَا لَهُمْ مِنْ عَذَابٍ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 63,
+      "snippet": "عَمَلٌ حَسَنٌ",
+      "question_text": "قال تعالى: ﴿عَمَلٌ حَسَنٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 70,
+      "snippet": "أَمْ لَهُمْ سُلَّمٌ عَلَيْهِ",
+      "question_text": "قال تعالى: ﴿أَمْ لَهُمْ سُلَّمٌ عَلَيْهِ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 73,
+      "snippet": "مِنْ هَذَا الْقُرْآنِ",
+      "question_text": "قال تعالى: ﴿مِنْ هَذَا الْقُرْآنِ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 78,
+      "snippet": "حَلِيمٌ خَبِيرٌ",
+      "question_text": "قال تعالى: ﴿حَلِيمٌ خَبِيرٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 81,
+      "snippet": "وَأَنْ أَخْشَى",
+      "question_text": "قال تعالى: ﴿وَأَنْ أَخْشَى﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 82,
+      "snippet": "كَلِمَةٌ حَسَنَةٌ",
+      "question_text": "قال تعالى: ﴿كَلِمَةٌ حَسَنَةٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 83,
+      "snippet": "مِنْ حَمِيدٍ",
+      "question_text": "قال تعالى: ﴿مِنْ حَمِيدٍ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 84,
+      "snippet": "عَلَى عَلِيمٌ",
+      "question_text": "قال تعالى: ﴿عَلَى عَلِيمٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 85,
+      "snippet": "وَهَذَا خَلْقُ",
+      "question_text": "قال تعالى: ﴿وَهَذَا خَلْقُ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 86,
+      "snippet": "قَوْلٌ غَيْرَ",
+      "question_text": "قال تعالى: ﴿قَوْلٌ غَيْرَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 87,
+      "snippet": "عَزِيزٌ غَفَّارٌ",
+      "question_text": "قال تعالى: ﴿عَزِيزٌ غَفَّارٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 89,
+      "snippet": "مَا يَكُونُ لَكُمْ أَنْ تُخْرِجُوهُ",
+      "question_text": "قال تعالى: ﴿مَا يَكُونُ لَكُمْ أَنْ تُخْرِجُوهُ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 90,
+      "snippet": "فَسَلامٌ هُوَ",
+      "question_text": "قال تعالى: ﴿فَسَلامٌ هُوَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 93,
+      "snippet": "إِنَّمَا نُؤَخِّرُهُمْ لِيَوْمٍ عَبُوسٍ",
+      "question_text": "قال تعالى: ﴿إِنَّمَا نُؤَخِّرُهُمْ لِيَوْمٍ عَبُوسٍ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 94,
+      "snippet": "مِنْ هَذَا الْمِثَالِ",
+      "question_text": "قال تعالى: ﴿مِنْ هَذَا الْمِثَالِ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 95,
+      "snippet": "كُلُّهُنَّ خَيْرٌ",
+      "question_text": "قال تعالى: ﴿كُلُّهُنَّ خَيْرٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 96,
+      "snippet": "أَنْ عُبُدُوا",
+      "question_text": "قال تعالى: ﴿أَنْ عُبُدُوا﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 97,
+      "snippet": "مِنْ حِينٍ",
+      "question_text": "قال تعالى: ﴿مِنْ حِينٍ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 98,
+      "snippet": "فَلَنَبْلُوَنَّكُمْ بِشَيْءٍ مِنَ الْخَوْفِ",
+      "question_text": "قال تعالى: ﴿فَلَنَبْلُوَنَّكُمْ بِشَيْءٍ مِنَ الْخَوْفِ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idhar_halaqi",
+      "qnum": 100,
+      "snippet": "وَأَنْ هُوَ",
+      "question_text": "قال تعالى: ﴿وَأَنْ هُوَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 4,
+      "snippet": "مَلِكٍ نَصِيرٍ",
+      "question_text": "قال تعالى: ﴿مَلِكٍ نَصِيرٍ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 6,
+      "snippet": "مُحَمَّدٌ وَرَسُولُ",
+      "question_text": "قال تعالى: ﴿مُحَمَّدٌ وَرَسُولُ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 11,
+      "snippet": "وَمِنْ نُصْرَةٍ",
+      "question_text": "قال تعالى: ﴿وَمِنْ نُصْرَةٍ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 12,
+      "snippet": "إِنَّهُ عَلَى رَجْعِهِ لَقَادِرٌ وَالسَّمَاءِ",
+      "question_text": "قال تعالى: ﴿إِنَّهُ عَلَى رَجْعِهِ لَقَادِرٌ وَالسَّمَاءِ﴾ - ما حكم التنوين في ﴿لَقَادِرٌ﴾؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 13,
+      "snippet": "عَذَابٌ لَهُمْ",
+      "question_text": "قال تعالى: ﴿عَذَابٌ لَهُمْ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 17,
+      "snippet": "لَشَدِيدٌ رَحِيمٌ",
+      "question_text": "قال تعالى: ﴿لَشَدِيدٌ رَحِيمٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 20,
+      "snippet": "وَمِنْ نُصْرَةٍ",
+      "question_text": "قال تعالى: ﴿وَمِنْ نُصْرَةٍ﴾ - ما حكم النون الساكنة؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 26,
+      "snippet": "إِنَّمَا نُؤَخِّرُهُمْ لِيَوْمٍ مُتَفَرِّقٍ",
+      "question_text": "قال تعالى: ﴿إِنَّمَا نُؤَخِّرُهُمْ لِيَوْمٍ مُتَفَرِّقٍ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 29,
+      "snippet": "قَوْمًا لَعِبُوا",
+      "question_text": "قال تعالى: ﴿قَوْمًا لَعِبُوا﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 30,
+      "snippet": "أَلْفَيْنِ لَا",
+      "question_text": "قال تعالى: ﴿أَلْفَيْنِ لَا﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 33,
+      "snippet": "صَدٌّ لِلنَّاسِ",
+      "question_text": "قال تعالى: ﴿صَدٌّ لِلنَّاسِ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 34,
+      "snippet": "فَضْلًا مِنْهُ",
+      "question_text": "قال تعالى: ﴿فَضْلًا مِنْهُ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 35,
+      "snippet": "فَضْلًا مِنْهُ",
+      "question_text": "قال تعالى: ﴿فَضْلًا مِنْهُ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 41,
+      "snippet": "نَاصِفَةٍ مِنْ نَارٍ",
+      "question_text": "قال تعالى: ﴿نَاصِفَةٍ مِنْ نَارٍ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 43,
+      "snippet": "بِقَوْلٍ مَعْرُوفٍ",
+      "question_text": "قال تعالى: ﴿بِقَوْلٍ مَعْرُوفٍ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 44,
+      "snippet": "مِنْ رَءُوفٍ",
+      "question_text": "قال تعالى: ﴿مِنْ رَءُوفٍ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 48,
+      "snippet": "مِنْ رَجُلٍ",
+      "question_text": "قال تعالى: ﴿مِنْ رَجُلٍ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 49,
+      "snippet": "وَلَكِنْ لَا تَخَافُوا",
+      "question_text": "قال تعالى: ﴿وَلَكِنْ لَا تَخَافُوا﴾ - ما حكم النون الساكنة؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 50,
+      "snippet": "مِنْ رَجُلٍ وَامْرَأَةٍ",
+      "question_text": "قال تعالى: ﴿مِنْ رَجُلٍ وَامْرَأَةٍ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 55,
+      "snippet": "مُتَّكِئِينَ عَلَى سُرُرٍ مَوْضُونَةٍ",
+      "question_text": "قال تعالى: ﴿مُتَّكِئِينَ عَلَى سُرُرٍ مَوْضُونَةٍ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 64,
+      "snippet": "صَدٌّ لِلنَّاسِ",
+      "question_text": "قال تعالى: ﴿صَدٌّ لِلنَّاسِ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 65,
+      "snippet": "مِنْ رَجُلٍ وَامْرَأَةٍ",
+      "question_text": "قال تعالى: ﴿مِنْ رَجُلٍ وَامْرَأَةٍ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 68,
+      "snippet": "مِنْ رَءُوفٍ",
+      "question_text": "قال تعالى: ﴿مِنْ رَءُوفٍ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 70,
+      "snippet": "مَلِكٍ نَصِيرٍ",
+      "question_text": "قال تعالى: ﴿مَلِكٍ نَصِيرٍ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 72,
+      "snippet": "بِقَوْلٍ مَعْرُوفٍ",
+      "question_text": "قال تعالى: ﴿بِقَوْلٍ مَعْرُوفٍ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 74,
+      "snippet": "مِنْ رَجُلٍ وَامْرَأَةٍ",
+      "question_text": "قال تعالى: ﴿مِنْ رَجُلٍ وَامْرَأَةٍ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 77,
+      "snippet": "مُحَمَّدٌ وَرَسُولُ",
+      "question_text": "قال تعالى: ﴿مُحَمَّدٌ وَرَسُولُ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 78,
+      "snippet": "عَذَابٌ لَهُمْ",
+      "question_text": "قال تعالى: ﴿عَذَابٌ لَهُمْ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 79,
+      "snippet": "صَدٌّ لِلنَّاسِ",
+      "question_text": "قال تعالى: ﴿صَدٌّ لِلنَّاسِ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 80,
+      "snippet": "سَبْعَةٌ مِنْهُمْ",
+      "question_text": "قال تعالى: ﴿سَبْعَةٌ مِنْهُمْ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 86,
+      "snippet": "قَوْمًا لَعِبُوا",
+      "question_text": "قال تعالى: ﴿قَوْمًا لَعِبُوا﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 87,
+      "snippet": "أَلْفَيْنِ لَا",
+      "question_text": "قال تعالى: ﴿أَلْفَيْنِ لَا﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 90,
+      "snippet": "مِنْ رَءُوفٍ",
+      "question_text": "قال تعالى: ﴿مِنْ رَءُوفٍ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 91,
+      "snippet": "بِقَوْلٍ مَعْرُوفٍ",
+      "question_text": "قال تعالى: ﴿بِقَوْلٍ مَعْرُوفٍ﴾ - ما حكم التنوين؟ إظهار إدغام بغنة إدغام بغير غنة إإخفاء"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 96,
+      "snippet": "مَلِكٍ نَصِيرٍ",
+      "question_text": "قال تعالى: ﴿مَلِكٍ نَصِيرٍ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "idgham_bilaghunnah",
+      "qnum": 98,
+      "snippet": "مُحَمَّدٌ وَرَسُولُ",
+      "question_text": "قال تعالى: ﴿مُحَمَّدٌ وَرَسُولُ﴾ - ما حكم التنوين؟ "
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 3,
+      "snippet": "مُتَكَبِّرٌ قَبْلَ",
+      "question_text": "قال تعالى: ﴿مُتَكَبِّرٌ قَبْلَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 7,
+      "snippet": "لَمَنْ سَرَقَ",
+      "question_text": "قال تعالى: ﴿لَمَنْ سَرَقَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 14,
+      "snippet": "مَا لَكُمْ مِنْ ذِكْرٍ",
+      "question_text": "قال تعالى: ﴿مَا لَكُمْ مِنْ ذِكْرٍ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 16,
+      "snippet": "عَذَابٌ دُونَهُ",
+      "question_text": "قال تعالى: ﴿عَذَابٌ دُونَهُ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 19,
+      "snippet": "مُتَكَبِّرٌ قَبْلَ",
+      "question_text": "قال تعالى: ﴿مُتَكَبِّرٌ قَبْلَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 24,
+      "snippet": "وَمَا لَكُمْ مِنْ دُونِهِ",
+      "question_text": "قال تعالى: ﴿وَمَا لَكُمْ مِنْ دُونِهِ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 29,
+      "snippet": "شَيْئًا قَدِيرًا",
+      "question_text": "قال تعالى: ﴿شَيْئًا قَدِيرًا﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 31,
+      "snippet": "وَمَا تَنفَعُ",
+      "question_text": "قال تعالى: ﴿وَمَا تَنفَعُ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 32,
+      "snippet": "مُسْتَقِيمٍ دَامَ",
+      "question_text": "قال تعالى: ﴿مُسْتَقِيمٍ دَامَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 33,
+      "snippet": "يُنْظِرُونَهُمْ",
+      "question_text": "قال تعالى: ﴿يُنْظِرُونَهُمْ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 47,
+      "snippet": "أَنْ ظَلَمَ",
+      "question_text": "قال تعالى: ﴿أَنْ ظَلَمَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 48,
+      "snippet": "مُسْتَقِيمٍ دَامَ",
+      "question_text": "قال تعالى: ﴿مُسْتَقِيمٍ دَامَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 49,
+      "snippet": "وَمَنْ جَعَلَ",
+      "question_text": "قال تعالى: ﴿وَمَنْ جَعَلَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 52,
+      "snippet": "أَنْ دَعَا",
+      "question_text": "قال تعالى: ﴿أَنْ دَعَا﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 65,
+      "snippet": "وَمَا تَنفَعُ",
+      "question_text": "قال تعالى: ﴿وَمَا تَنفَعُ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 66,
+      "snippet": "إِنَّمَا نُؤَخِّرُهُمْ لِيَوْمٍ تَشْخَصُ",
+      "question_text": "قال تعالى: ﴿إِنَّمَا نُؤَخِّرُهُمْ لِيَوْمٍ تَشْخَصُ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 72,
+      "snippet": "أَنْ دَعَا",
+      "question_text": "قال تعالى: ﴿أَنْ دَعَا﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 73,
+      "snippet": "سَبْعِينَ ذِرَاعًا",
+      "question_text": "قال تعالى: ﴿سَبْعِينَ ذِرَاعًا﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 75,
+      "snippet": "لَمَن سَرَقَ",
+      "question_text": "قال تعالى: ﴿لَمَن سَرَقَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 80,
+      "snippet": "مُتَكَبِّرٌ قَبْلَ",
+      "question_text": "قال تعالى: ﴿مُتَكَبِّرٌ قَبْلَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 82,
+      "snippet": "وَمَا تَنفَعُ",
+      "question_text": "قال تعالى: ﴿وَمَا تَنفَعُ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 83,
+      "snippet": "مُتَكَبِّرٌ قَبْلَ",
+      "question_text": "قال تعالى: ﴿مُتَكَبِّرٌ قَبْلَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 85,
+      "snippet": "لَشَدِيدٌ قُوَّتُهُ",
+      "question_text": "قال تعالى: ﴿لَشَدِيدٌ قُوَّتُهُ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 88,
+      "snippet": "عَذَابٌ دُونَهُ",
+      "question_text": "قال تعالى: ﴿عَذَابٌ دُونَهُ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 89,
+      "snippet": "شَيْئًا قَدِيرًا",
+      "question_text": "قال تعالى: ﴿شَيْئًا قَدِيرًا﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "ikhfa",
+      "qnum": 98,
+      "snippet": "وَمَا لَكُمْ مِنْ ذِكْرٍ",
+      "question_text": "قال تعالى: ﴿وَمَا لَكُمْ مِنْ ذِكْرٍ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 2,
+      "snippet": "أَنْبَأَكُمْ",
+      "question_text": "قال تعالى: ﴿أَنْبَأَكُمْ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 6,
+      "snippet": "مِنْ بَنِيهَا",
+      "question_text": "قال تعالى: ﴿مِنْ بَنِيهَا﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 8,
+      "snippet": "بِرِزْقٍ بِهَا",
+      "question_text": "قال تعالى: ﴿بِرِزْقٍ بِهَا﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 12,
+      "snippet": "مُسَمًّى بَعْدُ",
+      "question_text": "قال تعالى: ﴿مُسَمًّى بَعْدُ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 13,
+      "snippet": "يَوْمَئِذٍ بَدَتْ",
+      "question_text": "قال تعالى: ﴿يَوْمَئِذٍ بَدَتْ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 14,
+      "snippet": "صَيْرُورَتَهُ بِمَا",
+      "question_text": "قال تعالى: ﴿صَيْرُورَتَهُ بِمَا﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 15,
+      "snippet": "شَيْءٍ بَدِيعٍ",
+      "question_text": "قال تعالى: ﴿شَيْءٍ بَدِيعٍ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 18,
+      "snippet": "أَنْ بَلَغَ",
+      "question_text": "قال تعالى: ﴿أَنْ بَلَغَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 20,
+      "snippet": "فَأَنْبِتْ بِهِ",
+      "question_text": "قال تعالى: ﴿فَأَنْبِتْ بِهِ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 21,
+      "snippet": "أَنْ بُعِثَ",
+      "question_text": "قال تعالى: ﴿أَنْ بُعِثَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 23,
+      "snippet": "نِعْمَةً بَاطِنَةً",
+      "question_text": "قال تعالى: ﴿نِعْمَةً بَاطِنَةً﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 25,
+      "snippet": "عَذَابٌ بَائِسٌ",
+      "question_text": "قال تعالى: ﴿عَذَابٌ بَائِسٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 26,
+      "snippet": "مُسْتَقِيمٌ بِمَا",
+      "question_text": "قال تعالى: ﴿مُسْتَقِيمٌ بِمَا﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 28,
+      "snippet": "وَاللَّهُ سَمِيعٌ بَصِيرٌ",
+      "question_text": "قال تعالى: ﴿وَاللَّهُ سَمِيعٌ بَصِيرٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 29,
+      "snippet": "عَذَابًا بَلَاغًا",
+      "question_text": "قال تعالى: ﴿عَذَابًا بَلَاغًا﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 32,
+      "snippet": "عَمًى بَصِيرٌ",
+      "question_text": "قال تعالى: ﴿عَمًى بَصِيرٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 33,
+      "snippet": "مُبَرَّأُونَ بِمَا",
+      "question_text": "قال تعالى: ﴿مُبَرَّأُونَ بِمَا﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 34,
+      "snippet": "وَلَمْ يُؤْتَوْا بَبَيِّنَةٍ",
+      "question_text": "قال تعالى: ﴿وَلَمْ يُؤْتَوْا بَبَيِّنَةٍ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 35,
+      "snippet": "وَاللَّهُ بِكُلِّ شَيْءٍ بَصِيرٌ",
+      "question_text": "قال تعالى: ﴿وَاللَّهُ بِكُلِّ شَيْءٍ بَصِيرٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 36,
+      "snippet": "مُقْتَرِنَةٌ بِغَيْرِ",
+      "question_text": "قال تعالى: ﴿مُقْتَرِنَةٌ بِغَيْرِ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 41,
+      "snippet": "شَيْءٍ بَعِيدٌ",
+      "question_text": "قال تعالى: ﴿شَيْءٍ بَعِيدٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 42,
+      "snippet": "مُحِيطًا بِمَا",
+      "question_text": "قال تعالى: ﴿مُحِيطًا بِمَا﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 43,
+      "snippet": "أَنْ بُعْدًا",
+      "question_text": "قال تعالى: ﴿أَنْ بُعْدًا﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 44,
+      "snippet": "مُسْتَقِيمٌ بِذَلِكَ",
+      "question_text": "قال تعالى: ﴿مُسْتَقِيمٌ بِذَلِكَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 45,
+      "snippet": "أَنبَائُهُمْ",
+      "question_text": "قال تعالى: ﴿أَنبَائُهُمْ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 46,
+      "snippet": "عَلِيمٌ بِأَنَّهُ",
+      "question_text": "قال تعالى: ﴿عَلِيمٌ بِأَنَّهُ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 47,
+      "snippet": "أَنْ بُعْدًا",
+      "question_text": "قال تعالى: ﴿أَنْ بُعْدًا﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 48,
+      "snippet": "شَيْءٍ بَشِيرٌ",
+      "question_text": "قال تعالى: ﴿شَيْءٍ بَشِيرٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 49,
+      "snippet": "مِنْ بَدَنِهِ",
+      "question_text": "قال تعالى: ﴿مِنْ بَدَنِهِ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 51,
+      "snippet": "لَنَبْذَنْ",
+      "question_text": "قال تعالى: ﴿لَنَبْذَنْ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 55,
+      "snippet": "عَلِيمٌ بِسِرِّكُمْ",
+      "question_text": "قال تعالى: ﴿عَلِيمٌ بِسِرِّكُمْ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 57,
+      "snippet": "مِنْ بَأْسِهِ",
+      "question_text": "قال تعالى: ﴿مِنْ بَأْسِهِ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 58,
+      "snippet": "بِالْحَقِّ وَأَنْبِئْهُمْ",
+      "question_text": "قال تعالى: ﴿بِالْحَقِّ وَأَنْبِئْهُمْ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 60,
+      "snippet": "أَنْ بُعِثَ",
+      "question_text": "قال تعالى: ﴿أَنْ بُعِثَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 61,
+      "snippet": "أَن بَعَثَ",
+      "question_text": "قال تعالى: ﴿أَن بَعَثَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 62,
+      "snippet": "مِن بَنَاتِهِ",
+      "question_text": "قال تعالى: ﴿مِن بَنَاتِهِ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 63,
+      "snippet": "لَشَدِيدٌ بَأْسُهُ",
+      "question_text": "قال تعالى: ﴿لَشَدِيدٌ بَأْسُهُ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 64,
+      "snippet": "عَزِيزٌ بِذِي",
+      "question_text": "قال تعالى: ﴿عَزِيزٌ بِذِي﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 66,
+      "snippet": "مُحِيطٌ بِهِمْ",
+      "question_text": "قال تعالى: ﴿مُحِيطٌ بِهِمْ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 67,
+      "snippet": "لَشَدِيدٌ بَأْسُهُ",
+      "question_text": "قال تعالى: ﴿لَشَدِيدٌ بَأْسُهُ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 68,
+      "snippet": "شَيْءٍ بَدِيعٌ",
+      "question_text": "قال تعالى: ﴿شَيْءٍ بَدِيعٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 70,
+      "snippet": "مُبَرَّأُونَ بِمَا يَقُولُونَ",
+      "question_text": "قال تعالى: ﴿مُبَرَّأُونَ بِمَا يَقُولُونَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 71,
+      "snippet": "مَنْ بَارَكَ",
+      "question_text": "قال تعالى: ﴿مَنْ بَارَكَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 73,
+      "snippet": "مُسْتَقِيمٌ بَيْنَ",
+      "question_text": "قال تعالى: ﴿مُسْتَقِيمٌ بَيْنَ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 75,
+      "snippet": "مِن بَنَاتِ",
+      "question_text": "قال تعالى: ﴿مِن بَنَاتِ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 77,
+      "snippet": "لَسَمِيعٌ بَصِيرٌ",
+      "question_text": "قال تعالى: ﴿لَسَمِيعٌ بَصِيرٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 79,
+      "snippet": "أَنْبَاءُ الْمُرْسَلِينَ",
+      "question_text": "قال تعالى: ﴿أَنْبَاءُ الْمُرْسَلِينَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 80,
+      "snippet": "عَزِيزٌ بِذِي",
+      "question_text": "قال تعالى: ﴿عَزِيزٌ بِذِي﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 81,
+      "snippet": "أَنْبَأَنِي",
+      "question_text": "قال تعالى: ﴿أَنْبَأَنِي﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 82,
+      "snippet": "مِنْ بَعْضِهِمْ",
+      "question_text": "قال تعالى: ﴿مِنْ بَعْضِهِمْ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 83,
+      "snippet": "أَنْبَأَكُمُ",
+      "question_text": "قال تعالى: ﴿أَنْبَأَكُمُ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 85,
+      "snippet": "أَنْ بُغَاتُ",
+      "question_text": "قال تعالى: ﴿أَنْ بُغَاتُ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 88,
+      "snippet": "أَنْ بَلَغَ مَطْلَعَ",
+      "question_text": "قال تعالى: ﴿أَنْ بَلَغَ مَطْلَعَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 89,
+      "snippet": "أَنْبَأْتُكُمْ",
+      "question_text": "قال تعالى: ﴿أَنْبَأْتُكُمْ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 93,
+      "snippet": "أَنْ بَعَثَ",
+      "question_text": "قال تعالى: ﴿أَنْ بَعَثَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 95,
+      "snippet": "شَيْءٍ بَدِيعٌ",
+      "question_text": "قال تعالى: ﴿شَيْءٍ بَدِيعٌ﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 96,
+      "snippet": "مَنْ بَارَكَ",
+      "question_text": "قال تعالى: ﴿مَنْ بَارَكَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 97,
+      "snippet": "أَنْ بَشَّرَهُمْ",
+      "question_text": "قال تعالى: ﴿أَنْ بَشَّرَهُمْ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 98,
+      "snippet": "سَمِيعٌ بِمَا",
+      "question_text": "قال تعالى: ﴿سَمِيعٌ بِمَا﴾ - ما حكم التنوين؟"
+    },
+    {
+      "section": "noon_tanween",
+      "part": "iqlab",
+      "qnum": 100,
+      "snippet": "أَنْ بَلَغَ",
+      "question_text": "قال تعالى: ﴿أَنْ بَلَغَ﴾ - ما حكم النون الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 3,
+      "snippet": "مَا كَانَ لَهُمْ بِهِ",
+      "question_text": "قال تعالى: ﴿مَا كَانَ لَهُمْ بِهِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 5,
+      "snippet": "كَمْ بَغَوْا",
+      "question_text": "قال تعالى: ﴿كَمْ بَغَوْا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 9,
+      "snippet": "لَكُمْ بَغْيًا",
+      "question_text": "قال تعالى: ﴿لَكُمْ بَغْيًا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 14,
+      "snippet": "وَلَا أَنْتُمْ بِمَا",
+      "question_text": "قال تعالى: ﴿وَلَا أَنْتُمْ بِمَا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 15,
+      "snippet": "وَمِنْهُمْ بَرِيءٌ",
+      "question_text": "قال تعالى: ﴿وَمِنْهُمْ بَرِيءٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 16,
+      "snippet": "لَكُمْ بَيِّنَاتٌ",
+      "question_text": "قال تعالى: ﴿لَكُمْ بَيِّنَاتٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 17,
+      "snippet": "إِلَيْهِمْ بِمَا",
+      "question_text": "قال تعالى: ﴿إِلَيْهِمْ بِمَا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 21,
+      "snippet": "أَمْ بِغَيْرِ",
+      "question_text": "قال تعالى: ﴿أَمْ بِغَيْرِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 23,
+      "snippet": "أَمْ بِسِحْرٍ",
+      "question_text": "قال تعالى: ﴿أَمْ بِسِحْرٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 28,
+      "snippet": "أَمْ بِكِتَابٍ",
+      "question_text": "قال تعالى: ﴿أَمْ بِكِتَابٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 29,
+      "snippet": "وَجَاءَهُمْ بَيِّنَاتٌ",
+      "question_text": "قال تعالى: ﴿وَجَاءَهُمْ بَيِّنَاتٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 30,
+      "snippet": "أَمْ بِغَيْرِ",
+      "question_text": "قال تعالى: ﴿أَمْ بِغَيْرِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 32,
+      "snippet": "عَلَيْهِمْ بِآيَاتِنَا",
+      "question_text": "قال تعالى: ﴿عَلَيْهِمْ بِآيَاتِنَا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 33,
+      "snippet": "أَمْ بِغَيْرِ",
+      "question_text": "قال تعالى: ﴿أَمْ بِغَيْرِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 34,
+      "snippet": "لَهُمْ بَشِيرًا",
+      "question_text": "قال تعالى: ﴿لَهُمْ بَشِيرًا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 35,
+      "snippet": "وَإِنَّ رَبَّهُمْ بِهِمْ لَخَبِيرٌ بَصِيرٌ",
+      "question_text": "قال تعالى: ﴿وَإِنَّ رَبَّهُمْ بِهِمْ لَخَبِيرٌ بَصِيرٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 36,
+      "snippet": "إِنْ كُنْتُمْ بِهِ",
+      "question_text": "قال تعالى: ﴿إِنْ كُنْتُمْ بِهِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 37,
+      "snippet": "وَأَنْعَمْتُمْ بِهِ",
+      "question_text": "قال تعالى: ﴿وَأَنْعَمْتُمْ بِهِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 38,
+      "snippet": "تَحْمِلُكُمْ بِالْبَحْرِ",
+      "question_text": "قال تعالى: ﴿تَحْمِلُكُمْ بِالْبَحْرِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 39,
+      "snippet": "جِئْتُمُونِي بِهِ",
+      "question_text": "قال تعالى: ﴿جِئْتُمُونِي بِهِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 40,
+      "snippet": "أَمْ بِسُوءٍ",
+      "question_text": "قال تعالى: ﴿أَمْ بِسُوءٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 43,
+      "snippet": "لَكُمْ بَيِّنَةٌ",
+      "question_text": "قال تعالى: ﴿لَكُمْ بَيِّنَةٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 44,
+      "snippet": "فَلَمَّا رَأَوْهُمْ بِرَحْمَةٍ",
+      "question_text": "قال تعالى: ﴿فَلَمَّا رَأَوْهُمْ بِرَحْمَةٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 45,
+      "snippet": "عَلَيْهِمْ بِآيَاتِنَا",
+      "question_text": "قال تعالى: ﴿عَلَيْهِمْ بِآيَاتِنَا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 46,
+      "snippet": "أَمْ بِسُوءٍ",
+      "question_text": "قال تعالى: ﴿أَمْ بِسُوءٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 47,
+      "snippet": "كَمْ بَغَوْا",
+      "question_text": "قال تعالى: ﴿كَمْ بَغَوْا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 48,
+      "snippet": "مَا أَنْتُمْ بِهِ",
+      "question_text": "قال تعالى: ﴿مَا أَنْتُمْ بِهِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 51,
+      "snippet": "وَلَا أَنْتُمْ بِعَابِدُونَ",
+      "question_text": "قال تعالى: ﴿وَلَا أَنْتُمْ بِعَابِدُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 52,
+      "snippet": "أَمْ بِكِتَابٍ",
+      "question_text": "قال تعالى: ﴿أَمْ بِكِتَابٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 55,
+      "snippet": "وَجِئْتُمْ بِهِ",
+      "question_text": "قال تعالى: ﴿وَجِئْتُمْ بِهِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 57,
+      "snippet": "وَهُمْ بِخَارِجِينَ",
+      "question_text": "قال تعالى: ﴿وَهُمْ بِخَارِجِينَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 60,
+      "snippet": "لَهُمْ بَيِّنَاتٌ",
+      "question_text": "قال تعالى: ﴿لَهُمْ بَيِّنَاتٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 61,
+      "snippet": "مِنْ قَبْلِهِمْ بِالْخَيْرِ",
+      "question_text": "قال تعالى: ﴿مِنْ قَبْلِهِمْ بِالْخَيْرِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 62,
+      "snippet": "إِلَيْهِمْ بِرَحْمَةٍ",
+      "question_text": "قال تعالى: ﴿إِلَيْهِمْ بِرَحْمَةٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 63,
+      "snippet": "لَهُمْ بَشِيرًا",
+      "question_text": "قال تعالى: ﴿لَهُمْ بَشِيرًا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 64,
+      "snippet": "عَلَيْهِمْ بِكِتَابٍ",
+      "question_text": "قال تعالى: ﴿عَلَيْهِمْ بِكِتَابٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 66,
+      "snippet": "وَمِنْهُمْ بِرَحْمَةٍ",
+      "question_text": "قال تعالى: ﴿وَمِنْهُمْ بِرَحْمَةٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 67,
+      "snippet": "إِنْ كُنْتُمْ بِهِ",
+      "question_text": "قال تعالى: ﴿إِنْ كُنْتُمْ بِهِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 68,
+      "snippet": "أَمْ بِسِحْرٍ",
+      "question_text": "قال تعالى: ﴿أَمْ بِسِحْرٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 69,
+      "snippet": "لَكُمْ بَيِّنَةٌ",
+      "question_text": "قال تعالى: ﴿لَكُمْ بَيِّنَةٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 71,
+      "snippet": "إِلَيْهِمْ بِمَا",
+      "question_text": "قال تعالى: ﴿إِلَيْهِمْ بِمَا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 72,
+      "snippet": "إِنَّ رَبَّكُمْ بِهِمْ",
+      "question_text": "قال تعالى: ﴿إِنَّ رَبَّكُمْ بِهِمْ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 73,
+      "snippet": "أَمْ بِغَيْرِ",
+      "question_text": "قال تعالى: ﴿أَمْ بِغَيْرِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 74,
+      "snippet": "كَمْ بَغَوْا",
+      "question_text": "قال تعالى: ﴿كَمْ بَغَوْا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 76,
+      "snippet": "أَمْ بِسُوءٍ",
+      "question_text": "قال تعالى: ﴿أَمْ بِسُوءٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 77,
+      "snippet": "تَحْمِلُكُمْ بِالْبَحْرِ",
+      "question_text": "قال تعالى: ﴿تَحْمِلُكُمْ بِالْبَحْرِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 80,
+      "snippet": "وَلَا أَنْتُمْ بِعَابِدُونَ",
+      "question_text": "قال تعالى: ﴿وَلَا أَنْتُمْ بِعَابِدُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 82,
+      "snippet": "أَمْ بِكِتَابٍ",
+      "question_text": "قال تعالى: ﴿أَمْ بِكِتَابٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 83,
+      "snippet": "لَهُمْ بَيِّنَاتٌ",
+      "question_text": "قال تعالى: ﴿لَهُمْ بَيِّنَاتٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 84,
+      "snippet": "وَمِنْهُمْ بَرِيءٌ",
+      "question_text": "قال تعالى: ﴿وَمِنْهُمْ بَرِيءٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 85,
+      "snippet": "إِنْ كُنْتُمْ بِهِ",
+      "question_text": "قال تعالى: ﴿إِنْ كُنْتُمْ بِهِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 87,
+      "snippet": "أَمْ بِغَيْرِ",
+      "question_text": "قال تعالى: ﴿أَمْ بِغَيْرِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 90,
+      "snippet": "كَمْ بَغَوْا",
+      "question_text": "قال تعالى: ﴿كَمْ بَغَوْا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 91,
+      "snippet": "إِنَّ رَبَّكُمْ بِهِمْ",
+      "question_text": "قال تعالى: ﴿إِنَّ رَبَّكُمْ بِهِمْ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 93,
+      "snippet": "جِئْتُمُونِي بِهِ",
+      "question_text": "قال تعالى: ﴿جِئْتُمُونِي بِهِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 94,
+      "snippet": "أَمْ بِسُوءٍ",
+      "question_text": "قال تعالى: ﴿أَمْ بِسُوءٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 98,
+      "snippet": "وَلَا أَنْتُمْ بِمَا",
+      "question_text": "قال تعالى: ﴿وَلَا أَنْتُمْ بِمَا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "ikhfa_shafawi",
+      "qnum": 100,
+      "snippet": "أَمْ بِغَيْرِ",
+      "question_text": "قال تعالى: ﴿أَمْ بِغَيْرِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 5,
+      "snippet": "إِنَّهُمْ مُجْرِمُونَ",
+      "question_text": "قال تعالى: ﴿إِنَّهُمْ مُجْرِمُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 7,
+      "snippet": "وَأَمْتَعْنَاهُمْ مُدَّةً",
+      "question_text": "قال تعالى: ﴿وَأَمْتَعْنَاهُمْ مُدَّةً﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 8,
+      "snippet": "كُنْتُمْ مُهْتَدِينَ",
+      "question_text": "قال تعالى: ﴿كُنْتُمْ مُهْتَدِينَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 9,
+      "snippet": "وَمِنْهُمْ مُهْتَدُونَ",
+      "question_text": "قال تعالى: ﴿وَمِنْهُمْ مُهْتَدُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 10,
+      "snippet": "لِتَبْلُوَكُمْ مَنْ",
+      "question_text": "قال تعالى: ﴿لِتَبْلُوَكُمْ مَنْ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 12,
+      "snippet": "لَكُمْ مَغْفِرَةٌ",
+      "question_text": "قال تعالى: ﴿لَكُمْ مَغْفِرَةٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 13,
+      "snippet": "عَلَيْكُمْ مُّلُوكًا",
+      "question_text": "قال تعالى: ﴿عَلَيْكُمْ مُّلُوكًا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 15,
+      "snippet": "لَهُمْ مِيثَاقًا",
+      "question_text": "قال تعالى: ﴿لَهُمْ مِيثَاقًا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 16,
+      "snippet": "إِنَّهُمْ مُبْطِلُونَ",
+      "question_text": "قال تعالى: ﴿إِنَّهُمْ مُبْطِلُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 17,
+      "snippet": "خَلَقْنَاكُمْ مِنْ مَاءٍ",
+      "question_text": "قال تعالى: ﴿خَلَقْنَاكُمْ مِنْ مَاءٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 18,
+      "snippet": "فَآتَاهُمْ مَّا",
+      "question_text": "قال تعالى: ﴿فَآتَاهُمْ مَّا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 20,
+      "snippet": "بَلْ هُمْ مُقْسَمُونَ",
+      "question_text": "قال تعالى: ﴿بَلْ هُمْ مُقْسَمُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 21,
+      "snippet": "وَمَا لَكُمْ مِّنْ دُونِهِ",
+      "question_text": "قال تعالى: ﴿وَمَا لَكُمْ مِّنْ دُونِهِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 22,
+      "snippet": "مِنْ أَجْلِكُمْ مَّذْهَبٌ",
+      "question_text": "قال تعالى: ﴿مِنْ أَجْلِكُمْ مَّذْهَبٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 23,
+      "snippet": "فَمَا لَكُمْ مِّنْ",
+      "question_text": "قال تعالى: ﴿فَمَا لَكُمْ مِّنْ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 26,
+      "snippet": "إِلَيْهِمْ مَالًا",
+      "question_text": "قال تعالى: ﴿إِلَيْهِمْ مَالًا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 27,
+      "snippet": "أَمْ مَكَّنَّاهُمْ",
+      "question_text": "قال تعالى: ﴿أَمْ مَكَّنَّاهُمْ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 29,
+      "snippet": "مَا لَهُمْ مِنْ عِلْمٍ",
+      "question_text": "قال تعالى: ﴿مَا لَهُمْ مِنْ عِلْمٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 31,
+      "snippet": "وَلَا عَلَيْكُمْ مَّغْفِرَةٌ",
+      "question_text": "قال تعالى: ﴿وَلَا عَلَيْكُمْ مَّغْفِرَةٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 32,
+      "snippet": "يُمْسِكْ مِّنْ",
+      "question_text": "قال تعالى: ﴿يُمْسِكْ مِّنْ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 33,
+      "snippet": "وَأَمْتَعْنَاهُمْ مُّدَّةً",
+      "question_text": "قال تعالى: ﴿وَأَمْتَعْنَاهُمْ مُّدَّةً﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 34,
+      "snippet": "إِنَّكُمْ مَّيِّتُونَ",
+      "question_text": "قال تعالى: ﴿إِنَّكُمْ مَّيِّتُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 35,
+      "snippet": "عَلَيْهِمْ مُحْكَمَةٌ",
+      "question_text": "قال تعالى: ﴿عَلَيْهِمْ مُحْكَمَةٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 37,
+      "snippet": "إِنَّهُمْ مُبْطِلُونَ",
+      "question_text": "قال تعالى: ﴿إِنَّهُمْ مُبْطِلُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 39,
+      "snippet": "لَكُمْ مَغْفِرَةٌ",
+      "question_text": "قال تعالى: ﴿لَكُمْ مَغْفِرَةٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 40,
+      "snippet": "كُنْتُمْ مُهْتَدِينَ",
+      "question_text": "قال تعالى: ﴿كُنْتُمْ مُهْتَدِينَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 41,
+      "snippet": "إِنَّهُمْ مُحْسِنُونَ",
+      "question_text": "قال تعالى: ﴿إِنَّهُمْ مُحْسِنُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 42,
+      "snippet": "لَكُمْ مَّيِّتُونَ",
+      "question_text": "قال تعالى: ﴿لَكُمْ مَّيِّتُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 43,
+      "snippet": "إِنَّهُمْ مُجْرِمُونَ",
+      "question_text": "قال تعالى: ﴿إِنَّهُمْ مُجْرِمُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 46,
+      "snippet": "عَلَيْكُمْ مُؤْصَدَةٌ",
+      "question_text": "قال تعالى: ﴿عَلَيْكُمْ مُؤْصَدَةٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 48,
+      "snippet": "فَمَا لَكُمْ مِّنْ",
+      "question_text": "قال تعالى: ﴿فَمَا لَكُمْ مِّنْ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 49,
+      "snippet": "وَهُمْ مُّقْسَمُونَ",
+      "question_text": "قال تعالى: ﴿وَهُمْ مُّقْسَمُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 50,
+      "snippet": "إِنَّهُمْ مُحْسِنُونَ",
+      "question_text": "قال تعالى: ﴿إِنَّهُمْ مُحْسِنُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 51,
+      "snippet": "أَمْ مَكَّنَّاهُمْ",
+      "question_text": "قال تعالى: ﴿أَمْ مَكَّنَّاهُمْ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 53,
+      "snippet": "لِتَبْلُوَكُمْ مَنْ",
+      "question_text": "قال تعالى: ﴿لِتَبْلُوَكُمْ مَنْ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 55,
+      "snippet": "خَلَقْنَاكُمْ مِنْ مَاءٍ",
+      "question_text": "قال تعالى: ﴿خَلَقْنَاكُمْ مِنْ مَاءٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 56,
+      "snippet": "لَهُمْ مِيثَاقًا",
+      "question_text": "قال تعالى: ﴿لَهُمْ مِيثَاقًا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 57,
+      "snippet": "وَأَمْتَعْنَاهُمْ مُدَّةً",
+      "question_text": "قال تعالى: ﴿وَأَمْتَعْنَاهُمْ مُدَّةً﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 59,
+      "snippet": "إِنَّكُمْ مَّيِّتُونَ",
+      "question_text": "قال تعالى: ﴿إِنَّكُمْ مَّيِّتُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 61,
+      "snippet": "إِلَيْهِمْ مَالًا",
+      "question_text": "قال تعالى: ﴿إِلَيْهِمْ مَالًا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 62,
+      "snippet": "عَلَيْهِمْ مُّحْكَمَةٌ",
+      "question_text": "قال تعالى: ﴿عَلَيْهِمْ مُّحْكَمَةٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 64,
+      "snippet": "فَآتَاهُمْ مَّا",
+      "question_text": "قال تعالى: ﴿فَآتَاهُمْ مَّا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 66,
+      "snippet": "يُمْسِكْ مِّنْ",
+      "question_text": "قال تعالى: ﴿يُمْسِكْ مِّنْ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 68,
+      "snippet": "وَمَا لَكُمْ مِّنْ دُونِهِ",
+      "question_text": "قال تعالى: ﴿وَمَا لَكُمْ مِّنْ دُونِهِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 70,
+      "snippet": "لَكُمْ مَّغْفِرَةٌ",
+      "question_text": "قال تعالى: ﴿لَكُمْ مَّغْفِرَةٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 71,
+      "snippet": "كُنْتُمْ مُهْتَدِينَ",
+      "question_text": "قال تعالى: ﴿كُنْتُمْ مُهْتَدِينَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 75,
+      "snippet": "وَمِنْهُمْ مُهْتَدُونَ",
+      "question_text": "قال تعالى: ﴿وَمِنْهُمْ مُهْتَدُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 76,
+      "snippet": "لَكُمْ مَّيِّتُونَ",
+      "question_text": "قال تعالى: ﴿لَكُمْ مَّيِّتُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 77,
+      "snippet": "إِنَّهُمْ مُجْرِمُونَ",
+      "question_text": "قال تعالى: ﴿إِنَّهُمْ مُجْرِمُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 78,
+      "snippet": "فَمَا لَكُمْ مِّنْ",
+      "question_text": "قال تعالى: ﴿فَمَا لَكُمْ مِّنْ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 80,
+      "snippet": "إِنَّهُمْ مُحْسِنُونَ",
+      "question_text": "قال تعالى: ﴿إِنَّهُمْ مُحْسِنُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 81,
+      "snippet": "لِتَبْلُوَكُمْ مَنْ",
+      "question_text": "قال تعالى: ﴿لِتَبْلُوَكُمْ مَنْ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 82,
+      "snippet": "إِنَّكُمْ مَّيِّتُونَ",
+      "question_text": "قال تعالى: ﴿إِنَّكُمْ مَّيِّتُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 85,
+      "snippet": "أَمْ مَكَّنَّاهُمْ",
+      "question_text": "قال تعالى: ﴿أَمْ مَكَّنَّاهُمْ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 87,
+      "snippet": "خَلَقْنَاكُمْ مِنْ مَاءٍ",
+      "question_text": "قال تعالى: ﴿خَلَقْنَاكُمْ مِنْ مَاءٍ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 90,
+      "snippet": "وَهُمْ مُّقْسَمُونَ",
+      "question_text": "قال تعالى: ﴿وَهُمْ مُّقْسَمُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 93,
+      "snippet": "إِلَيْهِمْ مَالًا",
+      "question_text": "قال تعالى: ﴿إِلَيْهِمْ مَالًا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 94,
+      "snippet": "وَأَمْتَعْنَاهُمْ مُّدَّةً",
+      "question_text": "قال تعالى: ﴿وَأَمْتَعْنَاهُمْ مُّدَّةً﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 97,
+      "snippet": "عَلَيْهِمْ مُّحْكَمَةٌ",
+      "question_text": "قال تعالى: ﴿عَلَيْهِمْ مُّحْكَمَةٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 98,
+      "snippet": "فَآتَاهُمْ مَّا",
+      "question_text": "قال تعالى: ﴿فَآتَاهُمْ مَّا﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idgham_shafawi",
+      "qnum": 100,
+      "snippet": "يُمْسِكْ مِّنْ",
+      "question_text": "قال تعالى: ﴿يُمْسِكْ مِّنْ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 2,
+      "snippet": "إِنَّهُمْ يَعْمَلُونَ",
+      "question_text": "قال تعالى: ﴿إِنَّهُمْ يَعْمَلُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 8,
+      "snippet": "أَنْتُمْ وَهُوَ",
+      "question_text": "قال تعالى: ﴿أَنْتُمْ وَهُوَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 10,
+      "snippet": "عَلَيْهِمْ عَذَابٌ",
+      "question_text": "قال تعالى: ﴿عَلَيْهِمْ عَذَابٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 20,
+      "snippet": "إِنْ كُنْتُمْ تَكْرَهُونَهُ",
+      "question_text": "قال تعالى: ﴿إِنْ كُنْتُمْ تَكْرَهُونَهُ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 23,
+      "snippet": "وَمِنْهُمْ وَمَنْ يَتَّقِ",
+      "question_text": "قال تعالى: ﴿وَمِنْهُمْ وَمَنْ يَتَّقِ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 24,
+      "snippet": "لَهُمْ عَمَلٌ",
+      "question_text": "قال تعالى: ﴿لَهُمْ عَمَلٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 26,
+      "snippet": "أَمْ لَهُمْ أَجْرٌ",
+      "question_text": "قال تعالى: ﴿أَمْ لَهُمْ أَجْرٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 27,
+      "snippet": "عَلَيْهِمْ عَذَابٌ",
+      "question_text": "قال تعالى: ﴿عَلَيْهِمْ عَذَابٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 31,
+      "snippet": "وَلَا عَلَيْكُمْ جُنَاحٌ",
+      "question_text": "قال تعالى: ﴿وَلَا عَلَيْكُمْ جُنَاحٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 32,
+      "snippet": "إِنَّهُمْ لَكُمْ عَدُوٌّ",
+      "question_text": "قال تعالى: ﴿إِنَّهُمْ لَكُمْ عَدُوٌّ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 48,
+      "snippet": "عَلَيْهِمْ قَوْلٌ",
+      "question_text": "قال تعالى: ﴿عَلَيْهِمْ قَوْلٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 49,
+      "snippet": "فَهُمْ خَاسِرُونَ",
+      "question_text": "قال تعالى: ﴿فَهُمْ خَاسِرُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 51,
+      "snippet": "عَلَيْهِمْ أَجْرٌ",
+      "question_text": "قال تعالى: ﴿عَلَيْهِمْ أَجْرٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 53,
+      "snippet": "إِنْ كُنْتُمْ تَتَّقُونَ",
+      "question_text": "قال تعالى: ﴿إِنْ كُنْتُمْ تَتَّقُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 57,
+      "snippet": "وَلَا هُمْ يُسْأَلُونَ",
+      "question_text": "قال تعالى: ﴿وَلَا هُمْ يُسْأَلُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 60,
+      "snippet": "أَنْتُمْ وَهُوَ",
+      "question_text": "قال تعالى: ﴿أَنْتُمْ وَهُوَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 61,
+      "snippet": "وَمِنْهُمْ وَمَنْ",
+      "question_text": "قال تعالى: ﴿وَمِنْهُمْ وَمَنْ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 62,
+      "snippet": "لَهُمْ عَمَلٌ",
+      "question_text": "قال تعالى: ﴿لَهُمْ عَمَلٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 63,
+      "snippet": "إِنَّهُمْ لَكُمْ عَدُوٌّ",
+      "question_text": "قال تعالى: ﴿إِنَّهُمْ لَكُمْ عَدُوٌّ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 71,
+      "snippet": "أَمْ لَهُمْ أَجْرٌ",
+      "question_text": "قال تعالى: ﴿أَمْ لَهُمْ أَجْرٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 79,
+      "snippet": "عَلَيْهِمْ عَذَابٌ",
+      "question_text": "قال تعالى: ﴿عَلَيْهِمْ عَذَابٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 80,
+      "snippet": "فَهُمْ خَاسِرُونَ",
+      "question_text": "قال تعالى: ﴿فَهُمْ خَاسِرُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 81,
+      "snippet": "إِنَّهُمْ يَعْمَلُونَ",
+      "question_text": "قال تعالى: ﴿إِنَّهُمْ يَعْمَلُونَ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 88,
+      "snippet": "لَهُمْ عَمَلٌ",
+      "question_text": "قال تعالى: ﴿لَهُمْ عَمَلٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 90,
+      "snippet": "إِنْ كُنْتُمْ تَكْرَهُونَهُ",
+      "question_text": "قال تعالى: ﴿إِنْ كُنْتُمْ تَكْرَهُونَهُ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "meem_sakinah",
+      "part": "idhar_shafawi",
+      "qnum": 99,
+      "snippet": "عَلَيْهِمْ قَوْلٌ",
+      "question_text": "قال تعالى: ﴿عَلَيْهِمْ قَوْلٌ﴾ - ما حكم الميم الساكنة؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 10,
+      "snippet": "بَنَاؤُهَا",
+      "question_text": "قال تعالى: ﴿بَنَاؤُهَا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 14,
+      "snippet": "مَلَائِكَتَهُمْ",
+      "question_text": "قال تعالى: ﴿مَلَائِكَتَهُمْ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 17,
+      "snippet": "أَفَتُجَادِلُونَنِي فِي أَسْمَاءٍ",
+      "question_text": "قال تعالى: ﴿أَفَتُجَادِلُونَنِي فِي أَسْمَاءٍ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 23,
+      "snippet": "سَمَائِهَا",
+      "question_text": "قال تعالى: ﴿سَمَائِهَا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 35,
+      "snippet": "بِالْأَسْوَاءِ",
+      "question_text": "قال تعالى: ﴿بِالْأَسْوَاءِ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 36,
+      "snippet": "جَاءُوا بِالسَّيِّئَةِ",
+      "question_text": "قال تعالى: ﴿جَاءُوا بِالسَّيِّئَةِ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 40,
+      "snippet": "أَفَتُجَادِلُونَنِي فِي أَسْمَاءٍ",
+      "question_text": "قال تعالى: ﴿أَفَتُجَادِلُونَنِي فِي أَسْمَاءٍ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 44,
+      "snippet": "بَنَاؤُهَا",
+      "question_text": "قال تعالى: ﴿بَنَاؤُهَا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 57,
+      "snippet": "سَمَائِهَا",
+      "question_text": "قال تعالى: ﴿سَمَائِهَا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 58,
+      "snippet": "مَلَائِكَتَهُمْ",
+      "question_text": "قال تعالى: ﴿مَلَائِكَتَهُمْ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 59,
+      "snippet": "جَاءُوا بِالسَّيِّئَةِ",
+      "question_text": "قال تعالى: ﴿جَاءُوا بِالسَّيِّئَةِ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 74,
+      "snippet": "بَنَاؤُهَا",
+      "question_text": "قال تعالى: ﴿بَنَاؤُهَا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 76,
+      "snippet": "سَمَائِهَا",
+      "question_text": "قال تعالى: ﴿سَمَائِهَا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 96,
+      "snippet": "أَفَتُجَادِلُونَنِي فِي أَسْمَاءٍ",
+      "question_text": "قال تعالى: ﴿أَفَتُجَادِلُونَنِي فِي أَسْمَاءٍ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 99,
+      "snippet": "سَمَائِهَا",
+      "question_text": "قال تعالى: ﴿سَمَائِهَا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_muttasil",
+      "qnum": 100,
+      "snippet": "بَنَاؤُهَا",
+      "question_text": "قال تعالى: ﴿بَنَاؤُهَا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 8,
+      "snippet": "قَالُوا يَا أَبَتَنَا",
+      "question_text": "قال تعالى: ﴿قَالُوا يَا أَبَتَنَا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 14,
+      "snippet": "أَوْ فِي أُذُنِكَ",
+      "question_text": "قال تعالى: ﴿أَوْ فِي أُذُنِكَ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 15,
+      "snippet": "وَمَا آتَيْنَاكُمْ",
+      "question_text": "قال تعالى: ﴿وَمَا آتَيْنَاكُمْ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 18,
+      "snippet": "قُلْ إِنَّنِي أَمَرْتُ",
+      "question_text": "قال تعالى: ﴿قُلْ إِنَّنِي أَمَرْتُ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 24,
+      "snippet": "فَمَا أَنْتَ بِنِعْمَةِ رَبِّكَ",
+      "question_text": "قال تعالى: ﴿فَمَا أَنْتَ بِنِعْمَةِ رَبِّكَ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 27,
+      "snippet": "وَلَا تَتَّبِعُوا أَهْوَاءَهُمْ",
+      "question_text": "قال تعالى: ﴿وَلَا تَتَّبِعُوا أَهْوَاءَهُمْ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 32,
+      "snippet": "عَلَى أَنْ أُصْلِحَ",
+      "question_text": "قال تعالى: ﴿عَلَى أَنْ أُصْلِحَ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 33,
+      "snippet": "وَمَا آتَيْنَاكُمْ",
+      "question_text": "قال تعالى: ﴿وَمَا آتَيْنَاكُمْ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 34,
+      "snippet": "وَأَنَا أُخْرَجُ",
+      "question_text": "قال تعالى: ﴿وَأَنَا أُخْرَجُ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 38,
+      "snippet": "قَالُوا يَا أَبَتَنَا",
+      "question_text": "قال تعالى: ﴿قَالُوا يَا أَبَتَنَا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 42,
+      "snippet": "فَمَا أَنْتَ بِنِعْمَةِ رَبِّكَ",
+      "question_text": "قال تعالى: ﴿فَمَا أَنْتَ بِنِعْمَةِ رَبِّكَ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 49,
+      "snippet": "وَأَنَا أُخْرَجُ",
+      "question_text": "قال تعالى: ﴿وَأَنَا أُخْرَجُ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 50,
+      "snippet": "قُلْ إِنَّنِي أَمَرْتُ",
+      "question_text": "قال تعالى: ﴿قُلْ إِنَّنِي أَمَرْتُ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 53,
+      "snippet": "عَلَى أَنْ أُصْلِحَ",
+      "question_text": "قال تعالى: ﴿عَلَى أَنْ أُصْلِحَ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 54,
+      "snippet": "وَمَا آتَيْنَاكُمْ",
+      "question_text": "قال تعالى: ﴿وَمَا آتَيْنَاكُمْ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 56,
+      "snippet": "أَوْ فِي أُذُنِكَ",
+      "question_text": "قال تعالى: ﴿أَوْ فِي أُذُنِكَ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 60,
+      "snippet": "فَمَا أَنْتَ بِنِعْمَةِ رَبِّكَ",
+      "question_text": "قال تعالى: ﴿فَمَا أَنْتَ بِنِعْمَةِ رَبِّكَ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 71,
+      "snippet": "قُلْ إِنَّنِي أَمَرْتُ",
+      "question_text": "قال تعالى: ﴿قُلْ إِنَّنِي أَمَرْتُ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 73,
+      "snippet": "وَأَنَا أُخْرَجُ",
+      "question_text": "قال تعالى: ﴿وَأَنَا أُخْرَجُ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 75,
+      "snippet": "وَمَا آتَيْنَاكُمْ",
+      "question_text": "قال تعالى: ﴿وَمَا آتَيْنَاكُمْ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 76,
+      "snippet": "أَوْ فِي أُذُنِكَ",
+      "question_text": "قال تعالى: ﴿أَوْ فِي أُذُنِكَ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 77,
+      "snippet": "عَلَى أَنْ أُصْلِحَ",
+      "question_text": "قال تعالى: ﴿عَلَى أَنْ أُصْلِحَ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 82,
+      "snippet": "فَمَا أَنْتَ بِنِعْمَةِ رَبِّكَ",
+      "question_text": "قال تعالى: ﴿فَمَا أَنْتَ بِنِعْمَةِ رَبِّكَ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 85,
+      "snippet": "قَالُوا يَا أَبَتَنَا",
+      "question_text": "قال تعالى: ﴿قَالُوا يَا أَبَتَنَا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 92,
+      "snippet": "قُلْ إِنَّنِي أَمَرْتُ",
+      "question_text": "قال تعالى: ﴿قُلْ إِنَّنِي أَمَرْتُ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 94,
+      "snippet": "عَلَى أَنْ أُصْلِحَ",
+      "question_text": "قال تعالى: ﴿عَلَى أَنْ أُصْلِحَ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_munfasil",
+      "qnum": 99,
+      "snippet": "وَلَا تَتَّبِعُوا أَهْوَاءَهُمْ",
+      "question_text": "قال تعالى: ﴿وَلَا تَتَّبِعُوا أَهْوَاءَهُمْ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_lazim",
+      "qnum": 7,
+      "snippet": "وَالصَّاخَّةُ",
+      "question_text": "قال تعالى: ﴿وَالصَّاخَّةُ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_lazim",
+      "qnum": 15,
+      "snippet": "الصَّوَاخَّةُ",
+      "question_text": "قال تعالى: ﴿الصَّوَاخَّةُ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_lazim",
+      "qnum": 34,
+      "snippet": "وَالصَّاخَّةُ",
+      "question_text": "قال تعالى: ﴿وَالصَّاخَّةُ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_lazim",
+      "qnum": 60,
+      "snippet": "وَالصَّاخَّةُ",
+      "question_text": "قال تعالى: ﴿وَالصَّاخَّةُ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_lazim",
+      "qnum": 75,
+      "snippet": "وَالصَّاخَّةُ",
+      "question_text": "قال تعالى: ﴿وَالصَّاخَّةُ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_lazim",
+      "qnum": 89,
+      "snippet": "وَالصَّاخَّةُ",
+      "question_text": "قال تعالى: ﴿وَالصَّاخَّةُ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_tabii",
+      "qnum": 24,
+      "snippet": "لِتَقْضُوا",
+      "question_text": "قال تعالى: ﴿لِتَقْضُوا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_tabii",
+      "qnum": 30,
+      "snippet": "يَوْمَ يُحْشَرُونَ",
+      "question_text": "قال تعالى: ﴿يَوْمَ يُحْشَرُونَ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_tabii",
+      "qnum": 34,
+      "snippet": "وَبَارِكْ لَنَا",
+      "question_text": "قال تعالى: ﴿وَبَارِكْ لَنَا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_tabii",
+      "qnum": 45,
+      "snippet": "تَأْكُلُونَهَا",
+      "question_text": "قال تعالى: ﴿تَأْكُلُونَهَا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_tabii",
+      "qnum": 46,
+      "snippet": "لِتَقْضُوا",
+      "question_text": "قال تعالى: ﴿لِتَقْضُوا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_tabii",
+      "qnum": 56,
+      "snippet": "وَبَارِكْ لَنَا",
+      "question_text": "قال تعالى: ﴿وَبَارِكْ لَنَا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_tabii",
+      "qnum": 80,
+      "snippet": "يَوْمَ يُحْشَرُونَ",
+      "question_text": "قال تعالى: ﴿يَوْمَ يُحْشَرُونَ﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_tabii",
+      "qnum": 89,
+      "snippet": "تَأْكُلُونَهَا",
+      "question_text": "قال تعالى: ﴿تَأْكُلُونَهَا﴾ - ما نوع المد؟"
+    },
+    {
+      "section": "madd",
+      "part": "madd_tabii",
+      "qnum": 95,
+      "snippet": "وَبَارِكْ لَنَا",
+      "question_text": "قال تعالى: ﴿وَبَارِكْ لَنَا﴾ - ما نوع المد؟"
+    }
+  ]
+}

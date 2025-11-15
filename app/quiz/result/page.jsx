@@ -1,4 +1,4 @@
-// app/quiz/result/page.js
+// app/result/page.jsx
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
@@ -14,10 +14,11 @@ function toEnglishDigits(input = '') {
     '٠':'0','١':'1','٢':'2','٣':'3','٤':'4',
     '٥':'5','٦':'6','٧':'7','٨':'8','٩':'9',
     '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4',
-    '۵':'5','۶':'6','۷':'7','۸':'8','۹':'9'
+    '۵':'5','۶':'6','۷':'7','۸':'۸','۹':'9'
   };
   return String(input).replace(/[٠-٩۰-۹]/g, d => map[d] ?? d);
 }
+
 function formatDate(date) {
   const d = new Date(date || Date.now());
   const day = String(d.getDate()).padStart(2, '0');
@@ -25,12 +26,14 @@ function formatDate(date) {
   const year = d.getFullYear();
   return `${day}/${month}/${year}`;
 }
+
 function formatTime(date) {
   const d = new Date(date || Date.now());
   const hours = String(d.getHours()).padStart(2, '0');
   const minutes = String(d.getMinutes()).padStart(2, '0');
   return `${hours}:${minutes}`;
 }
+
 // Base64 (UTF-8 safe) — “تغبيش” اختياري للـ attemptId في الرابط
 function b64encode(str) {
   try { return btoa(unescape(encodeURIComponent(String(str)))); } catch { return String(str); }
@@ -38,6 +41,163 @@ function b64encode(str) {
 function b64decode(b64) {
   try { return decodeURIComponent(escape(atob(String(b64)))); } catch { return String(b64); }
 }
+
+/* ======================= أيقونات SVG خفيفة ======================= */
+
+function IconPrint({ className = 'w-5 h-5' }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M6 9V4h12v5" />
+      <rect x="6" y="14" width="12" height="6" rx="1" />
+      <path d="M6 11H5a2 2 0 0 0-2 2v3h3" />
+      <path d="M18 11h1a2 2 0 0 1 2 2v3h-3" />
+    </svg>
+  );
+}
+
+function IconHome({ className = 'w-5 h-5' }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 11.5 12 4l9 7.5" />
+      <path d="M5 10.5V20h5v-4h4v4h5v-9.5" />
+    </svg>
+  );
+}
+
+function IconRefresh({ className = 'w-5 h-5' }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 4v6h6" />
+      <path d="M20 20v-6h-6" />
+      <path d="M5.5 18A7 7 0 0 0 18 18.5" />
+      <path d="M18.5 5A7 7 0 0 0 6 5.5" />
+    </svg>
+  );
+}
+
+function IconReport({ className = 'w-5 h-5' }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="4" y="4" width="16" height="16" rx="2" />
+      <path d="M8 16v-4" />
+      <path d="M12 16v-6" />
+      <path d="M16 16v-3" />
+    </svg>
+  );
+}
+
+function IconHistory({ className = 'w-5 h-5' }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 4v6h6" />
+      <path d="M12 8v5l3 2" />
+      <circle cx="12" cy="13" r="7" />
+    </svg>
+  );
+}
+
+function IconPhoneQr({ className = 'w-5 h-5' }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="7" y="2" width="10" height="20" rx="2" />
+      <path d="M10 6h1v1h-1zM13 6h1v1h-1zM10 9h1v1h-1zM13 9h1v1h-1z" />
+      <path d="M11 18h2" />
+    </svg>
+  );
+}
+
+function IconDownload({ className = 'w-4 h-4' }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 3v12" />
+      <path d="M7 11l5 5 5-5" />
+      <path d="M4 19h16" />
+    </svg>
+  );
+}
+
+function IconDoc({ className = 'w-4 h-4' }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M7 3h7l5 5v13H7z" />
+      <path d="M14 3v5h5" />
+      <path d="M10 12h6" />
+      <path d="M10 16h4" />
+    </svg>
+  );
+}
+
+/* ============ استايل الأزرار الزجاجية (مطابق لصفحة المراجعة) ============ */
+
+const glassPrimary =
+  'group relative flex-1 overflow-hidden rounded-2xl border border-emerald-400 bg-white/20 backdrop-blur-sm px-5 py-3 md:py-4 text-sm md:text-base font-semibold text-emerald-800 shadow-sm hover:shadow-lg hover:bg-white/40 transition-all duration-200';
+
+const glassSecondary =
+  'group relative flex-1 overflow-hidden rounded-2xl border border-slate-300 bg-white/20 backdrop-blur-sm px-5 py-3 md:py-4 text-sm md:text-base font-semibold text-slate-800 shadow-sm hover:shadow-lg hover:bg-white/40 transition-all duration-200';
 
 /* ======================= QR Code Component ======================= */
 function QrCode({ text, size = 250, className = '' }) {
@@ -110,18 +270,26 @@ function QrCode({ text, size = 250, className = '' }) {
             style={{ width: size, height: size }}
             referrerPolicy="no-referrer"
           />
-          <div className="mt-3 flex items-center justify-center gap-2 no-print">
+          <div className="mt-3 flex items-center justify-center gap-3 no-print">
             <button
               onClick={downloadQr}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors"
+              className={glassPrimary + ' max-w-[180px] px-4 py-2'}
             >
-              تحميل QR 📥
+              <span className="absolute inset-0 pointer-events-none bg-gradient-to-l from-emerald-500/15 via-sky-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="relative flex items-center justify-center gap-2">
+                <IconDownload />
+                <span>تحميل QR</span>
+              </span>
             </button>
             <button
               onClick={downloadTxt}
-              className="px-4 py-2 bg-gray-700 hover:bg-black text-white font-bold rounded-xl transition-colors"
+              className={glassSecondary + ' max-w-[180px] px-4 py-2'}
             >
-              حفظ النص 📝
+              <span className="absolute inset-0 pointer-events-none bg-gradient-to-l from-slate-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="relative flex items-center justify-center gap-2">
+                <IconDoc />
+                <span>حفظ النص</span>
+              </span>
             </button>
           </div>
         </>
@@ -135,9 +303,13 @@ function QrCode({ text, size = 250, className = '' }) {
               <pre className="bg-gray-50 border rounded-lg p-3 text-xs whitespace-pre-wrap leading-6">{text}</pre>
               <button
                 onClick={downloadTxt}
-                className="mt-2 px-4 py-2 bg-gray-700 hover:bg-black text-white font-bold rounded-xl no-print transition-colors"
+                className={glassSecondary + ' mt-2 max-w-[180px] px-4 py-2 no-print'}
               >
-                حفظ النص 📝
+                <span className="absolute inset-0 pointer-events-none bg-gradient-to-l from-slate-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="relative flex items-center justify-center gap-2">
+                  <IconDoc />
+                  <span>حفظ النص</span>
+                </span>
               </button>
             </div>
           )}
@@ -158,19 +330,39 @@ function ResultContent() {
   const [loading, setLoading] = useState(true);
   const [qrText, setQrText] = useState(''); // نصّ QR المُفصّل
 
-  // تحميل المحاولة والمستخدم
+  // تحميل المحاولة + اسم المتدرب من المحاولة أو من التخزين المحلي
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('user') || '{}');
-    setUser({ name: userData.name || 'اسم المتدرب' });
+    try {
+      const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
+      const sortedAttempts = [...attempts].sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      );
 
-    const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
-    setAllAttempts([...attempts].sort((a, b) => new Date(b.date) - new Date(a.date)));
+      let found = null;
+      if (attemptId) {
+        found = attempts.find(
+          (a) =>
+            String(a?.id) === String(attemptId) ||
+            Number(a?.id) === Number(attemptId)
+        );
+      }
 
-    if (attemptId) {
-      const found = attempts.find(a => String(a?.id) === String(attemptId) || Number(a?.id) === Number(attemptId));
+      const storedName =
+        localStorage.getItem('tajweedy_trainee_name') || '';
+
+      const traineeName =
+        (found && found.traineeName && String(found.traineeName).trim()) ||
+        (storedName && String(storedName).trim()) ||
+        'اسم المتدرب';
+
+      setUser({ name: traineeName });
       if (found) setAttempt(found);
+      setAllAttempts(sortedAttempts);
+    } catch (err) {
+      console.error('خطأ في تحميل بيانات النتائج:', err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [attemptId]);
 
   // بناء نصّ QR التفصيلي + حفظه محليًا + “تغبيش” attemptId في الرابط
@@ -185,21 +377,27 @@ function ResultContent() {
     const total = attempt.total ?? 0;
     const percentage = total ? Math.round((score / total) * 100) : 0;
     const examType =
-      attempt.type === 'periodic' ? 'اختبار دوري' :
-      attempt.type === 'therapeutic' ? 'تدريب علاجي' :
-      'اختبار';
+      attempt.type === 'periodic'
+        ? 'اختبار دوري'
+        : attempt.type === 'therapeutic'
+        ? 'تدريب علاجي'
+        : 'اختبار';
     const examCode = `TJ-${toEnglishDigits(attemptId)}`;
 
     const text = `Tajweedy Report
 Type: ${examType}
 Name: ${user.name}
-Score: ${toEnglishDigits(score)}/${toEnglishDigits(total)} (${toEnglishDigits(percentage)}%)
+Score: ${toEnglishDigits(score)}/${toEnglishDigits(total)} (${toEnglishDigits(
+      percentage
+    )}%)
 Code: ${examCode}
 Date: ${formatDate(attempt.date)} ${formatTime(attempt.date)}
 Link: ${fullLink}`;
 
     setQrText(text);
-    try { localStorage.setItem(`qrtext:${attemptId}`, text); } catch {}
+    try {
+      localStorage.setItem(`qrtext:${attemptId}`, text);
+    } catch {}
   }, [attempt, attemptId, user.name]);
 
   if (loading) {
@@ -214,10 +412,17 @@ Link: ${fullLink}`;
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center p-4" dir="rtl">
         <div className="text-center">
-          <p className="text-2xl font-bold text-gray-700 mb-4">❌ لا توجد بيانات</p>
+          <p className="text-2xl font-bold text-gray-700 mb-4">لا توجد بيانات</p>
           <p className="text-gray-600 mb-6">لم يتم العثور على نتيجة الاختبار</p>
-          <Link href="/quiz" className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl inline-block">
-            ← اختبار جديد
+          <Link
+            href="/quiz"
+            className={glassPrimary + ' inline-flex max-w-xs justify-center'}
+          >
+            <span className="absolute inset-0 pointer-events-none bg-gradient-to-l from-emerald-500/15 via-sky-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="relative flex items-center justify-center gap-2">
+              <IconRefresh />
+              <span>اختبار جديد</span>
+            </span>
           </Link>
         </div>
       </div>
@@ -228,11 +433,17 @@ Link: ${fullLink}`;
   const total = attempt.total ?? 0;
   const percentage = total ? Math.round((score / total) * 100) : 0;
   const examType =
-    attempt.type === 'periodic' ? 'اختبار دوري' :
-    attempt.type === 'therapeutic' ? 'تدريب علاجي' :
-    'اختبار';
+    attempt.type === 'periodic'
+      ? 'اختبار دوري'
+      : attempt.type === 'therapeutic'
+      ? 'تدريب علاجي'
+      : 'اختبار';
   const examName = attempt.name || 'اختبار التجويد';
   const examCode = `TJ-${toEnglishDigits(attemptId)}`;
+
+  // 🟢 متغيرات البطاقة الجديدة
+  const examTypeArabic = examType;
+  const examDate = `${formatDate(attempt.date)} ${formatTime(attempt.date)}`;
 
   return (
     <>
@@ -260,20 +471,40 @@ Link: ${fullLink}`;
             <h1 className="text-2xl font-bold text-green-600 mb-2">Tajweedy - التجويد الذكي</h1>
           </div>
 
-          <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 text-center">
+          {/* بطاقة اسم المتدرّب + اسم الاختبار */}
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-4 text-center">
             <h2 className="text-2xl font-bold text-gray-800 mb-2">{user.name}</h2>
             <p className="text-lg text-gray-600">
-              <strong>النوع:</strong> {examType} | <strong>الاسم:</strong> {examName} | <strong>الكود:</strong> {examCode}
+              <strong>اسم الاختبار:</strong> {examName}
             </p>
-            <p className="text-sm text-gray-500 mt-2">
-              {formatDate(attempt.date)} | {formatTime(attempt.date)}
+          </div>
+
+          {/* بطاقة نوع الاختبار / كود الاختبار / تاريخ الاختبار */}
+          <div
+            className="bg-white rounded-3xl shadow-lg p-6 mb-6 float-right text-right w-full"
+            dir="rtl"
+          >
+            <p className="text-lg text-gray-600 mb-2">
+              <strong>نوع الاختبار:</strong> {examTypeArabic}
+            </p>
+
+            <p className="text-lg text-gray-600 mb-2">
+              <strong>كود الاختبار:</strong> {examCode}
+            </p>
+
+            {/* التاريخ: أرقام إنجليزية، ملاصق للنقطتين */}
+            <p className="text-base text-[#1e7850] text-right">
+              <strong className="ml-2">تاريخ الاختبار:</strong>
+              <span dir="rtl" className="inline-block">
+                {toEnglishDigits(examDate)}
+              </span>
             </p>
           </div>
 
           {/* النسبة ونتيجة الاختبار */}
-          <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 text-center">
+          <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 text-center clear-both">
             <h1 className="text-2xl font-bold text-green-600 mb-3">
-              {percentage >= 80 ? '🎉 ممتاز!' : percentage >= 60 ? '👍 جيد جداً' : '📚 يحتاج مراجعة'}
+              {percentage >= 80 ? 'ممتاز' : percentage >= 60 ? 'جيد' : 'يحتاج إلى مزيد من التدريب'}
             </h1>
             <p className="text-3xl font-bold text-gray-700 mb-2">{toEnglishDigits(percentage)}%</p>
             <p className="text-lg text-gray-600">
@@ -281,10 +512,13 @@ Link: ${fullLink}`;
             </p>
           </div>
 
-          {/* 🔳 QR CODE (نصّ تفصيلي + حفظ محلي) */}
+          {/* QR CODE */}
           {qrText && (
             <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 page-break-after">
-              <h2 className="text-xl font-bold text-green-600 mb-3">رمز الاستجابة السريع 📱</h2>
+              <h2 className="text-xl font-bold text-green-600 mb-3 flex items-center gap-2">
+                <IconPhoneQr />
+                <span>رمز الاستجابة السريع</span>
+              </h2>
               <QrCode text={qrText} size={240} />
               <p className="text-sm text-gray-600">امسح للوصول إلى تقريرك مباشرة</p>
             </div>
@@ -293,7 +527,10 @@ Link: ${fullLink}`;
           {/* سجل المحاولات */}
           {allAttempts.length > 0 && (
             <div className="bg-white rounded-3xl shadow-lg p-5 mb-5">
-              <h2 className="text-xl font-bold text-green-600 mb-3">📈 سجل المحاولات</h2>
+              <h2 className="text-xl font-bold text-green-600 mb-3 flex items-center gap-2">
+                <IconHistory />
+                <span>سجل المحاولات</span>
+              </h2>
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
                   <thead>
@@ -313,7 +550,9 @@ Link: ${fullLink}`;
                         <tr key={index} className="border-b hover:bg-gray-50">
                           <td className="px-3 py-2 text-right">{formatDate(att.date)}</td>
                           <td className="px-3 py-2 text-right">{formatTime(att.date)}</td>
-                          <td className="px-3 py-2 text-right font-bold text-green-600">{toEnglishDigits(attScore)}</td>
+                          <td className="px-3 py-2 text-right font-bold text-green-600">
+                            {toEnglishDigits(attScore)}
+                          </td>
                           <td className="px-3 py-2 text-right font-bold">
                             <span className={attPercentage >= 60 ? 'text-green-600' : 'text-red-600'}>
                               {toEnglishDigits(attPercentage)}%
@@ -330,29 +569,48 @@ Link: ${fullLink}`;
 
           {/* الأزرار */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 no-print mt-6">
-            <button 
-              onClick={() => window.print()} 
-              className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-2xl transition-colors"
+            <button
+              onClick={() => window.print()}
+              className={glassSecondary}
             >
-              🖨️ طباعة
+              <span className="absolute inset-0 pointer-events-none bg-gradient-to-l from-slate-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="relative flex items-center justify-center gap-2">
+                <IconPrint />
+                <span>طباعة</span>
+              </span>
             </button>
-            <Link 
-              href={`/quiz/report/${attemptId}`} 
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-2xl text-center transition-colors"
+
+            <Link
+              href={`/quiz/report/${attemptId}`}
+              className={glassPrimary}
             >
-              📊 التقرير الكامل
+              <span className="absolute inset-0 pointer-events-none bg-gradient-to-l from-emerald-500/15 via-sky-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="relative flex items-center justify-center gap-2">
+                <IconReport />
+                <span>التقرير الكامل</span>
+              </span>
             </Link>
-            <Link 
-              href="/" 
-              className="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-4 rounded-2xl text-center transition-colors"
+
+            <Link
+              href="/"
+              className={glassSecondary}
             >
-              🏠 الرئيسية
+              <span className="absolute inset-0 pointer-events-none bg-gradient-to-l from-slate-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="relative flex items-center justify-center gap-2">
+                <IconHome />
+                <span>الرئيسية</span>
+              </span>
             </Link>
-            <Link 
-              href="/quiz" 
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-2xl text-center transition-colors"
+
+            <Link
+              href="/quiz"
+              className={glassPrimary}
             >
-              🔄 اختبار جديد
+              <span className="absolute inset-0 pointer-events-none bg-gradient-to-l from-emerald-500/15 via-sky-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="relative flex items-center justify-center gap-2">
+                <IconRefresh />
+                <span>اختبار جديد</span>
+              </span>
             </Link>
           </div>
         </div>
@@ -374,4 +632,4 @@ export default function ResultPage() {
       <ResultContent />
     </Suspense>
   );
-          }
+}

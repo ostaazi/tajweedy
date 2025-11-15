@@ -8,7 +8,7 @@ const cairo = Cairo({
 });
 
 export const metadata = {
-  title: 'Tajweedy - مُذيب أحكام التجويد',
+  title: 'Tajweedy - مُدرّب أحكام التجويد',
   description: 'منصة تفاعلية لتعلم قواعد تجويد القرآن الكريم بالذكاء الاصطناعي',
   icons: {
     icon: '/favicon.ico',
