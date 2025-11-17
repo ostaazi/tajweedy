@@ -142,14 +142,60 @@ const glassPrimary =
 const glassSecondaryBase =
   'group relative w-full overflow-hidden rounded-full border border-slate-300 bg-white/40 backdrop-blur-sm px-8 py-4 text-lg font-bold text-slate-800 shadow-md hover:shadow-lg hover:bg-white/70 transition-all duration-200 flex items-center justify-center gap-2';
 
+/**
+ * ملاحظة: chapterReciterId افتراضي لمشاري العفاسي والشاطري فقط
+ * والباقي fallback على العفاسي في المزامنة، مع بقاء الاسم كما هو.
+ */
 const RECITERS = [
-  { id: 0, name: 'اسم القارئ', subtext: 'غير محدد (عشوائي)', edition: null },
-  { id: 1, name: 'مشاري العفاسي', subtext: null, edition: 'ar.alafasy' },
-  { id: 2, name: 'عبد الباسط عبد الصمد', subtext: null, edition: 'ar.abdulbasitmurattal' },
-  { id: 3, name: 'عبد الرحمن السديس', subtext: null, edition: 'ar.abdurrahmaansudais' },
-  { id: 4, name: 'محمد صديق المنشاوي', subtext: null, edition: 'ar.minshawi' },
-  { id: 5, name: 'محمود خليل الحصري', subtext: null, edition: 'ar.husary' },
-  { id: 6, name: 'أبو بكر الشاطري', subtext: null, edition: 'ar.shaatree' },
+  {
+    id: 0,
+    name: 'اسم القارئ',
+    subtext: 'غير محدد (عشوائي)',
+    edition: null,
+    chapterReciterId: null,
+  },
+  {
+    id: 1,
+    name: 'مشاري العفاسي',
+    subtext: null,
+    edition: 'ar.alafasy',
+    chapterReciterId: 5,
+  },
+  {
+    id: 2,
+    name: 'عبد الباسط عبد الصمد',
+    subtext: null,
+    edition: 'ar.abdulbasitmurattal',
+    chapterReciterId: null,
+  },
+  {
+    id: 3,
+    name: 'عبد الرحمن السديس',
+    subtext: null,
+    edition: 'ar.abdurrahmaansudais',
+    chapterReciterId: null,
+  },
+  {
+    id: 4,
+    name: 'محمد صديق المنشاوي',
+    subtext: null,
+    edition: 'ar.minshawi',
+    chapterReciterId: null,
+  },
+  {
+    id: 5,
+    name: 'محمود خليل الحصري',
+    subtext: null,
+    edition: 'ar.husary',
+    chapterReciterId: null,
+  },
+  {
+    id: 6,
+    name: 'أبو بكر الشاطري',
+    subtext: null,
+    edition: 'ar.shaatree',
+    chapterReciterId: 3,
+  },
 ];
 
 const DEFAULT_AYAH_OPTION = {
@@ -157,6 +203,8 @@ const DEFAULT_AYAH_OPTION = {
   label: 'رقم الآية',
   subtext: 'غير محدد (عشوائي)',
 };
+
+const QURAN_API_BASE = 'https://api.quran.com/api/v4';
 
 export default function RecitationPage() {
   const [verse, setVerse] = useState(null);
@@ -169,25 +217,34 @@ export default function RecitationPage() {
   const [highlightedWordIndex, setHighlightedWordIndex] = useState(-1);
 
   const [selectedReciter, setSelectedReciter] = useState(0);
-  const [selectedSurah, setSelectedSurah] = useState(0); // بداية التلاوة - السورة
-  const [selectedAyah, setSelectedAyah] = useState(0);   // بداية التلاوة - الآية
+  const [selectedSurah, setSelectedSurah] = useState(0);
+  const [selectedAyah, setSelectedAyah] = useState(0);
   const [availableAyahs, setAvailableAyahs] = useState([DEFAULT_AYAH_OPTION]);
 
-  const [selectedSurahEnd, setSelectedSurahEnd] = useState(0); // نهاية التلاوة - السورة
-  const [selectedAyahEnd, setSelectedAyahEnd] = useState(0);   // نهاية التلاوة - الآية
-  const [availableAyahsEnd, setAvailableAyahsEnd] = useState([DEFAULT_AYAH_OPTION]);
+  const [selectedSurahEnd, setSelectedSurahEnd] = useState(0);
+  const [selectedAyahEnd, setSelectedAyahEnd] = useState(0);
+  const [availableAyahsEnd, setAvailableAyahsEnd] = useState([
+    DEFAULT_AYAH_OPTION,
+  ]);
 
-  // حالة لتتبع موضعنا الحالي ونهاية المقطع
   const [currentSurah, setCurrentSurah] = useState(null);
   const [currentAyah, setCurrentAyah] = useState(null);
   const [rangeEndSurah, setRangeEndSurah] = useState(null);
   const [rangeEndAyah, setRangeEndAyah] = useState(null);
 
+  // تزامن الصوت
+  const [chapterAudioUrl, setChapterAudioUrl] = useState(null);
+  const [chapterTimestamps, setChapterTimestamps] = useState({});
+  const [currentVerseWindow, setCurrentVerseWindow] = useState(null);
+  const [wordTimings, setWordTimings] = useState([]);
+
   const audioRef = useRef(null);
 
+  /* ========= تحميل السور + الآية الأولى عند فتح الصفحة ========= */
   useEffect(() => {
     fetchSurahs();
-    fetchVerse();
+    fetchVerse(); // <—— هذا هو التعديل المهم
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchSurahs = async () => {
@@ -209,7 +266,7 @@ export default function RecitationPage() {
     }
   };
 
-  // الآيات المتاحة لبداية التلاوة
+  /* ============ تجهيز الآيات لبداية التلاوة ============ */
   useEffect(() => {
     if (selectedSurah > 0) {
       const surah = surahs.find((s) => s.id === selectedSurah);
@@ -227,7 +284,7 @@ export default function RecitationPage() {
     }
   }, [selectedSurah, surahs]);
 
-  // الآيات المتاحة لنهاية التلاوة
+  /* ============ تجهيز الآيات لنهاية التلاوة ============ */
   useEffect(() => {
     if (selectedSurahEnd > 0) {
       const surah = surahs.find((s) => s.id === selectedSurahEnd);
@@ -245,10 +302,66 @@ export default function RecitationPage() {
     }
   }, [selectedSurahEnd, surahs]);
 
+  /* ============ دوال الصوت والمزامنة ============ */
+
+  const getCurrentReciterMeta = () => {
+    let reciterData =
+      selectedReciter === 0
+        ? RECITERS[Math.floor(Math.random() * (RECITERS.length - 1)) + 1]
+        : RECITERS.find((r) => r.id === selectedReciter) || RECITERS[1];
+
+    const chapterReciterId = reciterData.chapterReciterId || 5;
+    return { reciterData, chapterReciterId };
+  };
+
+  const loadChapterAudio = async (chapterReciterId, surahNum) => {
+    const url = `${QURAN_API_BASE}/chapter_reciters/${chapterReciterId}/by_chapter/${surahNum}?segments=true`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('تعذر تحميل ملف السورة الصوتي مع التوقيتات');
+    const json = await resp.json();
+    const audioFile = json.audio_file || json.data?.audio_file || json;
+
+    const timestampsArray = audioFile.timestamps || [];
+    const tsMap = {};
+    timestampsArray.forEach((ts) => {
+      if (ts.verse_key) tsMap[ts.verse_key] = ts;
+    });
+
+    setChapterAudioUrl(audioFile.audio_url);
+    setChapterTimestamps(tsMap);
+    return { audioFile, tsMap };
+  };
+
+  const prepareVerseTiming = (surahNum, ayahNum, tsMap) => {
+    const verseKey = `${surahNum}:${ayahNum}`;
+    const ts = tsMap[verseKey];
+    if (!ts || !ts.segments) {
+      setCurrentVerseWindow(null);
+      setWordTimings([]);
+      return;
+    }
+
+    setCurrentVerseWindow({
+      from: ts.timestamp_from,
+      to: ts.timestamp_to,
+    });
+
+    const segs = ts.segments.map(([wordIndex, startMs, endMs]) => ({
+      wordIndex: (wordIndex || 1) - 1,
+      start: startMs,
+      end: endMs,
+    }));
+    setWordTimings(segs);
+  };
+
+  /* ============ جلب الآية + الصوت المتزامن ============ */
+
   const fetchVerse = async () => {
     setLoading(true);
     setAudioBlob(null);
     setHighlightedWordIndex(-1);
+    setWordTimings([]);
+    setCurrentVerseWindow(null);
 
     try {
       let surahNum =
@@ -258,19 +371,14 @@ export default function RecitationPage() {
 
       let ayahNum = selectedAyah;
       if (ayahNum === 0 && surahs.length > 0) {
-        const surah = surahs.find((s) => s.id === surahNum) || { verses_count: 7 };
+        const surah = surahs.find((s) => s.id === surahNum) || {
+          verses_count: 7,
+        };
         ayahNum = Math.floor(Math.random() * surah.verses_count) + 1;
       } else if (ayahNum === 0) {
         ayahNum = 1;
       }
 
-      // تحديد بيانات القارئ
-      let reciterData =
-        selectedReciter === 0
-          ? RECITERS[Math.floor(Math.random() * (RECITERS.length - 1)) + 1]
-          : RECITERS.find((r) => r.id === selectedReciter);
-
-      // تحديد نهاية المقطع (إذا لم تُحدَّد نعتبرها مثل البداية أو نهاية السورة)
       let endSurahNum = selectedSurahEnd || surahNum;
       let endAyahNum = selectedAyahEnd;
       if (endAyahNum === 0) {
@@ -284,152 +392,93 @@ export default function RecitationPage() {
       setRangeEndAyah(endAyahNum);
 
       const verseResponse = await fetch(
-        `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/editions/quran-uthmani,${reciterData.edition}`
+        `${QURAN_API_BASE}/verses/by_key/${surahNum}:${ayahNum}?language=ar&words=true&word_fields=text_uthmani`
       );
-      const verseData = await verseResponse.json();
+      const verseJson = await verseResponse.json();
+      const v = verseJson.verse || verseJson.data?.verse || verseJson.data;
 
-      if (verseData.status === 'OK' && verseData.data.length >= 2) {
-        const textData = verseData.data[0];
-        const audioData = verseData.data[1];
+      const surahMeta = surahs.find((s) => s.id === surahNum);
+      const surahName = surahMeta ? surahMeta.name : `سورة رقم ${surahNum}`;
 
-        const verseObj = {
-          text: textData.text,
-          surah: textData.surah.name,
-          surahNumber: surahNum,
-          number: ayahNum,
-          audio: audioData.audio || audioData.audioSecondary?.[0] || null,
-          reciter: reciterData.name,
-        };
-
-        setVerse(verseObj);
-
-        try {
-          const wordsResponse = await fetch(
-            `https://api.quran.com/api/v4/verses/by_key/${surahNum}:${ayahNum}?language=ar&words=true&word_fields=text_uthmani`
-          );
-          const wordsData = await wordsResponse.json();
-          if (wordsData.verse && wordsData.verse.words) {
-            setWords(wordsData.verse.words);
-          } else {
-            setWords([]);
-          }
-        } catch (err) {
-          console.log('تعذر جلب الكلمات');
-          setWords([]);
-        }
-      }
-    } catch (error) {
-      console.error('خطأ في جلب الآية:', error);
       setVerse({
-        text: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+        text: v.text_uthmani || v.text_imlaei || '',
+        surah: surahName,
+        surahNumber: surahNum,
+        number: ayahNum,
+        audio: null,
+        reciter: null,
+      });
+      setWords(v.words || []);
+
+      const { reciterData, chapterReciterId } = getCurrentReciterMeta();
+      const { audioFile, tsMap } = await loadChapterAudio(
+        chapterReciterId,
+        surahNum
+      );
+
+      prepareVerseTiming(surahNum, ayahNum, tsMap);
+
+      setVerse((prev) =>
+        prev
+          ? { ...prev, audio: audioFile.audio_url, reciter: reciterData.name }
+          : prev
+      );
+    } catch (error) {
+      console.error('خطأ في جلب الآية أو الصوت:', error);
+      setVerse({
+        text: 'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ',
         surah: 'الفاتحة',
         surahNumber: 1,
         number: 1,
-        audio: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3',
-        reciter: RECITERS[1].name,
+        audio: null,
+        reciter: 'مشاري العفاسي',
       });
       setWords([]);
+      setWordTimings([]);
+      setCurrentVerseWindow(null);
     } finally {
       setLoading(false);
     }
   };
 
-  // جلب الآية التالية داخل المقطع المحدد وتشغيلها تلقائياً
-  const fetchNextInRange = async () => {
-    if (
-      !currentSurah ||
-      !currentAyah ||
-      !rangeEndSurah ||
-      !rangeEndAyah
-    ) {
-      return;
-    }
+  /* ============ تزامن الصوت مع الكلمات ============ */
 
-    // التأكد هل وصلنا للنهاية
-    if (
-      currentSurah > rangeEndSurah ||
-      (currentSurah === rangeEndSurah && currentAyah >= rangeEndAyah)
-    ) {
-      return;
-    }
-
-    let nextSurah = currentSurah;
-    let nextAyah = currentAyah + 1;
-
-    const currentSurahMeta = surahs.find((s) => s.id === currentSurah);
-    const lastAyahCurrent = currentSurahMeta?.verses_count || currentAyah;
-
-    // الانتقال للسورة التالية إذا انتهت الآيات
-    if (nextAyah > lastAyahCurrent) {
-      nextSurah = currentSurah + 1;
-      nextAyah = 1;
-    }
-
-    // عدم تجاوز نهاية المقطع
-    if (
-      nextSurah > rangeEndSurah ||
-      (nextSurah === rangeEndSurah && nextAyah > rangeEndAyah)
-    ) {
-      return;
-    }
-
-    try {
-      let reciterData =
-        selectedReciter === 0
-          ? RECITERS.find((r) => r.name === verse?.reciter) || RECITERS[1]
-          : RECITERS.find((r) => r.id === selectedReciter);
-
-      const verseResponse = await fetch(
-        `https://api.alquran.cloud/v1/ayah/${nextSurah}:${nextAyah}/editions/quran-uthmani,${reciterData.edition}`
-      );
-      const verseData = await verseResponse.json();
-
-      if (verseData.status === 'OK' && verseData.data.length >= 2) {
-        const textData = verseData.data[0];
-        const audioData = verseData.data[1];
-
-        const verseObj = {
-          text: textData.text,
-          surah: textData.surah.name,
-          surahNumber: nextSurah,
-          number: nextAyah,
-          audio: audioData.audio || audioData.audioSecondary?.[0] || null,
-          reciter: reciterData.name,
-        };
-
-        setVerse(verseObj);
-        setCurrentSurah(nextSurah);
-        setCurrentAyah(nextAyah);
-
-        try {
-          const wordsResponse = await fetch(
-            `https://api.quran.com/api/v4/verses/by_key/${nextSurah}:${nextAyah}?language=ar&words=true&word_fields=text_uthmani`
-          );
-          const wordsData = await wordsResponse.json();
-          if (wordsData.verse && wordsData.verse.words) {
-            setWords(wordsData.verse.words);
-          } else {
-            setWords([]);
-          }
-        } catch {
-          setWords([]);
-        }
-
-        // تشغيل الصوت تلقائياً للآية التالية
-        if (audioRef.current) {
-          audioRef.current.load();
-          audioRef.current.play().catch(() => {});
-        }
-      }
-    } catch (e) {
-      console.error('خطأ في جلب الآية التالية:', e);
+  const handleAudioPlay = () => {
+    if (!audioRef.current || !currentVerseWindow) return;
+    const startSec = (currentVerseWindow.from || 0) / 1000;
+    if (Math.abs(audioRef.current.currentTime - startSec) > 0.3) {
+      audioRef.current.currentTime = startSec;
     }
   };
 
-  const handleAudioEnded = () => {
-    // عند انتهاء الصوت، نحاول جلب الآية التالية
-    fetchNextInRange();
+  const handleTimeUpdate = (e) => {
+    const currentMs = e.target.currentTime * 1000;
+
+    if (
+      currentVerseWindow &&
+      currentMs > (currentVerseWindow.to || 0) + 150
+    ) {
+      e.target.pause();
+      e.target.currentTime = (currentVerseWindow.to || currentMs) / 1000;
+      return;
+    }
+
+    if (!wordTimings.length) return;
+
+    const activeSeg = wordTimings.find(
+      (seg) => currentMs >= seg.start && currentMs <= seg.end
+    );
+
+    if (
+      activeSeg &&
+      typeof activeSeg.wordIndex === 'number' &&
+      activeSeg.wordIndex !== highlightedWordIndex
+    ) {
+      setHighlightedWordIndex(activeSeg.wordIndex);
+    }
   };
+
+  /* ============ التسجيل الصوتي (كما هو) ============ */
 
   const startRecording = async () => {
     try {
@@ -469,9 +518,10 @@ export default function RecitationPage() {
     }
   };
 
+  /* ============ الواجهة ============ */
+
   return (
     <>
-      {/* نفس خط UthmanicHafs المستخدم في صفحة الاختبار */}
       <style jsx global>{`
         @font-face {
           font-family: 'UthmanicHafs';
@@ -547,7 +597,7 @@ export default function RecitationPage() {
                 )}
               </div>
 
-              {/* اختيارات القارئ + بداية/نهاية التلاوة للسورة والآية */}
+              {/* اختيارات القارئ + البداية والنهاية */}
               <div className="flex flex-col gap-4 mb-6">
                 <select
                   value={selectedReciter}
@@ -563,7 +613,6 @@ export default function RecitationPage() {
                   ))}
                 </select>
 
-                {/* السورة: بداية التلاوة / نهاية التلاوة */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1">
                     <span className="text-sm text-gray-600 pr-2 text-right">
@@ -604,7 +653,6 @@ export default function RecitationPage() {
                   </div>
                 </div>
 
-                {/* الآية: بداية التلاوة / نهاية التلاوة */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1">
                     <span className="text-sm text-gray-600 pr-2 text-right">
@@ -648,7 +696,6 @@ export default function RecitationPage() {
                 </div>
               </div>
 
-              {/* زر تطبيق الاختيارات (زجاجي) */}
               <button onClick={fetchVerse} className={glassPrimary}>
                 <span className="absolute inset-0 pointer-events-none bg-gradient-to-l from-emerald-500/15 via-sky-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <span className="relative inline-flex items-center justify-center gap-2">
@@ -657,36 +704,35 @@ export default function RecitationPage() {
                 </span>
               </button>
 
-              {/* مشغل الصوت */}
               <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-4 mt-4">
                 <p className="text-base md:text-lg text-gray-600 mb-2 text-center">
                   استمع للتلاوة الصحيحة - القارئ:{' '}
-                  <span className="font-bold">{verse?.reciter}</span>
+                  <span className="font-bold">{verse?.reciter || '—'}</span>
                 </p>
-                {verse?.audio ? (
+                {verse?.audio && chapterAudioUrl ? (
                   <audio
-                    key={verse.audio}
+                    key={chapterAudioUrl}
                     ref={audioRef}
                     controls
-                    onEnded={handleAudioEnded}
+                    onPlay={handleAudioPlay}
+                    onTimeUpdate={handleTimeUpdate}
                     className="w-full rounded-full"
                   >
-                    <source src={verse.audio} type="audio/mpeg" />
+                    <source src={chapterAudioUrl} type="audio/mpeg" />
                     المتصفح لا يدعم تشغيل الصوت
                   </audio>
                 ) : (
                   <p className="text-center text-gray-500 text-base">
-                    جاري تحميل الصوت...
+                    لم يتم تحميل الصوت بعد. اضغط على "تطبيق الاختيارات".
                   </p>
                 )}
               </div>
 
-              {/* زر التسجيل الزجاجي مع حالة التسجيل */}
               <button
                 onClick={isRecording ? stopRecording : startRecording}
                 className={
                   isRecording
-                    ? `relative w-full rounded-full px-8 py-4 text-lg font-bold text-white shadow-md transition-all duration-200 flex items-center justify-center gap-2 border border-red-500 bg-red-500 animate-pulse`
+                    ? 'relative w-full rounded-full px-8 py-4 text-lg font-bold text-white shadow-md transition-all duration-200 flex items-center justify-center gap-2 border border-red-500 bg-red-500 animate-pulse'
                     : glassSecondaryBase
                 }
               >
@@ -716,11 +762,10 @@ export default function RecitationPage() {
 
               <div className="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg mt-2">
                 <p className="text-sm text-gray-700 flex items-start gap-2">
-                  {/* 🔽 هنا فقط صغرنا الأيقونة لتناسب التلميح */}
                   <IconHint className="mt-0.5 w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
                   <span>
-                    <strong>تلميح:</strong> اضغط على "تطبيق الاختيارات" لتحميل الآية
-                    والصوت الصحيح. انقر على أي كلمة لتمييزها.
+                    <strong>تلميح:</strong> اضغط على "تطبيق الاختيارات" لتحميل
+                    الآية والصوت الصحيح مع مزامنة الكلمات قدر الإمكان.
                   </span>
                 </p>
               </div>
@@ -730,4 +775,4 @@ export default function RecitationPage() {
       </div>
     </>
   );
-}
+              }
