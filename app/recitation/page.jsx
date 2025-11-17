@@ -163,36 +163,54 @@ const DEFAULT_AYAH_OPTION = {
   subtext: 'غير محدد (عشوائي)',
 };
 
-/* ============ دوال مساعدة للتجويد ============ */
+/* ============ دوال مساعدة للتجويد والبسملة ============ */
 
-// جملة البسملة بالخط العثماني الشائع
 const BASMALA = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';
 
-// حذف البسملة من نص الآية إن كانت في بدايته
-function stripBasmala(text) {
-  if (!text) return text;
-  if (text === BASMALA) {
-    return '';
+// إرجاع موضع نهاية البسملة (إن كانت في أول الآية ويتبعها نص آخر)
+function getBasmalaSplitIndex(text) {
+  if (!text) return null;
+
+  const textChars = Array.from(text);
+  const basChars = Array.from(BASMALA);
+
+  // لو الآية نفسها هي البسملة فقط → لا نضيف سطر جديد
+  if (textChars.length <= basChars.length) {
+    return null;
   }
-  if (text.startsWith(BASMALA)) {
-    return text.slice(BASMALA.length).trimStart();
+
+  // تأكد أن البداية تطابق البسملة حرفًا بحرف
+  for (let i = 0; i < basChars.length; i += 1) {
+    if (textChars[i] !== basChars[i]) {
+      return null;
+    }
   }
-  return text;
+
+  // تأكد أن بعد البسملة يوجد حروف أخرى حقيقية (ليست مسافات فقط)
+  let hasMore = false;
+  for (let j = basChars.length; j < textChars.length; j += 1) {
+    if (textChars[j].trim() !== '') {
+      hasMore = true;
+      break;
+    }
+  }
+
+  return hasMore ? basChars.length : null;
 }
 
-// مقارنة مصفوفتين بسيطتين
-function sameRules(a, b) {
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i += 1) {
-    if (a[i] !== b[i]) return false;
-  }
-  return true;
-}
-
-// تحويل النص الخام + annotations إلى HTML مع span لكل قاعدة
-function buildTajweedHtml(baseText, annotations) {
+// بناء HTML التجويد مع إمكانية إدخال سطر بعد البسملة
+function buildTajweedHtml(baseText, annotations, splitIndex = null) {
   if (!baseText) return '';
-  if (!annotations || annotations.length === 0) return baseText;
+  if (!annotations || annotations.length === 0) {
+    // لو مافيش تجويد من الملف نرجّع النص كما هو (مع السطر بعد البسملة يدويًا)
+    if (splitIndex != null) {
+      const chars = Array.from(baseText);
+      const first = chars.slice(0, splitIndex).join('');
+      const rest = chars.slice(splitIndex).join('');
+      return `${first}<br /><br />${rest}`;
+    }
+    return baseText;
+  }
 
   const chars = Array.from(baseText);
   const meta = chars.map((ch) => ({ ch, rules: [] }));
@@ -206,15 +224,30 @@ function buildTajweedHtml(baseText, annotations) {
     }
   });
 
+  const sameRules = (a, b) => {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i += 1) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  };
+
   let html = '';
   let i = 0;
+
   while (i < meta.length) {
+    // إدخال سطر جديد بعد البسملة مباشرة
+    if (splitIndex != null && i === splitIndex) {
+      html += '<br /><br />';
+    }
+
     const currentRules = meta[i].rules;
     let j = i + 1;
     while (j < meta.length && sameRules(meta[j].rules, currentRules)) {
       j += 1;
     }
     const segment = meta.slice(i, j).map((c) => c.ch).join('');
+
     if (currentRules.length === 0) {
       html += segment;
     } else {
@@ -226,6 +259,13 @@ function buildTajweedHtml(baseText, annotations) {
   }
 
   return html;
+}
+
+// تنظيف HTML النهائي من الدوائر السوداء غير المرغوبة
+function cleanTajweedHtml(html) {
+  if (!html) return html;
+  // إزالة: رمز نهاية الآية والزخرفة والسجدة (إن وُجدت داخل النص)
+  return html.replace(/[۞۩۝]/g, '');
 }
 
 export default function RecitationPage() {
@@ -385,18 +425,19 @@ export default function RecitationPage() {
         const textData = verseData.data[0];
         const audioData = verseData.data[1];
 
-        // حذف البسملة من حاوية النص (إن وُجدت)
-        const rawText = stripBasmala(textData.text || '');
-
-        // تطبيق التجويد من ملف JSON
+        const originalText = textData.text || '';
+        const splitIndex = getBasmalaSplitIndex(originalText);
         const key = `${surahNum}:${ayahNum}`;
         const annotations = tajweedMap ? tajweedMap[key] : null;
-        const tajweedHtml = annotations
-          ? buildTajweedHtml(rawText, annotations)
-          : rawText;
+
+        let tajweedHtml = annotations
+          ? buildTajweedHtml(originalText, annotations, splitIndex)
+          : buildTajweedHtml(originalText, [], splitIndex);
+
+        tajweedHtml = cleanTajweedHtml(tajweedHtml);
 
         const verseObj = {
-          text: rawText,
+          text: originalText,
           html: tajweedHtml,
           surah: textData.surah.name,
           surahNumber: surahNum,
@@ -446,7 +487,6 @@ export default function RecitationPage() {
       return;
     }
 
-    // التأكد هل وصلنا للنهاية
     if (
       currentSurah > rangeEndSurah ||
       (currentSurah === rangeEndSurah && currentAyah >= rangeEndAyah)
@@ -460,13 +500,11 @@ export default function RecitationPage() {
     const currentSurahMeta = surahs.find((s) => s.id === currentSurah);
     const lastAyahCurrent = currentSurahMeta?.verses_count || currentAyah;
 
-    // الانتقال للسورة التالية إذا انتهت الآيات
     if (nextAyah > lastAyahCurrent) {
       nextSurah = currentSurah + 1;
       nextAyah = 1;
     }
 
-    // عدم تجاوز نهاية المقطع
     if (
       nextSurah > rangeEndSurah ||
       (nextSurah === rangeEndSurah && nextAyah > rangeEndAyah)
@@ -489,15 +527,19 @@ export default function RecitationPage() {
         const textData = verseData.data[0];
         const audioData = verseData.data[1];
 
-        const rawText = stripBasmala(textData.text || '');
+        const originalText = textData.text || '';
+        const splitIndex = getBasmalaSplitIndex(originalText);
         const key = `${nextSurah}:${nextAyah}`;
         const annotations = tajweedMap ? tajweedMap[key] : null;
-        const tajweedHtml = annotations
-          ? buildTajweedHtml(rawText, annotations)
-          : rawText;
+
+        let tajweedHtml = annotations
+          ? buildTajweedHtml(originalText, annotations, splitIndex)
+          : buildTajweedHtml(originalText, [], splitIndex);
+
+        tajweedHtml = cleanTajweedHtml(tajweedHtml);
 
         const verseObj = {
-          text: rawText,
+          text: originalText,
           html: tajweedHtml,
           surah: textData.surah.name,
           surahNumber: nextSurah,
@@ -524,7 +566,6 @@ export default function RecitationPage() {
           setWords([]);
         }
 
-        // تشغيل الصوت تلقائياً للآية التالية
         if (audioRef.current) {
           audioRef.current.load();
           audioRef.current.play().catch(() => {});
@@ -536,7 +577,6 @@ export default function RecitationPage() {
   };
 
   const handleAudioEnded = () => {
-    // عند انتهاء الصوت، نحاول جلب الآية التالية
     fetchNextInRange();
   };
 
@@ -580,7 +620,7 @@ export default function RecitationPage() {
 
   return (
     <>
-      {/* نفس خط UthmanicHafs المستخدم في صفحة الاختبار + ألوان التجويد */}
+      {/* خط المصحف + ألوان التجويد + زيادة المسافة بين السطور */}
       <style jsx global>{`
         @font-face {
           font-family: 'UthmanicHafs';
@@ -594,45 +634,45 @@ export default function RecitationPage() {
           font-family: 'UthmanicHafs', 'Amiri', 'Scheherazade New', serif;
         }
 
-        /* ألوان التجويد (يمكنك تعديلها كما تحب) */
+        /* ألوان التجويد (يمكن ضبطها لاحقاً كما تحب) */
         .tj-madd_2,
         .tj-madd_6,
         .tj-madd_246,
         .tj-madd_munfasil,
         .tj-madd_muttasil {
-          color: #1d4ed8; /* المدود */
+          color: #1d4ed8;
         }
 
         .tj-ghunnah,
         .tj-idghaam_ghunnah,
         .tj-idghaam_shafawi {
-          color: #16a34a; /* الغنة والإدغام بغنة */
+          color: #16a34a;
         }
 
         .tj-idghaam_no_ghunnah {
-          color: #15803d; /* إدغام بدون غنة */
+          color: #15803d;
         }
 
         .tj-ikhfa,
         .tj-ikhfa_shafawi {
-          color: #ea580c; /* الإخفاء */
+          color: #ea580c;
         }
 
         .tj-iqlab {
-          color: #db2777; /* الإقلاب */
+          color: #db2777;
         }
 
         .tj-qalqalah {
-          color: #b91c1c; /* القلقلة */
+          color: #b91c1c;
         }
 
         .tj-hamzat_wasl,
         .tj-lam_shamsiyyah {
-          color: #7c2d12; /* همزة الوصل واللام الشمسية */
+          color: #7c2d12;
         }
 
         .tj-silent {
-          opacity: 0.5; /* الحروف الساكنة غير المنطوقة */
+          opacity: 0.5;
         }
       `}</style>
 
@@ -673,16 +713,14 @@ export default function RecitationPage() {
                 </p>
               </div>
 
-              {/* حاوية نص الآية مع التجويد من ملف JSON، بدون بسملة وبدون رقم آية داخل المربع */}
+              {/* نص الآية مع التجويد، مع سطر مستقل للبسملة ومسافة أسطر أكبر */}
               <div className="quran-text bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner">
                 <div
-                  className="text-center text-3xl md:text-4xl leading-[2.4rem]"
+                  className="text-center text-3xl md:text-4xl leading-[3.1rem] md:leading-[3.4rem]"
                   dir="rtl"
                   dangerouslySetInnerHTML={{ __html: verse?.html || verse?.text || '' }}
                 />
               </div>
-
-              {/* باقي الصفحة كما هي تماماً */}
 
               {/* اختيارات القارئ + بداية/نهاية التلاوة للسورة والآية */}
               <div className="flex flex-col gap-4 mb-6">
@@ -866,4 +904,4 @@ export default function RecitationPage() {
       </div>
     </>
   );
-  }
+}
