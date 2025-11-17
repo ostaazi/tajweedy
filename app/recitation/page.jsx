@@ -28,44 +28,14 @@ function IconBack({ className = 'w-5 h-5' }) {
   );
 }
 
-function IconApply({ className = 'w-4 h-4' }) {
+function IconApply({ className = 'w-5 h-5' }) {
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-        fill="none"
-        stroke="#166534"
-        strokeWidth="1.8"
-      />
+      <circle cx="12" cy="12" r="9" fill="#dcfce7" />
       <path
-        d="M8 12.5l2.5 2.5L16 9"
+        d="M9 12.5l2.2 2.3L15.5 9"
         fill="none"
-        stroke="#166534"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function IconCheck({ className = 'w-4 h-4' }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-        fill="none"
-        stroke="#166534"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M8 12.5l2.5 2.5L16 9"
-        fill="none"
-        stroke="#166534"
+        stroke="#16a34a"
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -77,35 +47,26 @@ function IconCheck({ className = 'w-4 h-4' }) {
 function IconMic({ className = 'w-5 h-5' }) {
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
-      <rect
-        x="9"
-        y="4"
-        width="6"
-        height="10"
-        rx="3"
-        fill="none"
-        stroke="#166534"
-        strokeWidth="1.8"
-      />
+      <rect x="9" y="4" width="6" height="10" rx="3" fill="#22c55e" />
       <path
-        d="M6 11v1a6 6 0 0012 0v-1"
+        d="M7 10a5 5 0 0 0 10 0"
         fill="none"
-        stroke="#166534"
-        strokeWidth="1.8"
+        stroke="#16a34a"
+        strokeWidth="1.6"
         strokeLinecap="round"
       />
       <path
-        d="M12 17v3"
+        d="M12 15v3.2"
         fill="none"
-        stroke="#166534"
-        strokeWidth="1.8"
+        stroke="#065f46"
+        strokeWidth="1.6"
         strokeLinecap="round"
       />
       <path
-        d="M9 20h6"
+        d="M9 18.5h6"
         fill="none"
-        stroke="#166534"
-        strokeWidth="1.8"
+        stroke="#065f46"
+        strokeWidth="1.6"
         strokeLinecap="round"
       />
     </svg>
@@ -115,8 +76,31 @@ function IconMic({ className = 'w-5 h-5' }) {
 function IconRecordDot({ className = 'w-4 h-4' }) {
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
-      <circle cx="12" cy="12" r="10" fill="none" stroke="#b91c1c" strokeWidth="1.7" />
-      <circle cx="12" cy="12" r="5" fill="#ef4444" />
+      <circle cx="12" cy="12" r="6" fill="#ef4444" />
+      <circle
+        cx="12"
+        cy="12"
+        r="8.5"
+        fill="none"
+        stroke="#fecaca"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
+function IconCheck({ className = 'w-5 h-5' }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <circle cx="12" cy="12" r="9" fill="#dbeafe" />
+      <path
+        d="M8.5 12.5l2.3 2.3 4.7-5"
+        fill="none"
+        stroke="#2563eb"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -124,30 +108,28 @@ function IconRecordDot({ className = 'w-4 h-4' }) {
 function IconHint({ className = 'w-5 h-5' }) {
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-        fill="none"
-        stroke="#0f766e"
-        strokeWidth="1.8"
+      <path
+        d="M12 4a6 6 0 0 1 3.5 10.9c-.5.4-.8.9-.9 1.5l-.1.6H9.5l-.1-.6c-.1-.6-.4-1.1-.9-1.5A6 6 0 0 1 12 4z"
+        fill="#fef3c7"
+        stroke="#f59e0b"
+        strokeWidth="1.5"
       />
       <path
-        d="M12 7a3 3 0 00-3 3"
+        d="M11 19h2"
         fill="none"
-        stroke="#0f766e"
-        strokeWidth="1.8"
+        stroke="#f59e0b"
+        strokeWidth="1.5"
         strokeLinecap="round"
       />
       <path
-        d="M9 13a3 3 0 003 3 3 3 0 003-3 3 3 0 00-1.2-2.4L12 9"
+        d="M11.25 9.5c0-.4.3-.75.75-.75s.75.35.75.75c0 .9-.75 1.05-.75 1.75"
         fill="none"
-        stroke="#0f766e"
-        strokeWidth="1.8"
+        stroke="#92400e"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx="12" cy="17" r="0.9" fill="#0f766e" />
+      <circle cx="12" cy="15.5" r=".75" fill="#92400e" />
     </svg>
   );
 }
@@ -155,97 +137,81 @@ function IconHint({ className = 'w-5 h-5' }) {
 /* ============ استايل الأزرار الزجاجية ============ */
 
 const glassPrimary =
-  'group relative w-full overflow-hidden rounded-full border border-emerald-400 bg-white/20 backdrop-blur-md text-emerald-800 shadow-md hover:shadow-lg hover:bg-white/40 transition-all duration-200 flex items-center justify-center gap-2';
+  'group relative w-full overflow-hidden rounded-full border border-emerald-400 bg-white/20 backdrop-blur-sm px-8 py-4 text-lg font-bold text-emerald-800 shadow-md hover:shadow-lg hover:bg-white/40 transition-all duration-200 flex items-center justify-center gap-2';
 
 const glassSecondaryBase =
-  'group relative w-full overflow-hidden rounded-full border border-slate-300 bg-white/60 backdrop-blur-md text-slate-700 hover:bg-white hover:border-emerald-300 transition-all duration-200 flex items-center justify-center gap-2';
-
-/* ============ بيانات القرّاء ============ */
+  'group relative w-full overflow-hidden rounded-full border border-slate-300 bg-white/40 backdrop-blur-sm px-8 py-4 text-lg font-bold text-slate-800 shadow-md hover:shadow-lg hover:bg-white/70 transition-all duration-200 flex items-center justify-center gap-2';
 
 const RECITERS = [
   { id: 0, name: 'اسم القارئ', subtext: 'غير محدد (عشوائي)', edition: null },
-  { id: 1, name: 'مشاري العفاسي', subtext: 'رواية حفص', edition: 'ar.alafasy' },
-  { id: 2, name: 'عبدالباسط عبدالصمد', subtext: 'رواية حفص', edition: 'ar.abdulbasitmurattal' },
-  { id: 3, name: 'المنشاوي', subtext: 'معلم', edition: 'ar.minshawi' },
+  { id: 1, name: 'مشاري العفاسي', subtext: null, edition: 'ar.alafasy' },
+  { id: 2, name: 'عبد الباسط عبد الصمد', subtext: null, edition: 'ar.abdulbasitmurattal' },
+  { id: 3, name: 'عبد الرحمن السديس', subtext: null, edition: 'ar.abdurrahmaansudais' },
+  { id: 4, name: 'محمد صديق المنشاوي', subtext: null, edition: 'ar.minshawi' },
+  { id: 5, name: 'محمود خليل الحصري', subtext: null, edition: 'ar.husary' },
+  { id: 6, name: 'أبو بكر الشاطري', subtext: null, edition: 'ar.shaatree' },
 ];
-
-const DEFAULT_SURAH_OPTION = {
-  id: 0,
-  name: 'اسم السورة',
-  subtext: 'غير محدد (عشوائي)',
-  verses_count: 0,
-};
 
 const DEFAULT_AYAH_OPTION = {
   number: 0,
   label: 'رقم الآية',
-  subtext: 'غير محددة',
+  subtext: 'غير محدد (عشوائي)',
 };
 
-/* ============ المكوّن الرئيسي لصفحة التلاوة ============ */
-
 export default function RecitationPage() {
-  const [surahs, setSurahs] = useState([DEFAULT_SURAH_OPTION]);
-
-  // بداية التلاوة
-  const [selectedSurah, setSelectedSurah] = useState(0);
-  const [availableAyahs, setAvailableAyahs] = useState([DEFAULT_AYAH_OPTION]);
-  const [selectedAyah, setSelectedAyah] = useState(0);
-
-  // نهاية التلاوة
-  const [rangeEndSurah, setRangeEndSurah] = useState(0);
-  const [availableEndAyahs, setAvailableEndAyahs] = useState([DEFAULT_AYAH_OPTION]);
-  const [rangeEndAyah, setRangeEndAyah] = useState(0);
-
-  // القارئ
-  const [selectedReciter, setSelectedReciter] = useState(0);
-
-  // حالة الآية
   const [verse, setVerse] = useState(null);
+  const [words, setWords] = useState([]);
+  const [surahs, setSurahs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const [highlightedWordIndex, setHighlightedWordIndex] = useState(-1);
 
-  // حالة الصوت
-  const [audioUrl, setAudioUrl] = useState(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [selectedReciter, setSelectedReciter] = useState(0);
+  const [selectedSurah, setSelectedSurah] = useState(0); // بداية التلاوة - السورة
+  const [selectedAyah, setSelectedAyah] = useState(0);   // بداية التلاوة - الآية
+  const [availableAyahs, setAvailableAyahs] = useState([DEFAULT_AYAH_OPTION]);
+
+  const [selectedSurahEnd, setSelectedSurahEnd] = useState(0); // نهاية التلاوة - السورة
+  const [selectedAyahEnd, setSelectedAyahEnd] = useState(0);   // نهاية التلاوة - الآية
+  const [availableAyahsEnd, setAvailableAyahsEnd] = useState([DEFAULT_AYAH_OPTION]);
+
+  // حالة لتتبع موضعنا الحالي ونهاية المقطع
+  const [currentSurah, setCurrentSurah] = useState(null);
+  const [currentAyah, setCurrentAyah] = useState(null);
+  const [rangeEndSurah, setRangeEndSurah] = useState(null);
+  const [rangeEndAyah, setRangeEndAyah] = useState(null);
+
   const audioRef = useRef(null);
 
-  // حالة التسجيل (واجهة فقط)
-  const [isRecording, setIsRecording] = useState(false);
-
-  // حالة التحميل والأخطاء
-  const [isLoading, setIsLoading] = useState(false);
-  const [applyClicked, setApplyClicked] = useState(false);
-  const [error, setError] = useState(null);
-
-  /* ============ تحميل بيانات السور من API ============ */
-
   useEffect(() => {
-    const fetchSurahs = async () => {
-      try {
-        const response = await fetch('https://api.alquran.cloud/v1/meta');
-        const data = await response.json();
-        const surahsList = [
-          DEFAULT_SURAH_OPTION,
-          ...data.data.surahs.references.map((s) => ({
-            id: s.number,
-            name: s.name,
-            subtext: null,
-            verses_count: s.numberOfAyahs,
-          })),
-        ];
-        setSurahs(surahsList);
-      } catch (err) {
-        console.error('Error fetching surahs meta:', err);
-        setError('حدث خطأ أثناء تحميل بيانات السور.');
-      }
-    };
-
     fetchSurahs();
+    fetchVerse();
   }, []);
 
-  /* ============ تحديث الآيات المتاحة عند اختيار السورة ============ */
+  const fetchSurahs = async () => {
+    try {
+      const response = await fetch('https://api.alquran.cloud/v1/meta');
+      const data = await response.json();
+      const surahsList = [
+        { id: 0, name: 'اسم السورة', subtext: 'غير محدد (عشوائي)', verses_count: 0 },
+        ...data.data.surahs.references.map((s) => ({
+          id: s.number,
+          name: s.name,
+          subtext: null,
+          verses_count: s.numberOfAyahs,
+        })),
+      ];
+      setSurahs(surahsList);
+    } catch (error) {
+      console.error('خطأ في جلب السور:', error);
+    }
+  };
 
+  // الآيات المتاحة لبداية التلاوة
   useEffect(() => {
-    if (selectedSurah !== 0) {
+    if (selectedSurah > 0) {
       const surah = surahs.find((s) => s.id === selectedSurah);
       if (surah) {
         const ayahs = [DEFAULT_AYAH_OPTION];
@@ -261,29 +227,63 @@ export default function RecitationPage() {
     }
   }, [selectedSurah, surahs]);
 
+  // الآيات المتاحة لنهاية التلاوة
   useEffect(() => {
-    if (rangeEndSurah !== 0) {
-      const surah = surahs.find((s) => s.id === rangeEndSurah);
+    if (selectedSurahEnd > 0) {
+      const surah = surahs.find((s) => s.id === selectedSurahEnd);
       if (surah) {
         const ayahs = [DEFAULT_AYAH_OPTION];
         for (let i = 1; i <= surah.verses_count; i++) {
           ayahs.push({ number: i, label: `الآية ${i}`, subtext: null });
         }
-        setAvailableEndAyahs(ayahs);
-        setRangeEndAyah(0);
+        setAvailableAyahsEnd(ayahs);
+        setSelectedAyahEnd(0);
       }
     } else {
-      setAvailableEndAyahs([DEFAULT_AYAH_OPTION]);
-      setRangeEndAyah(0);
+      setAvailableAyahsEnd([DEFAULT_AYAH_OPTION]);
+      setSelectedAyahEnd(0);
     }
-  }, [rangeEndSurah, surahs]);
+  }, [selectedSurahEnd, surahs]);
 
-  /* ============ دالة مساعدة لجلب الآية (نص تجويد) ============ */
+  const fetchVerse = async () => {
+    setLoading(true);
+    setAudioBlob(null);
+    setHighlightedWordIndex(-1);
 
-  const fetchVerse = async (surahNum, ayahNum, reciterData) => {
-    setIsLoading(true);
-    setError(null);
     try {
+      let surahNum =
+        selectedSurah === 0
+          ? Math.floor(Math.random() * 114) + 1
+          : selectedSurah;
+
+      let ayahNum = selectedAyah;
+      if (ayahNum === 0 && surahs.length > 0) {
+        const surah = surahs.find((s) => s.id === surahNum) || { verses_count: 7 };
+        ayahNum = Math.floor(Math.random() * surah.verses_count) + 1;
+      } else if (ayahNum === 0) {
+        ayahNum = 1;
+      }
+
+      // تحديد بيانات القارئ
+      let reciterData =
+        selectedReciter === 0
+          ? RECITERS[Math.floor(Math.random() * (RECITERS.length - 1)) + 1]
+          : RECITERS.find((r) => r.id === selectedReciter);
+
+      // تحديد نهاية المقطع (إذا لم تُحدَّد نعتبرها مثل البداية أو نهاية السورة)
+      let endSurahNum = selectedSurahEnd || surahNum;
+      let endAyahNum = selectedAyahEnd;
+      if (endAyahNum === 0) {
+        const endSurahMeta = surahs.find((s) => s.id === endSurahNum);
+        endAyahNum = endSurahMeta ? endSurahMeta.verses_count : ayahNum;
+      }
+
+      setCurrentSurah(surahNum);
+      setCurrentAyah(ayahNum);
+      setRangeEndSurah(endSurahNum);
+      setRangeEndAyah(endAyahNum);
+
+      // *** هنا التعديل الأول: استخدام quran-uthmani-tajweed ***
       const verseResponse = await fetch(
         `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/editions/quran-uthmani-tajweed,${reciterData.edition}`
       );
@@ -294,7 +294,7 @@ export default function RecitationPage() {
         const audioData = verseData.data[1];
 
         const verseObj = {
-          text: textData.text, // HTML بعلامات التجويد
+          text: textData.text,
           surah: textData.surah.name,
           surahNumber: surahNum,
           number: ayahNum,
@@ -303,265 +303,256 @@ export default function RecitationPage() {
         };
 
         setVerse(verseObj);
-        setAudioUrl(verseObj.audio);
-      } else {
-        setError('تعذر جلب الآية. حاول مرة أخرى.');
+
+        try {
+          const wordsResponse = await fetch(
+            `https://api.quran.com/api/v4/verses/by_key/${surahNum}:${ayahNum}?language=ar&words=true&word_fields=text_uthmani`
+          );
+          const wordsData = await wordsResponse.json();
+          if (wordsData.verse && wordsData.verse.words) {
+            setWords(wordsData.verse.words);
+          } else {
+            setWords([]);
+          }
+        } catch (err) {
+          console.log('تعذر جلب الكلمات');
+          setWords([]);
+        }
       }
-    } catch (err) {
-      console.error('Error fetching verse:', err);
-      setError('حدث خطأ أثناء جلب الآية. تحقق من الاتصال بالإنترنت.');
+    } catch (error) {
+      console.error('خطأ في جلب الآية:', error);
+      setVerse({
+        text: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+        surah: 'الفاتحة',
+        surahNumber: 1,
+        number: 1,
+        audio: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3',
+        reciter: RECITERS[1].name,
+      });
+      setWords([]);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  /* ============ تطبيق الاختيارات ============ */
-
-  const handleApplySelections = async () => {
-    setApplyClicked(true);
-
-    // اختيار القارئ
-    let reciterData =
-      selectedReciter === 0
-        ? RECITERS[1]
-        : RECITERS.find((r) => r.id === selectedReciter) || RECITERS[1];
-
-    // في حالة عدم اختيار السورة/الآية نختار عشوائيًا
-    let surahNum = selectedSurah;
-    let ayahNum = selectedAyah;
-
-    if (surahNum === 0 || ayahNum === 0) {
-      const validSurahs = surahs.filter((s) => s.id !== 0);
-      const randomSurah =
-        validSurahs[Math.floor(Math.random() * validSurahs.length)];
-      surahNum = randomSurah.id;
-      const randomAyah =
-        1 + Math.floor(Math.random() * randomSurah.verses_count);
-      ayahNum = randomAyah;
-      setSelectedSurah(randomSurah.id);
-      setSelectedAyah(randomAyah);
-      setRangeEndSurah(randomSurah.id);
-      setRangeEndAyah(randomAyah);
-    }
-
-    await fetchVerse(surahNum, ayahNum, reciterData);
-  };
-
-  /* ============ الآية التالية داخل النطاق ============ */
-
-  const handleNextVerse = async () => {
-    if (!verse) return;
-
-    let nextSurah = verse.surahNumber;
-    let nextAyah = verse.number + 1;
-
+  // جلب الآية التالية داخل المقطع المحدد وتشغيلها تلقائياً
+  const fetchNextInRange = async () => {
     if (
-      rangeEndSurah &&
-      rangeEndAyah &&
-      (nextSurah > rangeEndSurah ||
-        (nextSurah === rangeEndSurah && nextAyah > rangeEndAyah))
+      !currentSurah ||
+      !currentAyah ||
+      !rangeEndSurah ||
+      !rangeEndAyah
     ) {
-      nextSurah = selectedSurah || verse.surahNumber;
-      nextAyah = selectedAyah || 1;
+      return;
     }
 
-    let reciterData =
-      selectedReciter === 0
-        ? RECITERS.find((r) => r.name === verse.reciter) || RECITERS[1]
-        : RECITERS.find((r) => r.id === selectedReciter) || RECITERS[1];
+    // التأكد هل وصلنا للنهاية
+    if (
+      currentSurah > rangeEndSurah ||
+      (currentSurah === rangeEndSurah && currentAyah >= rangeEndAyah)
+    ) {
+      return;
+    }
 
-    await fetchVerse(nextSurah, nextAyah, reciterData);
-    setSelectedSurah(nextSurah);
-    setSelectedAyah(nextAyah);
-  };
+    let nextSurah = currentSurah;
+    let nextAyah = currentAyah + 1;
 
-  /* ============ تشغيل/إيقاف التلاوة ============ */
+    const currentSurahMeta = surahs.find((s) => s.id === currentSurah);
+    const lastAyahCurrent = currentSurahMeta?.verses_count || currentAyah;
 
-  const handlePlayPause = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioRef.current
-        .play()
-        .then(() => {
-          setIsPlaying(true);
-        })
-        .catch((err) => {
-          console.error('Error playing audio:', err);
-        });
+    // الانتقال للسورة التالية إذا انتهت الآيات
+    if (nextAyah > lastAyahCurrent) {
+      nextSurah = currentSurah + 1;
+      nextAyah = 1;
+    }
+
+    // عدم تجاوز نهاية المقطع
+    if (
+      nextSurah > rangeEndSurah ||
+      (nextSurah === rangeEndSurah && nextAyah > rangeEndAyah)
+    ) {
+      return;
+    }
+
+    try {
+      let reciterData =
+        selectedReciter === 0
+          ? RECITERS.find((r) => r.name === verse?.reciter) || RECITERS[1]
+          : RECITERS.find((r) => r.id === selectedReciter);
+
+      // *** هنا التعديل الثاني: أيضًا quran-uthmani-tajweed ***
+      const verseResponse = await fetch(
+        `https://api.alquran.cloud/v1/ayah/${nextSurah}:${nextAyah}/editions/quran-uthmani-tajweed,${reciterData.edition}`
+      );
+      const verseData = await verseResponse.json();
+
+      if (verseData.status === 'OK' && verseData.data.length >= 2) {
+        const textData = verseData.data[0];
+        const audioData = verseData.data[1];
+
+        const verseObj = {
+          text: textData.text,
+          surah: textData.surah.name,
+          surahNumber: nextSurah,
+          number: nextAyah,
+          audio: audioData.audio || audioData.audioSecondary?.[0] || null,
+          reciter: reciterData.name,
+        };
+
+        setVerse(verseObj);
+        setCurrentSurah(nextSurah);
+        setCurrentAyah(nextAyah);
+
+        try {
+          const wordsResponse = await fetch(
+            `https://api.quran.com/api/v4/verses/by_key/${nextSurah}:${nextAyah}?language=ar&words=true&word_fields=text_uthmani`
+          );
+          const wordsData = await wordsResponse.json();
+          if (wordsData.verse && wordsData.verse.words) {
+            setWords(wordsData.verse.words);
+          } else {
+            setWords([]);
+          }
+        } catch {
+          setWords([]);
+        }
+
+        // تشغيل الصوت تلقائياً للآية التالية
+        if (audioRef.current) {
+          audioRef.current.load();
+          audioRef.current.play().catch(() => {});
+        }
+      }
+    } catch (e) {
+      console.error('خطأ في جلب الآية التالية:', e);
     }
   };
 
   const handleAudioEnded = () => {
-    setIsPlaying(false);
+    // عند انتهاء الصوت، نحاول جلب الآية التالية
+    fetchNextInRange();
   };
 
-  /* ============ تسجيل صوت المستخدم (واجهة فقط) ============ */
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const audioChunks = [];
 
-  const handleToggleRecording = () => {
-    setIsRecording((prev) => !prev);
+      recorder.ondataavailable = (event) => {
+        audioChunks.push(event.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(audioChunks, { type: 'audio/wav' });
+        setAudioBlob(blob);
+        stream.getTracks().forEach((track) => track.stop());
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+
+      setTimeout(() => {
+        if (recorder.state === 'recording') {
+          stopRecording();
+        }
+      }, 30000);
+    } catch (error) {
+      console.error('خطأ في تسجيل الصوت:', error);
+      alert('لم نتمكن من الوصول إلى الميكروفون.');
+    }
   };
 
-  /* ============ الواجهة ============ */
+  const stopRecording = () => {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+      setIsRecording(false);
+    }
+  };
 
   return (
     <>
+      {/* نفس خط UthmanicHafs المستخدم في صفحة الاختبار */}
       <style jsx global>{`
         @font-face {
           font-family: 'UthmanicHafs';
-          src: url('/fonts/UthmanicHafs1-Ver22.woff2') format('woff2');
+          src: url('/fonts/UthmanicHafs_V22.ttf') format('truetype');
+          font-weight: normal;
+          font-style: normal;
           font-display: swap;
         }
 
-        .font-quran {
-          font-family: 'UthmanicHafs', 'Scheherazade New', 'Traditional Arabic',
-            system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        .quran-text {
+          font-family: 'UthmanicHafs', 'Amiri', 'Scheherazade New', serif;
         }
       `}</style>
 
-      <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col">
-        {/* شريط علوي */}
-        <header className="w-full border-b border-emerald-100 bg-white/80 backdrop-blur-md">
-          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <Link
-                href="/"
-                className="inline-flex items-center gap-2 text-emerald-700 hover:text-emerald-900 text-sm md:text-base"
-              >
-                <IconBack className="w-4 h-4" />
-                <span>العودة للرئيسية</span>
-              </Link>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 relative">
-                <Image
-                  src="/logo.png"
-                  alt="Tajweedy Logo"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-              <span className="font-semibold text-emerald-800 hidden sm:inline">
-                مدرب أحكام التجويد
-              </span>
+      <div className="min-h-screen p-4 md:p-8 relative z-10 bg-gradient-to-br from-green-50 to-teal-50">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-between mb-6 bg-white rounded-2xl p-4 shadow-md border border-gray-100">
+            <Link
+              href="/"
+              className="text-[#1e7850] hover:text-[#155c3e] font-semibold flex items-center gap-2"
+            >
+              <IconBack />
+              <span>العودة للرئيسية</span>
+            </Link>
+            <div className="w-12 h-12 relative">
+              <Image src="/logo.png" alt="Logo" fill className="object-contain" />
             </div>
           </div>
-        </header>
 
-        {/* المحتوى */}
-        <main className="flex-1">
-          <div className="max-w-5xl mx-auto px-4 py-6 md:py-10">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold text-emerald-800 mb-2">
-                قسم التلاوة والتدريب
-              </h1>
-              <p className="text-gray-600 text-sm md:text-base">
-                اختر السورة، رقم الآية، والقارئ، ثم استمع ودرّب نفسك على التلاوة
-                مع عرض الآية مكتوبة بخط عثماني وعلامات التجويد.
-              </p>
+          <div className="text-center mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold text-[#1e7850] mb-2">
+              قسم التلاوة والتدريب
+            </h1>
+          </div>
+
+          {loading ? (
+            <div className="bg-white p-12 rounded-3xl shadow-lg border border-gray-100 text-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#1e7850] border-t-transparent mx-auto mb-4"></div>
+              <p className="text-gray-600 text-lg">جاري تحميل الآية...</p>
             </div>
-
-            {/* كارت التلاوة */}
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-emerald-100 px-4 py-5 md:px-8 md:py-7">
-              {/* معلومات السورة والآية */}
-              <div className="flex flex-col items-center gap-1 mb-4">
-                <p className="text-sm text-gray-500">
-                  التلاوة الحالية بواسطة{' '}
-                  <span className="font-semibold text-emerald-700">
-                    {verse?.reciter || '—'}
-                  </span>
-                </p>
-                <h2 className="text-2xl md:text-3xl font-quran text-emerald-800">
-                  {verse?.surah || 'لم يتم اختيار آية بعد'}
+          ) : (
+            <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 md:p-8 mb-6">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2 font-amiri">
+                  {verse?.surah}
                 </h2>
-                {verse && (
-                  <p className="text-base md:text-lg text-gray-600 font-amiri">
-                    الآية {verse?.number}
-                  </p>
-                )}
+                <p className="text-lg md:text-xl text-gray-600 font-amiri">
+                  الآية {verse?.number}
+                </p>
               </div>
 
-              {/* نص الآية بعلامات التجويد – مرة واحدة فقط */}
-              <div className="quran-text bg-gradient-to-br from-emerald-50 to-white p-6 md:p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner">
+              {/* *** هنا التعديل الثالث: عرض نص التجويد من verse.text *** */}
+              <div className="quran-text bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner">
                 <div
-                  className="text-center text-2xl md:text-3xl leading-relaxed font-quran"
+                  className="text-center text-3xl md:text-4xl leading-[2.4rem]"
                   dir="rtl"
                   dangerouslySetInnerHTML={{ __html: verse?.text || '' }}
                 />
               </div>
 
-              {/* مشغل التلاوة + التسجيل */}
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-                <div className="flex items-center gap-3 w-full md:w-auto">
-                  <button
-                    type="button"
-                    onClick={handlePlayPause}
-                    disabled={!audioUrl}
-                    className={`${glassPrimary} px-5 py-2 md:px-6 md:py-2.5 text-sm md:text-base`}
-                  >
-                    <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-emerald-600 text-white">
-                      {isPlaying ? '⏸' : '▶'}
-                    </span>
-                    <span className="font-semibold">
-                      {isPlaying ? 'إيقاف التلاوة' : 'تشغيل التلاوة'}
-                    </span>
-                  </button>
+              {/* باقي الصفحة كما هي تمامًا (اختيارات، أزرار، تسجيل، تلميح...) */}
 
-                  <audio
-                    ref={audioRef}
-                    src={audioUrl || undefined}
-                    onEnded={handleAudioEnded}
-                    className="hidden"
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleNextVerse}
-                  disabled={!verse}
-                  className={`${glassSecondaryBase} px-5 py-2 md:px-6 md:py-2.5 text-sm md:text-base`}
-                >
-                  <span className="font-semibold text-emerald-700">
-                    الآية التالية داخل النطاق
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleToggleRecording}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-rose-300 bg-rose-50/70 text-rose-700 hover:bg-rose-100 transition-colors text-xs md:text-sm"
-                >
-                  <IconMic className="w-4 h-4" />
-                  <span>{isRecording ? 'إيقاف التسجيل' : 'بدء تسجيل تلاوتك'}</span>
-                  {isRecording && <IconRecordDot className="w-3 h-3" />}
-                </button>
-              </div>
-
-              {/* اختيارات القارئ والسورة والآية */}
+              {/* اختيارات القارئ + بداية/نهاية التلاوة للسورة والآية */}
               <div className="flex flex-col gap-4 mb-6">
-                {/* القارئ */}
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm text-gray-600 pr-2 text-right">
-                    اختر القارئ
-                  </span>
-                  <select
-                    value={selectedReciter}
-                    onChange={(e) => setSelectedReciter(Number(e.target.value))}
-                    className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-2xl focus:border-emerald-600 focus:outline-none text-center font-semibold bg-white text-sm md:text-base font-amiri"
-                  >
-                    {RECITERS.map((reciter) => (
-                      <option key={reciter.id} value={reciter.id}>
-                        {reciter.subtext
-                          ? `${reciter.name} – ${reciter.subtext}`
-                          : reciter.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <select
+                  value={selectedReciter}
+                  onChange={(e) => setSelectedReciter(Number(e.target.value))}
+                  className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg font-amiri"
+                >
+                  {RECITERS.map((reciter) => (
+                    <option key={reciter.id} value={reciter.id}>
+                      {reciter.subtext
+                        ? `${reciter.name}  ${reciter.subtext}`
+                        : reciter.name}
+                    </option>
+                  ))}
+                </select>
 
-                {/* بداية/نهاية التلاوة – السورة */}
+                {/* السورة: بداية التلاوة / نهاية التلاوة */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1">
                     <span className="text-sm text-gray-600 pr-2 text-right">
@@ -570,11 +561,13 @@ export default function RecitationPage() {
                     <select
                       value={selectedSurah}
                       onChange={(e) => setSelectedSurah(Number(e.target.value))}
-                      className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-2xl focus:border-emerald-600 focus:outline-none text-center bg-white text-sm md:text-base font-amiri"
+                      className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg font-amiri"
                     >
-                      {surahs.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.id === 0 ? s.name : `سورة ${s.name}`}
+                      {surahs.map((surah) => (
+                        <option key={surah.id} value={surah.id}>
+                          {surah.subtext
+                            ? `${surah.name}  ${surah.subtext}`
+                            : `${surah.id}. ${surah.name}`}
                         </option>
                       ))}
                     </select>
@@ -585,33 +578,38 @@ export default function RecitationPage() {
                       نهاية التلاوة - السورة
                     </span>
                     <select
-                      value={rangeEndSurah}
-                      onChange={(e) => setRangeEndSurah(Number(e.target.value))}
-                      className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-2xl focus:border-emerald-600 focus:outline-none text-center bg-white text-sm md:text-base font-amiri"
+                      value={selectedSurahEnd}
+                      onChange={(e) => setSelectedSurahEnd(Number(e.target.value))}
+                      className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg font-amiri"
                     >
-                      {surahs.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.id === 0 ? s.name : `سورة ${s.name}`}
+                      {surahs.map((surah) => (
+                        <option key={surah.id} value={surah.id}>
+                          {surah.subtext
+                            ? `${surah.name}  ${surah.subtext}`
+                            : `${surah.id}. ${surah.name}`}
                         </option>
                       ))}
                     </select>
                   </div>
                 </div>
 
-                {/* بداية/نهاية التلاوة – الآية */}
+                {/* الآية: بداية التلاوة / نهاية التلاوة */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1">
                     <span className="text-sm text-gray-600 pr-2 text-right">
-                      بداية التلاوة - رقم الآية
+                      بداية التلاوة - الآية
                     </span>
                     <select
                       value={selectedAyah}
                       onChange={(e) => setSelectedAyah(Number(e.target.value))}
-                      className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-2xl focus:border-emerald-600 focus:outline-none text-center bg-white text-sm md:text-base font-amiri"
+                      disabled={selectedSurah === 0}
+                      className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white disabled:bg-gray-100 disabled:cursor-not-allowed text-lg font-amiri"
                     >
-                      {availableAyahs.map((a) => (
-                        <option key={a.number} value={a.number}>
-                          {a.number === 0 ? a.label : a.label}
+                      {availableAyahs.map((ayah) => (
+                        <option key={ayah.number} value={ayah.number}>
+                          {ayah.subtext
+                            ? `${ayah.label}  ${ayah.subtext}`
+                            : ayah.label}
                         </option>
                       ))}
                     </select>
@@ -619,16 +617,19 @@ export default function RecitationPage() {
 
                   <div className="flex flex-col gap-1">
                     <span className="text-sm text-gray-600 pr-2 text-right">
-                      نهاية التلاوة - رقم الآية
+                      نهاية التلاوة - الآية
                     </span>
                     <select
-                      value={rangeEndAyah}
-                      onChange={(e) => setRangeEndAyah(Number(e.target.value))}
-                      className="w-full p-3 md:p-4 border-2 border-gray-200 rounded-2xl focus:border-emerald-600 focus:outline-none text-center bg-white text-sm md:text-base font-amiri"
+                      value={selectedAyahEnd}
+                      onChange={(e) => setSelectedAyahEnd(Number(e.target.value))}
+                      disabled={selectedSurahEnd === 0}
+                      className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white disabled:bg-gray-100 disabled:cursor-not-allowed text-lg font-amiri"
                     >
-                      {availableEndAyahs.map((a) => (
-                        <option key={a.number} value={a.number}>
-                          {a.number === 0 ? a.label : a.label}
+                      {availableAyahsEnd.map((ayah) => (
+                        <option key={ayah.number} value={ayah.number}>
+                          {ayah.subtext
+                            ? `${ayah.label}  ${ayah.subtext}`
+                            : ayah.label}
                         </option>
                       ))}
                     </select>
@@ -636,55 +637,84 @@ export default function RecitationPage() {
                 </div>
               </div>
 
-              {/* زر تطبيق الاختيارات */}
-              <div className="flex flex-col md:flex-row items-center gap-3 md:gap-4">
-                <button
-                  type="button"
-                  onClick={handleApplySelections}
-                  className={`${glassPrimary} px-6 py-3 text-sm md:text-base`}
-                >
-                  <span className="inline-flex w-8 h-8 rounded-full bg-emerald-600 text-white items-center justify-center">
-                    <IconApply className="w-4 h-4" />
-                  </span>
-                  <span className="font-semibold">
-                    {applyClicked ? 'إعادة تحميل الآية' : 'تطبيق الاختيارات وتحميل الآية'}
-                  </span>
-                </button>
+              {/* زر تطبيق الاختيارات (زجاجي) */}
+              <button onClick={fetchVerse} className={glassPrimary}>
+                <span className="absolute inset-0 pointer-events-none bg-gradient-to-l from-emerald-500/15 via-sky-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="relative inline-flex items-center justify-center gap-2">
+                  <IconApply />
+                  <span>تطبيق الاختيارات</span>
+                </span>
+              </button>
 
-                {verse && (
-                  <span className="inline-flex items-center gap-2 text-xs md:text-sm text-gray-600">
-                    <IconCheck className="w-4 h-4" />
-                    <span>
-                      تم تحميل الآية{' '}
-                      <strong>
-                        {verse.surah} – {verse.number}
-                      </strong>{' '}
-                      بقارئ{' '}
-                      <strong>{verse.reciter}</strong>
-                    </span>
-                  </span>
+              {/* مشغل الصوت */}
+              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-4 mt-4">
+                <p className="text-base md:text-lg text-gray-600 mb-2 text-center">
+                  استمع للتلاوة الصحيحة - القارئ:{' '}
+                  <span className="font-bold">{verse?.reciter}</span>
+                </p>
+                {verse?.audio ? (
+                  <audio
+                    key={verse.audio}
+                    ref={audioRef}
+                    controls
+                    onEnded={handleAudioEnded}
+                    className="w-full rounded-full"
+                  >
+                    <source src={verse.audio} type="audio/mpeg" />
+                    المتصفح لا يدعم تشغيل الصوت
+                  </audio>
+                ) : (
+                  <p className="text-center text-gray-500 text-base">
+                    جاري تحميل الصوت...
+                  </p>
                 )}
               </div>
 
-              {/* رسالة الخطأ */}
-              {error && (
-                <div className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-                  {error}
+              {/* زر التسجيل الزجاجي مع حالة التسجيل */}
+              <button
+                onClick={isRecording ? stopRecording : startRecording}
+                className={
+                  isRecording
+                    ? `relative w-full rounded-full px-8 py-4 text-lg font-bold text-white shadow-md transition-all duration-200 flex items-center justify-center gap-2 border border-red-500 bg-red-500 animate-pulse`
+                    : glassSecondaryBase
+                }
+              >
+                {!isRecording && (
+                  <span className="absolute inset-0 pointer-events-none bg-gradient-to-l from-slate-400/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                )}
+                <span className="relative inline-flex items-center justify-center gap-2">
+                  {isRecording ? <IconRecordDot /> : <IconMic />}
+                  <span>{isRecording ? 'إيقاف التسجيل' : 'ابدأ التسجيل'}</span>
+                </span>
+              </button>
+
+              {audioBlob && (
+                <div className="bg-blue-50 p-4 rounded-2xl border border-blue-200 mb-4 mt-4">
+                  <p className="text-sm text-blue-700 mb-2 text-center font-semibold flex items-center justify-center gap-2">
+                    <IconCheck />
+                    <span>تم التسجيل بنجاح!</span>
+                  </p>
+                  <audio controls className="w-full rounded-full">
+                    <source src={URL.createObjectURL(audioBlob)} type="audio/wav" />
+                  </audio>
+                  <p className="text-xs text-gray-600 text-center mt-2">
+                    ميزة تحليل الصوت بالذكاء الاصطناعي ستكون متاحة قريباً
+                  </p>
                 </div>
               )}
 
-              {/* تلميح */}
-              <div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50/60 px-4 py-3 text-xs md:text-sm text-emerald-800 flex gap-3 items-start">
-                <IconHint className="mt-0.5 w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
-                <p>
-                  <strong>تلميح:</strong> الآية تظهر هنا بخط عثماني مع علامات
-                  التجويد الملوّنة؛ يمكنك تغيير السورة، الآية، والقارئ من الخيارات
-                  أعلاه ثم الضغط على زر "تطبيق الاختيارات وتحميل الآية".
+              <div className="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg mt-2">
+                <p className="text-sm text-gray-700 flex items-start gap-2">
+                  <IconHint className="mt-0.5 w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
+                  <span>
+                    <strong>تلميح:</strong> اضغط على "تطبيق الاختيارات" لتحميل الآية
+                    والصوت الصحيح.
+                  </span>
                 </p>
               </div>
             </div>
-          </div>
-        </main>
+          )}
+        </div>
       </div>
     </>
   );
