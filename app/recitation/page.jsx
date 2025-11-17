@@ -159,35 +159,36 @@ const DEFAULT_AYAH_OPTION = {
 };
 
 export default function RecitationPage() {
-  const [verse, setVerse] = useState(null);
-  const [words, setWords] = useState([]);
-  const [surahs, setSurahs] = useState([]);
+  const [verse, setVerse] = useState<any>(null);
+  const [words, setWords] = useState<any[]>([]);
+  const [surahs, setSurahs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [audioBlob, setAudioBlob] = useState(null);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [highlightedWordIndex, setHighlightedWordIndex] = useState(-1);
 
   const [selectedReciter, setSelectedReciter] = useState(0);
   const [selectedSurah, setSelectedSurah] = useState(0); // بداية التلاوة - السورة
   const [selectedAyah, setSelectedAyah] = useState(0);   // بداية التلاوة - الآية
-  const [availableAyahs, setAvailableAyahs] = useState([DEFAULT_AYAH_OPTION]);
+  const [availableAyahs, setAvailableAyahs] = useState<any[]>([DEFAULT_AYAH_OPTION]);
 
   const [selectedSurahEnd, setSelectedSurahEnd] = useState(0); // نهاية التلاوة - السورة
   const [selectedAyahEnd, setSelectedAyahEnd] = useState(0);   // نهاية التلاوة - الآية
-  const [availableAyahsEnd, setAvailableAyahsEnd] = useState([DEFAULT_AYAH_OPTION]);
+  const [availableAyahsEnd, setAvailableAyahsEnd] = useState<any[]>([DEFAULT_AYAH_OPTION]);
 
   // حالة لتتبع موضعنا الحالي ونهاية المقطع
-  const [currentSurah, setCurrentSurah] = useState(null);
-  const [currentAyah, setCurrentAyah] = useState(null);
-  const [rangeEndSurah, setRangeEndSurah] = useState(null);
-  const [rangeEndAyah, setRangeEndAyah] = useState(null);
+  const [currentSurah, setCurrentSurah] = useState<number | null>(null);
+  const [currentAyah, setCurrentAyah] = useState<number | null>(null);
+  const [rangeEndSurah, setRangeEndSurah] = useState<number | null>(null);
+  const [rangeEndAyah, setRangeEndAyah] = useState<number | null>(null);
 
-  const audioRef = useRef(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     fetchSurahs();
     fetchVerse();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchSurahs = async () => {
@@ -196,7 +197,7 @@ export default function RecitationPage() {
       const data = await response.json();
       const surahsList = [
         { id: 0, name: 'اسم السورة', subtext: 'غير محدد (عشوائي)', verses_count: 0 },
-        ...data.data.surahs.references.map((s) => ({
+        ...data.data.surahs.references.map((s: any) => ({
           id: s.number,
           name: s.name,
           subtext: null,
@@ -268,7 +269,7 @@ export default function RecitationPage() {
       let reciterData =
         selectedReciter === 0
           ? RECITERS[Math.floor(Math.random() * (RECITERS.length - 1)) + 1]
-          : RECITERS.find((r) => r.id === selectedReciter);
+          : RECITERS.find((r) => r.id === selectedReciter)!;
 
       // تحديد نهاية المقطع (إذا لم تُحدَّد نعتبرها مثل البداية أو نهاية السورة)
       let endSurahNum = selectedSurahEnd || surahNum;
@@ -283,7 +284,7 @@ export default function RecitationPage() {
       setRangeEndSurah(endSurahNum);
       setRangeEndAyah(endAyahNum);
 
-      // *** هنا التعديل الأول: استخدام quran-uthmani-tajweed ***
+      // استخدام quran-uthmani-tajweed
       const verseResponse = await fetch(
         `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/editions/quran-uthmani-tajweed,${reciterData.edition}`
       );
@@ -378,9 +379,8 @@ export default function RecitationPage() {
       let reciterData =
         selectedReciter === 0
           ? RECITERS.find((r) => r.name === verse?.reciter) || RECITERS[1]
-          : RECITERS.find((r) => r.id === selectedReciter);
+          : RECITERS.find((r) => r.id === selectedReciter)!;
 
-      // *** هنا التعديل الثاني: أيضًا quran-uthmani-tajweed ***
       const verseResponse = await fetch(
         `https://api.alquran.cloud/v1/ayah/${nextSurah}:${nextAyah}/editions/quran-uthmani-tajweed,${reciterData.edition}`
       );
@@ -437,7 +437,7 @@ export default function RecitationPage() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
-      const audioChunks = [];
+      const audioChunks: BlobPart[] = [];
 
       recorder.ondataavailable = (event) => {
         audioChunks.push(event.data);
@@ -525,16 +525,21 @@ export default function RecitationPage() {
                 </p>
               </div>
 
-              {/* *** هنا التعديل الثالث: عرض نص التجويد من verse.text *** */}
+              {/* نص التجويد + رقم الآية في دائرة */}
               <div className="quran-text bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner">
                 <div
-                  className="text-center text-3xl md:text-4xl leading-[2.4rem]"
+                  className="flex items-center justify-center gap-4"
                   dir="rtl"
-                  dangerouslySetInnerHTML={{ __html: verse?.text || '' }}
-                />
+                >
+                  <div
+                    className="text-center text-3xl md:text-4xl leading-[2.4rem]"
+                    dangerouslySetInnerHTML={{ __html: verse?.text || '' }}
+                  />
+                  <span className="inline-flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-full border-2 border-green-400 text-xl md:text-2xl text-green-800 bg-white/80 shadow-sm">
+                    {verse?.number}
+                  </span>
+                </div>
               </div>
-
-              {/* باقي الصفحة كما هي تمامًا (اختيارات، أزرار، تسجيل، تلميح...) */}
 
               {/* اختيارات القارئ + بداية/نهاية التلاوة للسورة والآية */}
               <div className="flex flex-col gap-4 mb-6">
@@ -719,3 +724,4 @@ export default function RecitationPage() {
     </>
   );
 }
+```0
