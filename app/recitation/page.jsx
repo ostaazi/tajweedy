@@ -194,24 +194,21 @@ export default function RecitationPage() {
 
   // نهاية التلاوة
   const [rangeEndSurah, setRangeEndSurah] = useState(0);
-  const [availableEndAyahs, setAvailableEndAyahs] =
-    useState([DEFAULT_AYAH_OPTION]);
+  const [availableEndAyahs, setAvailableEndAyahs] = useState([DEFAULT_AYAH_OPTION]);
   const [rangeEndAyah, setRangeEndAyah] = useState(0);
 
   // القارئ
   const [selectedReciter, setSelectedReciter] = useState(0);
 
-  // حالة الآية / الكلمات
+  // حالة الآية
   const [verse, setVerse] = useState(null);
-  const [words, setWords] = useState([]);
-  const [highlightedWordIndex, setHighlightedWordIndex] = useState(-1);
 
   // حالة الصوت
   const [audioUrl, setAudioUrl] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
 
-  // حالة التسجيل (واجهة فقط – يمكنك لاحقًا ربطها بـ MediaRecorder)
+  // حالة التسجيل (واجهة فقط)
   const [isRecording, setIsRecording] = useState(false);
 
   // حالة التحميل والأخطاء
@@ -281,13 +278,12 @@ export default function RecitationPage() {
     }
   }, [rangeEndSurah, surahs]);
 
-  /* ============ دالة مساعدة لجلب الآية مع نص التجويد والكلمات ============ */
+  /* ============ دالة مساعدة لجلب الآية (نص تجويد) ============ */
 
   const fetchVerse = async (surahNum, ayahNum, reciterData) => {
     setIsLoading(true);
     setError(null);
     try {
-      // نص الآية + تلاوة القارئ – مع التجويد
       const verseResponse = await fetch(
         `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/editions/quran-uthmani-tajweed,${reciterData.edition}`
       );
@@ -298,7 +294,7 @@ export default function RecitationPage() {
         const audioData = verseData.data[1];
 
         const verseObj = {
-          text: textData.text, // يحتوي HTML بعلامات التجويد
+          text: textData.text, // HTML بعلامات التجويد
           surah: textData.surah.name,
           surahNumber: surahNum,
           number: ayahNum,
@@ -308,26 +304,6 @@ export default function RecitationPage() {
 
         setVerse(verseObj);
         setAudioUrl(verseObj.audio);
-
-        // جلب الكلمات من API quran.com مع نص حفص عثماني
-        try {
-          const wordsResponse = await fetch(
-            `https://api.quran.com/api/v4/verses/by_key/${surahNum}:${ayahNum}?language=ar&words=true&word_fields=text_uthmani`
-          );
-          const wordsData = await wordsResponse.json();
-          if (wordsData?.verse?.words) {
-            setWords(
-              wordsData.verse.words.map((w) => ({
-                text_uthmani: w.text_uthmani,
-              }))
-            );
-          } else {
-            setWords([]);
-          }
-        } catch (wErr) {
-          console.error('Error fetching words:', wErr);
-          setWords([]);
-        }
       } else {
         setError('تعذر جلب الآية. حاول مرة أخرى.');
       }
@@ -343,7 +319,6 @@ export default function RecitationPage() {
 
   const handleApplySelections = async () => {
     setApplyClicked(true);
-    setHighlightedWordIndex(-1);
 
     // اختيار القارئ
     let reciterData =
@@ -372,7 +347,7 @@ export default function RecitationPage() {
     await fetchVerse(surahNum, ayahNum, reciterData);
   };
 
-  /* ============ الانتقال للآية التالية داخل النطاق ============ */
+  /* ============ الآية التالية داخل النطاق ============ */
 
   const handleNextVerse = async () => {
     if (!verse) return;
@@ -386,7 +361,6 @@ export default function RecitationPage() {
       (nextSurah > rangeEndSurah ||
         (nextSurah === rangeEndSurah && nextAyah > rangeEndAyah))
     ) {
-      // عدنا إلى بداية النطاق
       nextSurah = selectedSurah || verse.surahNumber;
       nextAyah = selectedAyah || 1;
     }
@@ -448,7 +422,7 @@ export default function RecitationPage() {
       `}</style>
 
       <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white flex flex-col">
-        {/* شريط علوي بسيط */}
+        {/* شريط علوي */}
         <header className="w-full border-b border-emerald-100 bg-white/80 backdrop-blur-md">
           <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
@@ -476,7 +450,7 @@ export default function RecitationPage() {
           </div>
         </header>
 
-        {/* المحتوى الرئيسي */}
+        {/* المحتوى */}
         <main className="flex-1">
           <div className="max-w-5xl mx-auto px-4 py-6 md:py-10">
             <div className="text-center mb-8">
@@ -489,7 +463,7 @@ export default function RecitationPage() {
               </p>
             </div>
 
-            {/* كارت التلاوة الرئيسي */}
+            {/* كارت التلاوة */}
             <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-emerald-100 px-4 py-5 md:px-8 md:py-7">
               {/* معلومات السورة والآية */}
               <div className="flex flex-col items-center gap-1 mb-4">
@@ -509,48 +483,17 @@ export default function RecitationPage() {
                 )}
               </div>
 
-              {/* نص الآية + علامات التجويد */}
+              {/* نص الآية بعلامات التجويد – مرة واحدة فقط */}
               <div className="quran-text bg-gradient-to-br from-emerald-50 to-white p-6 md:p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner">
-                {words.length > 0 ? (
-                  <>
-                    {/* الكلمات القابلة للنقر */}
-                    <div className="flex flex-wrap justify-center gap-1 mb-4" dir="rtl">
-                      {words.map((word, index) => (
-                        <span
-                          key={index}
-                          onClick={() => setHighlightedWordIndex(index)}
-                          className={`cursor-pointer px-3 py-2 rounded-lg transition-all text-2xl md:text-3xl font-quran ${
-                            highlightedWordIndex === index
-                              ? 'bg-emerald-200 shadow-md scale-110'
-                              : 'hover:bg-emerald-50'
-                          }`}
-                        >
-                          {word.text_uthmani}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* نص التجويد الملون من API */}
-                    {verse?.text && (
-                      <div
-                        className="text-center text-2xl md:text-3xl leading-relaxed font-quran"
-                        dir="rtl"
-                        dangerouslySetInnerHTML={{ __html: verse.text }}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <div
-                    className="text-center text-2xl md:text-3xl leading-relaxed font-quran"
-                    dir="rtl"
-                    dangerouslySetInnerHTML={{ __html: verse?.text || '' }}
-                  />
-                )}
+                <div
+                  className="text-center text-2xl md:text-3xl leading-relaxed font-quran"
+                  dir="rtl"
+                  dangerouslySetInnerHTML={{ __html: verse?.text || '' }}
+                />
               </div>
 
               {/* مشغل التلاوة + التسجيل */}
               <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-                {/* مشغل الصوت */}
                 <div className="flex items-center gap-3 w-full md:w-auto">
                   <button
                     type="button"
@@ -574,7 +517,6 @@ export default function RecitationPage() {
                   />
                 </div>
 
-                {/* زر الآية التالية */}
                 <button
                   type="button"
                   onClick={handleNextVerse}
@@ -586,7 +528,6 @@ export default function RecitationPage() {
                   </span>
                 </button>
 
-                {/* التسجيل (واجهة) */}
                 <button
                   type="button"
                   onClick={handleToggleRecording}
@@ -598,9 +539,9 @@ export default function RecitationPage() {
                 </button>
               </div>
 
-              {/* اختيارات القارئ + بداية/نهاية التلاوة للسورة والآية */}
+              {/* اختيارات القارئ والسورة والآية */}
               <div className="flex flex-col gap-4 mb-6">
-                {/* اختيار القارئ */}
+                {/* القارئ */}
                 <div className="flex flex-col gap-1">
                   <span className="text-sm text-gray-600 pr-2 text-right">
                     اختر القارئ
@@ -620,7 +561,7 @@ export default function RecitationPage() {
                   </select>
                 </div>
 
-                {/* السورة: بداية التلاوة / نهاية التلاوة */}
+                {/* بداية/نهاية التلاوة – السورة */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1">
                     <span className="text-sm text-gray-600 pr-2 text-right">
@@ -657,7 +598,7 @@ export default function RecitationPage() {
                   </div>
                 </div>
 
-                {/* الآية: بداية التلاوة / نهاية التلاوة */}
+                {/* بداية/نهاية التلاوة – الآية */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1">
                     <span className="text-sm text-gray-600 pr-2 text-right">
@@ -725,7 +666,7 @@ export default function RecitationPage() {
                 )}
               </div>
 
-              {/* رسالة الخطأ إن وجدت */}
+              {/* رسالة الخطأ */}
               {error && (
                 <div className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
                   {error}
@@ -736,10 +677,9 @@ export default function RecitationPage() {
               <div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50/60 px-4 py-3 text-xs md:text-sm text-emerald-800 flex gap-3 items-start">
                 <IconHint className="mt-0.5 w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
                 <p>
-                  <strong>تلميح:</strong> اضغط على "تطبيق الاختيارات" لتحميل الآية
-                  والصوت الصحيح. يمكنك النقر على كل كلمة في السطر العلوي لتمييزها،
-                  بينما يظهر أسفلها النص الكامل بعلامات التجويد الملوّنة من المصحف
-                  العثماني.
+                  <strong>تلميح:</strong> الآية تظهر هنا بخط عثماني مع علامات
+                  التجويد الملوّنة؛ يمكنك تغيير السورة، الآية، والقارئ من الخيارات
+                  أعلاه ثم الضغط على زر "تطبيق الاختيارات وتحميل الآية".
                 </p>
               </div>
             </div>
@@ -748,4 +688,4 @@ export default function RecitationPage() {
       </div>
     </>
   );
-                }
+}
