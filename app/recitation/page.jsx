@@ -158,6 +158,31 @@ const DEFAULT_AYAH_OPTION = {
   subtext: 'غير محدد (عشوائي)',
 };
 
+/* ============ دالة معالجة نص التجويد (فصل البسملة + إزالة رقم النهاية) ============ */
+
+function processTajweedText(rawHtml, surahNumber, ayahNumber) {
+  if (!rawHtml) {
+    return { basmalaHtml: null, ayahHtml: '', ayahNumber };
+  }
+
+  // إزالة أي span لنهاية الآية مثل <span class="end">١</span> مع الحفاظ على باقي علامات التجويد
+  const withoutEndSpan = rawHtml.replace(
+    /<span[^>]*class=["']?end["']?[^>]*>.*?<\/span>/gi,
+    ''
+  ).trim();
+
+  let basmalaHtml = null;
+  let ayahHtml = withoutEndSpan;
+
+  // فصل البسملة عن أول آية من الفاتحة فقط (سورة 1 آية 1)
+  if (surahNumber === 1 && ayahNumber === 1) {
+    basmalaHtml = withoutEndSpan;
+    ayahHtml = ''; // لا نكرر النص داخل حاوية الآية نفسها
+  }
+
+  return { basmalaHtml, ayahHtml, ayahNumber };
+}
+
 export default function RecitationPage() {
   const [verse, setVerse] = useState(null);
   const [words, setWords] = useState([]);
@@ -270,7 +295,7 @@ export default function RecitationPage() {
           ? RECITERS[Math.floor(Math.random() * (RECITERS.length - 1)) + 1]
           : RECITERS.find((r) => r.id === selectedReciter);
 
-      // تحديد نهاية المقطع (إذا لم تُحدَّد نعتبرها مثل البداية أو نهاية السورة)
+      // تحديد نهاية المقطع
       let endSurahNum = selectedSurahEnd || surahNum;
       let endAyahNum = selectedAyahEnd;
       if (endAyahNum === 0) {
@@ -283,7 +308,7 @@ export default function RecitationPage() {
       setRangeEndSurah(endSurahNum);
       setRangeEndAyah(endAyahNum);
 
-      // *** هنا التعديل الأول: استخدام quran-uthmani-tajweed ***
+      // استخدام quran-uthmani-tajweed لنص التجويد
       const verseResponse = await fetch(
         `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/editions/quran-uthmani-tajweed,${reciterData.edition}`
       );
@@ -293,8 +318,11 @@ export default function RecitationPage() {
         const textData = verseData.data[0];
         const audioData = verseData.data[1];
 
+        const processed = processTajweedText(textData.text, surahNum, ayahNum);
+
         const verseObj = {
-          text: textData.text,
+          text: processed.ayahHtml,
+          basmala: processed.basmalaHtml,
           surah: textData.surah.name,
           surahNumber: surahNum,
           number: ayahNum,
@@ -323,6 +351,7 @@ export default function RecitationPage() {
       console.error('خطأ في جلب الآية:', error);
       setVerse({
         text: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+        basmala: null,
         surah: 'الفاتحة',
         surahNumber: 1,
         number: 1,
@@ -346,7 +375,6 @@ export default function RecitationPage() {
       return;
     }
 
-    // التأكد هل وصلنا للنهاية
     if (
       currentSurah > rangeEndSurah ||
       (currentSurah === rangeEndSurah && currentAyah >= rangeEndAyah)
@@ -360,13 +388,11 @@ export default function RecitationPage() {
     const currentSurahMeta = surahs.find((s) => s.id === currentSurah);
     const lastAyahCurrent = currentSurahMeta?.verses_count || currentAyah;
 
-    // الانتقال للسورة التالية إذا انتهت الآيات
     if (nextAyah > lastAyahCurrent) {
       nextSurah = currentSurah + 1;
       nextAyah = 1;
     }
 
-    // عدم تجاوز نهاية المقطع
     if (
       nextSurah > rangeEndSurah ||
       (nextSurah === rangeEndSurah && nextAyah > rangeEndAyah)
@@ -380,7 +406,6 @@ export default function RecitationPage() {
           ? RECITERS.find((r) => r.name === verse?.reciter) || RECITERS[1]
           : RECITERS.find((r) => r.id === selectedReciter);
 
-      // *** هنا التعديل الثاني: أيضًا quran-uthmani-tajweed ***
       const verseResponse = await fetch(
         `https://api.alquran.cloud/v1/ayah/${nextSurah}:${nextAyah}/editions/quran-uthmani-tajweed,${reciterData.edition}`
       );
@@ -390,8 +415,11 @@ export default function RecitationPage() {
         const textData = verseData.data[0];
         const audioData = verseData.data[1];
 
+        const processed = processTajweedText(textData.text, nextSurah, nextAyah);
+
         const verseObj = {
-          text: textData.text,
+          text: processed.ayahHtml,
+          basmala: processed.basmalaHtml,
           surah: textData.surah.name,
           surahNumber: nextSurah,
           number: nextAyah,
@@ -417,7 +445,6 @@ export default function RecitationPage() {
           setWords([]);
         }
 
-        // تشغيل الصوت تلقائياً للآية التالية
         if (audioRef.current) {
           audioRef.current.load();
           audioRef.current.play().catch(() => {});
@@ -429,7 +456,6 @@ export default function RecitationPage() {
   };
 
   const handleAudioEnded = () => {
-    // عند انتهاء الصوت، نحاول جلب الآية التالية
     fetchNextInRange();
   };
 
@@ -525,197 +551,21 @@ export default function RecitationPage() {
                 </p>
               </div>
 
-              {/* *** هنا التعديل الثالث: عرض نص التجويد من verse.text *** */}
+              {/* حاوية نص التجويد مع فصل البسملة + ترقيم الآية في النهاية */}
               <div className="quran-text bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner">
+                {verse?.basmala && (
+                  <div
+                    className="text-center text-2xl md:text-3xl leading-[2.2rem] mb-4"
+                    dir="rtl"
+                    dangerouslySetInnerHTML={{ __html: verse.basmala }}
+                  />
+                )}
+
                 <div
-                  className="text-center text-3xl md:text-4xl leading-[2.4rem]"
+                  className="flex items-baseline justify-center gap-3"
                   dir="rtl"
-                  dangerouslySetInnerHTML={{ __html: verse?.text || '' }}
-                />
-              </div>
-
-              {/* باقي الصفحة كما هي تمامًا (اختيارات، أزرار، تسجيل، تلميح...) */}
-
-              {/* اختيارات القارئ + بداية/نهاية التلاوة للسورة والآية */}
-              <div className="flex flex-col gap-4 mb-6">
-                <select
-                  value={selectedReciter}
-                  onChange={(e) => setSelectedReciter(Number(e.target.value))}
-                  className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg font-amiri"
                 >
-                  {RECITERS.map((reciter) => (
-                    <option key={reciter.id} value={reciter.id}>
-                      {reciter.subtext
-                        ? `${reciter.name}  ${reciter.subtext}`
-                        : reciter.name}
-                    </option>
-                  ))}
-                </select>
-
-                {/* السورة: بداية التلاوة / نهاية التلاوة */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm text-gray-600 pr-2 text-right">
-                      بداية التلاوة - السورة
-                    </span>
-                    <select
-                      value={selectedSurah}
-                      onChange={(e) => setSelectedSurah(Number(e.target.value))}
-                      className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg font-amiri"
-                    >
-                      {surahs.map((surah) => (
-                        <option key={surah.id} value={surah.id}>
-                          {surah.subtext
-                            ? `${surah.name}  ${surah.subtext}`
-                            : `${surah.id}. ${surah.name}`}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm text-gray-600 pr-2 text-right">
-                      نهاية التلاوة - السورة
-                    </span>
-                    <select
-                      value={selectedSurahEnd}
-                      onChange={(e) => setSelectedSurahEnd(Number(e.target.value))}
-                      className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg font-amiri"
-                    >
-                      {surahs.map((surah) => (
-                        <option key={surah.id} value={surah.id}>
-                          {surah.subtext
-                            ? `${surah.name}  ${surah.subtext}`
-                            : `${surah.id}. ${surah.name}`}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* الآية: بداية التلاوة / نهاية التلاوة */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm text-gray-600 pr-2 text-right">
-                      بداية التلاوة - الآية
-                    </span>
-                    <select
-                      value={selectedAyah}
-                      onChange={(e) => setSelectedAyah(Number(e.target.value))}
-                      disabled={selectedSurah === 0}
-                      className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white disabled:bg-gray-100 disabled:cursor-not-allowed text-lg font-amiri"
-                    >
-                      {availableAyahs.map((ayah) => (
-                        <option key={ayah.number} value={ayah.number}>
-                          {ayah.subtext
-                            ? `${ayah.label}  ${ayah.subtext}`
-                            : ayah.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm text-gray-600 pr-2 text-right">
-                      نهاية التلاوة - الآية
-                    </span>
-                    <select
-                      value={selectedAyahEnd}
-                      onChange={(e) => setSelectedAyahEnd(Number(e.target.value))}
-                      disabled={selectedSurahEnd === 0}
-                      className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white disabled:bg-gray-100 disabled:cursor-not-allowed text-lg font-amiri"
-                    >
-                      {availableAyahsEnd.map((ayah) => (
-                        <option key={ayah.number} value={ayah.number}>
-                          {ayah.subtext
-                            ? `${ayah.label}  ${ayah.subtext}`
-                            : ayah.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* زر تطبيق الاختيارات (زجاجي) */}
-              <button onClick={fetchVerse} className={glassPrimary}>
-                <span className="absolute inset-0 pointer-events-none bg-gradient-to-l from-emerald-500/15 via-sky-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <span className="relative inline-flex items-center justify-center gap-2">
-                  <IconApply />
-                  <span>تطبيق الاختيارات</span>
-                </span>
-              </button>
-
-              {/* مشغل الصوت */}
-              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-4 mt-4">
-                <p className="text-base md:text-lg text-gray-600 mb-2 text-center">
-                  استمع للتلاوة الصحيحة - القارئ:{' '}
-                  <span className="font-bold">{verse?.reciter}</span>
-                </p>
-                {verse?.audio ? (
-                  <audio
-                    key={verse.audio}
-                    ref={audioRef}
-                    controls
-                    onEnded={handleAudioEnded}
-                    className="w-full rounded-full"
-                  >
-                    <source src={verse.audio} type="audio/mpeg" />
-                    المتصفح لا يدعم تشغيل الصوت
-                  </audio>
-                ) : (
-                  <p className="text-center text-gray-500 text-base">
-                    جاري تحميل الصوت...
-                  </p>
-                )}
-              </div>
-
-              {/* زر التسجيل الزجاجي مع حالة التسجيل */}
-              <button
-                onClick={isRecording ? stopRecording : startRecording}
-                className={
-                  isRecording
-                    ? `relative w-full rounded-full px-8 py-4 text-lg font-bold text-white shadow-md transition-all duration-200 flex items-center justify-center gap-2 border border-red-500 bg-red-500 animate-pulse`
-                    : glassSecondaryBase
-                }
-              >
-                {!isRecording && (
-                  <span className="absolute inset-0 pointer-events-none bg-gradient-to-l from-slate-400/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                )}
-                <span className="relative inline-flex items-center justify-center gap-2">
-                  {isRecording ? <IconRecordDot /> : <IconMic />}
-                  <span>{isRecording ? 'إيقاف التسجيل' : 'ابدأ التسجيل'}</span>
-                </span>
-              </button>
-
-              {audioBlob && (
-                <div className="bg-blue-50 p-4 rounded-2xl border border-blue-200 mb-4 mt-4">
-                  <p className="text-sm text-blue-700 mb-2 text-center font-semibold flex items-center justify-center gap-2">
-                    <IconCheck />
-                    <span>تم التسجيل بنجاح!</span>
-                  </p>
-                  <audio controls className="w-full rounded-full">
-                    <source src={URL.createObjectURL(audioBlob)} type="audio/wav" />
-                  </audio>
-                  <p className="text-xs text-gray-600 text-center mt-2">
-                    ميزة تحليل الصوت بالذكاء الاصطناعي ستكون متاحة قريباً
-                  </p>
-                </div>
-              )}
-
-              <div className="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg mt-2">
-                <p className="text-sm text-gray-700 flex items-start gap-2">
-                  <IconHint className="mt-0.5 w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
-                  <span>
-                    <strong>تلميح:</strong> اضغط على "تطبيق الاختيارات" لتحميل الآية
-                    والصوت الصحيح.
-                  </span>
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </>
-  );
-}
+                  <div
+                    className="text-center text-3xl md:text-4xl leading-[2.4rem]"
+                    dangerouslySetInnerHTML={{ __html: verse?.text || '' }}
+                  />
