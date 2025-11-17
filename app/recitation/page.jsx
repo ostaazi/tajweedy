@@ -165,55 +165,44 @@ const DEFAULT_AYAH_OPTION = {
 
 /* ============ دوال مساعدة للتجويد والبسملة ============ */
 
-const BASMALA = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';
-
-// تحديد نهاية البسملة ولو تغيّر شكل التشكيل قليلًا
-function getBasmalaSplitIndex(text) {
+// تحديد المدى الذي يمثّل البسملة في بداية الآية (لإخفائه من العرض)
+function getBasmalaHideRange(text, surahNumber) {
   if (!text) return null;
+  // لا نحذف البسملة من الفاتحة
+  if (surahNumber === 1) return null;
 
-  // نعمل على النص كما هو من الـ API
-  if (!text.startsWith('بِسْمِ اللَّهِ')) return null;
+  // بسم الله الرحمن الرحيم مع ما بعدها من مسافات أو رموز صغيرة إن وجدت
+  const basmalaRegex =
+    /^بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ[ \u0640\u06d6-\u06ed\u0610-\u0615\u06fd\u06fe\u06ff]*/;
 
-  // نبحث فقط عن نهاية كلمة "الرَّحِيمِ"
-  const rahimIndex = text.indexOf('الرَّحِيمِ');
-  if (rahimIndex === -1) return null;
+  const match = text.match(basmalaRegex);
+  if (!match) return null;
 
-  const splitIndex = rahimIndex + 'الرَّحِيمِ'.length;
-
-  // نتأكد أن هناك نصًّا بعد البسملة حتى نضعها في سطر مستقل
-  const rest = text.slice(splitIndex);
-  if (rest.trim().length === 0) {
-    // الآية كلها بسملة فقط
-    return null;
-  }
-
-  return splitIndex;
+  const length = match[0].length; // بعدد المحارف (يتطابق مع Array.from للغة العربية هنا)
+  return { start: 0, end: length };
 }
 
-// بناء HTML التجويد مع إمكانية إدخال سطر بعد البسملة
-function buildTajweedHtml(baseText, annotations, splitIndex = null) {
+// بناء HTML التجويد مع دعم إخفاء مدى معيّن (البسملة)
+function buildTajweedHtml(baseText, annotations, hideRange) {
   if (!baseText) return '';
-  if (!annotations || annotations.length === 0) {
-    if (splitIndex != null) {
-      const chars = Array.from(baseText);
-      const first = chars.slice(0, splitIndex).join('');
-      const rest = chars.slice(splitIndex).join('');
-      return `${first}<br /><br />${rest}`;
-    }
-    return baseText;
-  }
 
   const chars = Array.from(baseText);
-  const meta = chars.map((ch) => ({ ch, rules: [] }));
+  const meta = chars.map((ch, idx) => ({
+    ch,
+    rules: [],
+    hide: hideRange ? idx >= hideRange.start && idx < hideRange.end : false,
+  }));
 
-  annotations.forEach((ann) => {
-    const { start, end, rule } = ann;
-    for (let i = start; i < end; i += 1) {
-      if (meta[i]) {
-        meta[i].rules.push(rule);
+  if (annotations && annotations.length > 0) {
+    annotations.forEach((ann) => {
+      const { start, end, rule } = ann;
+      for (let i = start; i < end; i += 1) {
+        if (meta[i]) {
+          meta[i].rules.push(rule);
+        }
       }
-    }
-  });
+    });
+  }
 
   const sameRules = (a, b) => {
     if (a.length !== b.length) return false;
@@ -223,42 +212,46 @@ function buildTajweedHtml(baseText, annotations, splitIndex = null) {
     return true;
   };
 
+  const sameGroup = (a, b) =>
+    sameRules(a.rules, b.rules) && a.hide === b.hide;
+
   let html = '';
   let i = 0;
 
   while (i < meta.length) {
-    if (splitIndex != null && i === splitIndex) {
-      html += '<br /><br />';
-    }
-
     const currentRules = meta[i].rules;
+    const currentHide = meta[i].hide;
     let j = i + 1;
-    while (j < meta.length && sameRules(meta[j].rules, currentRules)) {
+    while (j < meta.length && sameGroup(meta[j], meta[i])) {
       j += 1;
     }
+
     const segment = meta.slice(i, j).map((c) => c.ch).join('');
 
-    if (currentRules.length === 0) {
+    if (currentHide) {
+      // إخفاء البسملة من العرض مع الحفاظ على أي تلوين إن وجد
+      const classNames = ['q-basmala-hide'];
+      if (currentRules.length > 0) {
+        classNames.push(...currentRules.map((r) => `tj-${r}`));
+      }
+      const classAttr = classNames.join(' ');
+      const dataAttr =
+        currentRules.length > 0
+          ? ` data-tj="${currentRules.join(' ')}"`
+          : '';
+      html += `<span class="${classAttr}"${dataAttr}>${segment}</span>`;
+    } else if (currentRules.length === 0) {
       html += segment;
     } else {
       const className = currentRules.map((r) => `tj-${r}`).join(' ');
       const dataAttr = currentRules.join(' ');
       html += `<span class="${className}" data-tj="${dataAttr}">${segment}</span>`;
     }
+
     i = j;
   }
 
   return html;
-}
-
-// تنظيف HTML من علامات الوقف / الحزب / السجدة (الدوائر السوداء وغيرها)
-function cleanTajweedHtml(html) {
-  if (!html) return html;
-  return html
-    // كل علامات الوقف والزخارف القرآنية (U+06D6–U+06ED)
-    .replace(/[\u06d6-\u06ed]/g, '')
-    // رموز إضافية محتملة: علامات الحزب/الآية/السجدة
-    .replace(/[۝۞۩﴾﴿]/g, '');
 }
 
 export default function RecitationPage() {
@@ -278,7 +271,8 @@ export default function RecitationPage() {
 
   const [selectedSurahEnd, setSelectedSurahEnd] = useState(0);
   const [selectedAyahEnd, setSelectedAyahEnd] = useState(0);
-  const [availableAyahsEnd, setAvailableAyahsEnd] = useState([DEFAULT_AYAH_OPTION]);
+  const [availableAyahsEnd, setAvailableAyahsEnd] =
+    useState([DEFAULT_AYAH_OPTION]);
 
   const [currentSurah, setCurrentSurah] = useState(null);
   const [currentAyah, setCurrentAyah] = useState(null);
@@ -378,7 +372,8 @@ export default function RecitationPage() {
 
       let ayahNum = selectedAyah;
       if (ayahNum === 0 && surahs.length > 0) {
-        const surah = surahs.find((s) => s.id === surahNum) || { verses_count: 7 };
+        const surah =
+          surahs.find((s) => s.id === surahNum) || { verses_count: 7 };
         ayahNum = Math.floor(Math.random() * surah.verses_count) + 1;
       } else if (ayahNum === 0) {
         ayahNum = 1;
@@ -411,15 +406,15 @@ export default function RecitationPage() {
         const audioData = verseData.data[1];
 
         const originalText = textData.text || '';
-        const splitIndex = getBasmalaSplitIndex(originalText);
+        const hideRange = getBasmalaHideRange(originalText, surahNum);
         const key = `${surahNum}:${ayahNum}`;
         const annotations = tajweedMap ? tajweedMap[key] : null;
 
-        let tajweedHtml = annotations
-          ? buildTajweedHtml(originalText, annotations, splitIndex)
-          : buildTajweedHtml(originalText, [], splitIndex);
-
-        tajweedHtml = cleanTajweedHtml(tajweedHtml);
+        const tajweedHtml = buildTajweedHtml(
+          originalText,
+          annotations || [],
+          hideRange
+        );
 
         const verseObj = {
           text: originalText,
@@ -450,14 +445,13 @@ export default function RecitationPage() {
       }
     } catch (error) {
       console.error('خطأ في جلب الآية:', error);
-      const fallbackText = BASMALA;
       setVerse({
-        text: fallbackText,
-        html: fallbackText,
+        text: '',
+        html: '',
         surah: 'الفاتحة',
         surahNumber: 1,
         number: 1,
-        audio: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3',
+        audio: '',
         reciter: RECITERS[1].name,
       });
       setWords([]);
@@ -482,7 +476,8 @@ export default function RecitationPage() {
     let nextAyah = currentAyah + 1;
 
     const currentSurahMeta = surahs.find((s) => s.id === currentSurah);
-    const lastAyahCurrent = currentSurahMeta?.verses_count || currentAyah;
+    const lastAyahCurrent =
+      currentSurahMeta?.verses_count || currentAyah;
 
     if (nextAyah > lastAyahCurrent) {
       nextSurah = currentSurah + 1;
@@ -512,15 +507,15 @@ export default function RecitationPage() {
         const audioData = verseData.data[1];
 
         const originalText = textData.text || '';
-        const splitIndex = getBasmalaSplitIndex(originalText);
+        const hideRange = getBasmalaHideRange(originalText, nextSurah);
         const key = `${nextSurah}:${nextAyah}`;
         const annotations = tajweedMap ? tajweedMap[key] : null;
 
-        let tajweedHtml = annotations
-          ? buildTajweedHtml(originalText, annotations, splitIndex)
-          : buildTajweedHtml(originalText, [], splitIndex);
-
-        tajweedHtml = cleanTajweedHtml(tajweedHtml);
+        const tajweedHtml = buildTajweedHtml(
+          originalText,
+          annotations || [],
+          hideRange
+        );
 
         const verseObj = {
           text: originalText,
@@ -566,7 +561,8 @@ export default function RecitationPage() {
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream =
+        await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
       const audioChunks = [];
 
@@ -615,6 +611,10 @@ export default function RecitationPage() {
 
         .quran-text {
           font-family: 'UthmanicHafs', 'Amiri', 'Scheherazade New', serif;
+        }
+
+        .q-basmala-hide {
+          display: none;
         }
 
         .tj-madd_2,
@@ -669,7 +669,12 @@ export default function RecitationPage() {
               <span>العودة للرئيسية</span>
             </Link>
             <div className="w-12 h-12 relative">
-              <Image src="/logo.png" alt="Logo" fill className="object-contain" />
+              <Image
+                src="/logo.png"
+                alt="Logo"
+                fill
+                className="object-contain"
+              />
             </div>
           </div>
 
@@ -681,7 +686,7 @@ export default function RecitationPage() {
 
           {loading ? (
             <div className="bg-white p-12 rounded-3xl shadow-lg border border-gray-100 text-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#1e7850] border-t-transparent mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#1e7850] border-t-transparent mx-auto mb-4" />
               <p className="text-gray-600 text-lg">جاري تحميل الآية...</p>
             </div>
           ) : (
@@ -699,7 +704,9 @@ export default function RecitationPage() {
                 <div
                   className="text-center text-3xl md:text-4xl leading-[3.1rem] md:leading-[3.4rem]"
                   dir="rtl"
-                  dangerouslySetInnerHTML={{ __html: verse?.html || verse?.text || '' }}
+                  dangerouslySetInnerHTML={{
+                    __html: verse?.html || verse?.text || '',
+                  }}
                 />
               </div>
 
@@ -744,7 +751,9 @@ export default function RecitationPage() {
                     </span>
                     <select
                       value={selectedSurahEnd}
-                      onChange={(e) => setSelectedSurahEnd(Number(e.target.value))}
+                      onChange={(e) =>
+                        setSelectedSurahEnd(Number(e.target.value))
+                      }
                       className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg font-amiri"
                     >
                       {surahs.map((surah) => (
@@ -785,7 +794,9 @@ export default function RecitationPage() {
                     </span>
                     <select
                       value={selectedAyahEnd}
-                      onChange={(e) => setSelectedAyahEnd(Number(e.target.value))}
+                      onChange={(e) =>
+                        setSelectedAyahEnd(Number(e.target.value))
+                      }
                       disabled={selectedSurahEnd === 0}
                       className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white disabled:bg-gray-100 disabled:cursor-not-allowed text-lg font-amiri"
                     >
@@ -856,7 +867,10 @@ export default function RecitationPage() {
                     <span>تم التسجيل بنجاح!</span>
                   </p>
                   <audio controls className="w-full rounded-full">
-                    <source src={URL.createObjectURL(audioBlob)} type="audio/wav" />
+                    <source
+                      src={URL.createObjectURL(audioBlob)}
+                      type="audio/wav"
+                    />
                   </audio>
                   <p className="text-xs text-gray-600 text-center mt-2">
                     ميزة تحليل الصوت بالذكاء الاصطناعي ستكون متاحة قريباً
@@ -868,8 +882,8 @@ export default function RecitationPage() {
                 <p className="text-sm text-gray-700 flex items-start gap-2">
                   <IconHint className="mt-0.5 w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
                   <span>
-                    <strong>تلميح:</strong> اضغط على "تطبيق الاختيارات" لتحميل الآية
-                    والصوت الصحيح.
+                    <strong>تلميح:</strong> اضغط على "تطبيق الاختيارات" لتحميل
+                    الآية والصوت الصحيح.
                   </span>
                 </p>
               </div>
@@ -879,4 +893,4 @@ export default function RecitationPage() {
       </div>
     </>
   );
-}
+      }
