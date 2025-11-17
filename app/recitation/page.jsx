@@ -159,31 +159,31 @@ const DEFAULT_AYAH_OPTION = {
 };
 
 export default function RecitationPage() {
-  const [verse, setVerse] = useState<any>(null);
-  const [words, setWords] = useState<any[]>([]);
-  const [surahs, setSurahs] = useState<any[]>([]);
+  const [verse, setVerse] = useState(null);
+  const [words, setWords] = useState([]);
+  const [surahs, setSurahs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [audioBlob, setAudioBlob] = useState(null);
   const [highlightedWordIndex, setHighlightedWordIndex] = useState(-1);
 
   const [selectedReciter, setSelectedReciter] = useState(0);
   const [selectedSurah, setSelectedSurah] = useState(0); // بداية التلاوة - السورة
   const [selectedAyah, setSelectedAyah] = useState(0);   // بداية التلاوة - الآية
-  const [availableAyahs, setAvailableAyahs] = useState<any[]>([DEFAULT_AYAH_OPTION]);
+  const [availableAyahs, setAvailableAyahs] = useState([DEFAULT_AYAH_OPTION]);
 
   const [selectedSurahEnd, setSelectedSurahEnd] = useState(0); // نهاية التلاوة - السورة
   const [selectedAyahEnd, setSelectedAyahEnd] = useState(0);   // نهاية التلاوة - الآية
-  const [availableAyahsEnd, setAvailableAyahsEnd] = useState<any[]>([DEFAULT_AYAH_OPTION]);
+  const [availableAyahsEnd, setAvailableAyahsEnd] = useState([DEFAULT_AYAH_OPTION]);
 
   // حالة لتتبع موضعنا الحالي ونهاية المقطع
-  const [currentSurah, setCurrentSurah] = useState<number | null>(null);
-  const [currentAyah, setCurrentAyah] = useState<number | null>(null);
-  const [rangeEndSurah, setRangeEndSurah] = useState<number | null>(null);
-  const [rangeEndAyah, setRangeEndAyah] = useState<number | null>(null);
+  const [currentSurah, setCurrentSurah] = useState(null);
+  const [currentAyah, setCurrentAyah] = useState(null);
+  const [rangeEndSurah, setRangeEndSurah] = useState(null);
+  const [rangeEndAyah, setRangeEndAyah] = useState(null);
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef(null);
 
   useEffect(() => {
     fetchSurahs();
@@ -196,7 +196,7 @@ export default function RecitationPage() {
       const data = await response.json();
       const surahsList = [
         { id: 0, name: 'اسم السورة', subtext: 'غير محدد (عشوائي)', verses_count: 0 },
-        ...data.data.surahs.references.map((s: any) => ({
+        ...data.data.surahs.references.map((s) => ({
           id: s.number,
           name: s.name,
           subtext: null,
@@ -268,7 +268,7 @@ export default function RecitationPage() {
       let reciterData =
         selectedReciter === 0
           ? RECITERS[Math.floor(Math.random() * (RECITERS.length - 1)) + 1]
-          : RECITERS.find((r) => r.id === selectedReciter)!;
+          : RECITERS.find((r) => r.id === selectedReciter);
 
       // تحديد نهاية المقطع (إذا لم تُحدَّد نعتبرها مثل البداية أو نهاية السورة)
       let endSurahNum = selectedSurahEnd || surahNum;
@@ -283,7 +283,6 @@ export default function RecitationPage() {
       setRangeEndSurah(endSurahNum);
       setRangeEndAyah(endAyahNum);
 
-      // نص الآية + الصوت من alquran.cloud (كما في النسخة الأصلية)
       const verseResponse = await fetch(
         `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/editions/quran-uthmani,${reciterData.edition}`
       );
@@ -304,10 +303,9 @@ export default function RecitationPage() {
 
         setVerse(verseObj);
 
-        // كلمات الآية من Quran.com مع text_uthmani_tajweed (علامات التجويد)
         try {
           const wordsResponse = await fetch(
-            `https://api.quran.com/api/v4/verses/by_key/${surahNum}:${ayahNum}?language=ar&words=true&word_fields=text_uthmani_tajweed,text_uthmani`
+            `https://api.quran.com/api/v4/verses/by_key/${surahNum}:${ayahNum}?language=ar&words=true&word_fields=text_uthmani`
           );
           const wordsData = await wordsResponse.json();
           if (wordsData.verse && wordsData.verse.words) {
@@ -316,7 +314,7 @@ export default function RecitationPage() {
             setWords([]);
           }
         } catch (err) {
-          console.log('تعذر جلب الكلمات من Quran.com', err);
+          console.log('تعذر جلب الكلمات');
           setWords([]);
         }
       }
@@ -379,7 +377,7 @@ export default function RecitationPage() {
       let reciterData =
         selectedReciter === 0
           ? RECITERS.find((r) => r.name === verse?.reciter) || RECITERS[1]
-          : RECITERS.find((r) => r.id === selectedReciter)!;
+          : RECITERS.find((r) => r.id === selectedReciter);
 
       const verseResponse = await fetch(
         `https://api.alquran.cloud/v1/ayah/${nextSurah}:${nextAyah}/editions/quran-uthmani,${reciterData.edition}`
@@ -405,7 +403,7 @@ export default function RecitationPage() {
 
         try {
           const wordsResponse = await fetch(
-            `https://api.quran.com/api/v4/verses/by_key/${nextSurah}:${nextAyah}?language=ar&words=true&word_fields=text_uthmani_tajweed,text_uthmani`
+            `https://api.quran.com/api/v4/verses/by_key/${nextSurah}:${nextAyah}?language=ar&words=true&word_fields=text_uthmani`
           );
           const wordsData = await wordsResponse.json();
           if (wordsData.verse && wordsData.verse.words) {
@@ -437,7 +435,7 @@ export default function RecitationPage() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
-      const audioChunks: BlobPart[] = [];
+      const audioChunks = [];
 
       recorder.ondataavailable = (event) => {
         audioChunks.push(event.data);
@@ -537,14 +535,9 @@ export default function RecitationPage() {
                             ? 'bg-green-200 shadow-md scale-110'
                             : 'hover:bg-green-50'
                         }`}
-                        // نص الكلمة مع علامات التجويد (HTML من Quran.com)
-                        dangerouslySetInnerHTML={{
-                          __html:
-                            word.text_uthmani_tajweed ||
-                            word.text_uthmani ||
-                            '',
-                        }}
-                      />
+                      >
+                        {word.text_uthmani}
+                      </span>
                     ))}
                   </div>
                 ) : (
@@ -723,6 +716,7 @@ export default function RecitationPage() {
 
               <div className="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg mt-2">
                 <p className="text-sm text-gray-700 flex items-start gap-2">
+                  {/* 🔽 هنا فقط صغرنا الأيقونة لتناسب التلميح */}
                   <IconHint className="mt-0.5 w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
                   <span>
                     <strong>تلميح:</strong> اضغط على "تطبيق الاختيارات" لتحميل الآية
