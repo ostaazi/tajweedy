@@ -283,9 +283,8 @@ export default function RecitationPage() {
       setRangeEndSurah(endSurahNum);
       setRangeEndAyah(endAyahNum);
 
-      // *** هنا التعديل الأول: استخدام quran-uthmani-tajweed ***
       const verseResponse = await fetch(
-        `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/editions/quran-uthmani-tajweed,${reciterData.edition}`
+        `https://api.alquran.cloud/v1/ayah/${surahNum}:${ayahNum}/editions/quran-uthmani,${reciterData.edition}`
       );
       const verseData = await verseResponse.json();
 
@@ -380,9 +379,8 @@ export default function RecitationPage() {
           ? RECITERS.find((r) => r.name === verse?.reciter) || RECITERS[1]
           : RECITERS.find((r) => r.id === selectedReciter);
 
-      // *** هنا التعديل الثاني: أيضًا quran-uthmani-tajweed ***
       const verseResponse = await fetch(
-        `https://api.alquran.cloud/v1/ayah/${nextSurah}:${nextAyah}/editions/quran-uthmani-tajweed,${reciterData.edition}`
+        `https://api.alquran.cloud/v1/ayah/${nextSurah}:${nextAyah}/editions/quran-uthmani,${reciterData.edition}`
       );
       const verseData = await verseResponse.json();
 
@@ -525,16 +523,29 @@ export default function RecitationPage() {
                 </p>
               </div>
 
-              {/* *** هنا التعديل الثالث: عرض نص التجويد من verse.text *** */}
               <div className="quran-text bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl border-2 border-green-100 mb-6 shadow-inner">
-                <div
-                  className="text-center text-3xl md:text-4xl leading-[2.4rem]"
-                  dir="rtl"
-                  dangerouslySetInnerHTML={{ __html: verse?.text || '' }}
-                />
+                {words.length > 0 ? (
+                  <div className="flex flex-wrap justify-center gap-1" dir="rtl">
+                    {words.map((word, index) => (
+                      <span
+                        key={index}
+                        onClick={() => setHighlightedWordIndex(index)}
+                        className={`cursor-pointer px-3 py-2 rounded-lg transition-all text-3xl md:text-4xl ${
+                          highlightedWordIndex === index
+                            ? 'bg-green-200 shadow-md scale-110'
+                            : 'hover:bg-green-50'
+                        }`}
+                      >
+                        {word.text_uthmani}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center text-3xl md:text-4xl">
+                    {verse?.text}
+                  </div>
+                )}
               </div>
-
-              {/* باقي الصفحة كما هي تمامًا (اختيارات، أزرار، تسجيل، تلميح...) */}
 
               {/* اختيارات القارئ + بداية/نهاية التلاوة للسورة والآية */}
               <div className="flex flex-col gap-4 mb-6">
@@ -705,10 +716,11 @@ export default function RecitationPage() {
 
               <div className="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg mt-2">
                 <p className="text-sm text-gray-700 flex items-start gap-2">
+                  {/* 🔽 هنا فقط صغرنا الأيقونة لتناسب التلميح */}
                   <IconHint className="mt-0.5 w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
                   <span>
                     <strong>تلميح:</strong> اضغط على "تطبيق الاختيارات" لتحميل الآية
-                    والصوت الصحيح.
+                    والصوت الصحيح. انقر على أي كلمة لتمييزها.
                   </span>
                 </p>
               </div>
