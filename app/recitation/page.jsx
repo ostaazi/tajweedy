@@ -569,3 +569,194 @@ export default function RecitationPage() {
                     className="text-center text-3xl md:text-4xl leading-[2.4rem]"
                     dangerouslySetInnerHTML={{ __html: verse?.text || '' }}
                   />
+                  {verse?.number != null && (
+                    <span className="text-2xl md:text-3xl text-emerald-700 font-bold">
+                      {verse.number}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* اختيارات القارئ + بداية/نهاية التلاوة للسورة والآية */}
+              <div className="flex flex-col gap-4 mb-6">
+                <select
+                  value={selectedReciter}
+                  onChange={(e) => setSelectedReciter(Number(e.target.value))}
+                  className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg font-amiri"
+                >
+                  {RECITERS.map((reciter) => (
+                    <option key={reciter.id} value={reciter.id}>
+                      {reciter.subtext
+                        ? `${reciter.name}  ${reciter.subtext}`
+                        : reciter.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* السورة: بداية التلاوة / نهاية التلاوة */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm text-gray-600 pr-2 text-right">
+                      بداية التلاوة - السورة
+                    </span>
+                    <select
+                      value={selectedSurah}
+                      onChange={(e) => setSelectedSurah(Number(e.target.value))}
+                      className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg font-amiri"
+                    >
+                      {surahs.map((surah) => (
+                        <option key={surah.id} value={surah.id}>
+                          {surah.subtext
+                            ? `${surah.name}  ${surah.subtext}`
+                            : `${surah.id}. ${surah.name}`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm text-gray-600 pr-2 text-right">
+                      نهاية التلاوة - السورة
+                    </span>
+                    <select
+                      value={selectedSurahEnd}
+                      onChange={(e) => setSelectedSurahEnd(Number(e.target.value))}
+                      className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white text-lg font-amiri"
+                    >
+                      {surahs.map((surah) => (
+                        <option key={surah.id} value={surah.id}>
+                          {surah.subtext
+                            ? `${surah.name}  ${surah.subtext}`
+                            : `${surah.id}. ${surah.name}`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* الآية: بداية التلاوة / نهاية التلاوة */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm text-gray-600 pr-2 text-right">
+                      بداية التلاوة - الآية
+                    </span>
+                    <select
+                      value={selectedAyah}
+                      onChange={(e) => setSelectedAyah(Number(e.target.value))}
+                      disabled={selectedSurah === 0}
+                      className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white disabled:bg-gray-100 disabled:cursor-not-allowed text-lg font-amiri"
+                    >
+                      {availableAyahs.map((ayah) => (
+                        <option key={ayah.number} value={ayah.number}>
+                          {ayah.subtext
+                            ? `${ayah.label}  ${ayah.subtext}`
+                            : ayah.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm text-gray-600 pr-2 text-right">
+                      نهاية التلاوة - الآية
+                    </span>
+                    <select
+                      value={selectedAyahEnd}
+                      onChange={(e) => setSelectedAyahEnd(Number(e.target.value))}
+                      disabled={selectedSurahEnd === 0}
+                      className="w-full p-4 border-2 border-gray-200 rounded-2xl focus:border-[#1e7850] focus:outline-none text-center font-semibold bg-white disabled:bg-gray-100 disabled:cursor-not-allowed text-lg font-amiri"
+                    >
+                      {availableAyahsEnd.map((ayah) => (
+                        <option key={ayah.number} value={ayah.number}>
+                          {ayah.subtext
+                            ? `${ayah.label}  ${ayah.subtext}`
+                            : ayah.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* زر تطبيق الاختيارات (زجاجي) */}
+              <button onClick={fetchVerse} className={glassPrimary}>
+                <span className="absolute inset-0 pointer-events-none bg-gradient-to-l from-emerald-500/15 via-sky-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="relative inline-flex items-center justify-center gap-2">
+                  <IconApply />
+                  <span>تطبيق الاختيارات</span>
+                </span>
+              </button>
+
+              {/* مشغل الصوت */}
+              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-4 mt-4">
+                <p className="text-base md:text-lg text-gray-600 mb-2 text-center">
+                  استمع للتلاوة الصحيحة - القارئ:{' '}
+                  <span className="font-bold">{verse?.reciter}</span>
+                </p>
+                {verse?.audio ? (
+                  <audio
+                    key={verse.audio}
+                    ref={audioRef}
+                    controls
+                    onEnded={handleAudioEnded}
+                    className="w-full rounded-full"
+                  >
+                    <source src={verse.audio} type="audio/mpeg" />
+                    المتصفح لا يدعم تشغيل الصوت
+                  </audio>
+                ) : (
+                  <p className="text-center text-gray-500 text-base">
+                    جاري تحميل الصوت...
+                  </p>
+                )}
+              </div>
+
+              {/* زر التسجيل الزجاجي مع حالة التسجيل */}
+              <button
+                onClick={isRecording ? stopRecording : startRecording}
+                className={
+                  isRecording
+                    ? `relative w-full rounded-full px-8 py-4 text-lg font-bold text-white shadow-md transition-all duration-200 flex items-center justify-center gap-2 border border-red-500 bg-red-500 animate-pulse`
+                    : glassSecondaryBase
+                }
+              >
+                {!isRecording && (
+                  <span className="absolute inset-0 pointer-events-none bg-gradient-to-l from-slate-400/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                )}
+                <span className="relative inline-flex items-center justify-center gap-2">
+                  {isRecording ? <IconRecordDot /> : <IconMic />}
+                  <span>{isRecording ? 'إيقاف التسجيل' : 'ابدأ التسجيل'}</span>
+                </span>
+              </button>
+
+              {audioBlob && (
+                <div className="bg-blue-50 p-4 rounded-2xl border border-blue-200 mb-4 mt-4">
+                  <p className="text-sm text-blue-700 mb-2 text-center font-semibold flex items-center justify-center gap-2">
+                    <IconCheck />
+                    <span>تم التسجيل بنجاح!</span>
+                  </p>
+                  <audio controls className="w-full rounded-full">
+                    <source src={URL.createObjectURL(audioBlob)} type="audio/wav" />
+                  </audio>
+                  <p className="text-xs text-gray-600 text-center mt-2">
+                    ميزة تحليل الصوت بالذكاء الاصطناعي ستكون متاحة قريباً
+                  </p>
+                </div>
+              )}
+
+              <div className="bg-yellow-50 border-r-4 border-yellow-400 p-4 rounded-lg mt-2">
+                <p className="text-sm text-gray-700 flex items-start gap-2">
+                  <IconHint className="mt-0.5 w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
+                  <span>
+                    <strong>تلميح:</strong> اضغط على "تطبيق الاختيارات" لتحميل الآية
+                    والصوت الصحيح.
+                  </span>
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
